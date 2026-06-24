@@ -9,6 +9,8 @@ This plugin adds a "Hello World" page to the RHOAI Dashboard that displays:
 - A clickable button that tracks interactions
 - Plugin metadata (version, deployment mode)
 
+Built with **PatternFly v6** UI components.
+
 ## Architecture
 
 This plugin uses the **Module Federation** pattern to integrate with the RHOAI Dashboard:
@@ -95,6 +97,14 @@ npm run build
 ```
 
 This produces a production build in the `dist/` directory.
+
+### Testing
+
+```bash
+npm test
+```
+
+Tests use semantic queries (`getByRole`, `getByText`) to verify real PatternFly v6 components. React Router is mocked for test isolation, but UI components render and behave as in production.
 
 ### Container Build (Podman)
 

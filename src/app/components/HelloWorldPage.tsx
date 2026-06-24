@@ -1,14 +1,13 @@
 import React from 'react';
 import {
   PageSection,
-  Text,
-  TextContent,
-  TextVariants,
+  Content,
   Title,
   Flex,
   FlexItem,
   Button,
   Alert,
+  AlertActionCloseButton,
   AlertVariant,
   Stack,
   StackItem,
@@ -26,7 +25,7 @@ const HelloWorldPage: React.FC = () => {
   };
 
   return (
-    <PageSection variant="light">
+    <PageSection>
       <Stack>
         <StackItem>
           <Flex justifyContent={{ default: 'justifyContentCenter' }}>
@@ -41,15 +40,16 @@ const HelloWorldPage: React.FC = () => {
         <StackItem>
           <Flex justifyContent={{ default: 'justifyContentCenter' }}>
             <FlexItem>
-              <Alert
-                variant={AlertVariant.success}
-                title="Welcome to RHOAI!"
-                isInline
-                isVisible={showAlert}
-                onClose={() => setShowAlert(false)}
-              >
-                This is your first RHOAI community plugin!
-              </Alert>
+              {showAlert && (
+                <Alert
+                  variant={AlertVariant.success}
+                  title="Welcome to RHOAI!"
+                  isInline
+                  actionClose={<AlertActionCloseButton onClose={() => setShowAlert(false)} />}
+                >
+                  This is your first RHOAI community plugin!
+                </Alert>
+              )}
             </FlexItem>
           </Flex>
         </StackItem>
@@ -60,13 +60,11 @@ const HelloWorldPage: React.FC = () => {
             display={{ default: 'displayFlex' }}
           >
             <FlexItem>
-              <TextContent>
-                <Text component={TextVariants.p}>
-                  This is a simple <strong>Hello World</strong> plugin for the Red Hat OpenShift
-                  AI (RHOAI) Dashboard. It demonstrates how to create a community plugin that
-                  integrates with the dashboard using Module Federation.
-                </Text>
-              </TextContent>
+              <Content component="p">
+                This is a simple <strong>Hello World</strong> plugin for the Red Hat OpenShift
+                AI (RHOAI) Dashboard. It demonstrates how to create a community plugin that
+                integrates with the dashboard using Module Federation.
+              </Content>
             </FlexItem>
           </Flex>
         </StackItem>
@@ -94,11 +92,9 @@ const HelloWorldPage: React.FC = () => {
             display={{ default: 'displayFlex' }}
           >
             <FlexItem>
-              <TextContent>
-                <Text component={TextVariants.small} color="color2">
-                  Plugin Version: 0.1.0 | Deployment Mode: Module Federation
-                </Text>
-              </TextContent>
+              <Content component="small">
+                Plugin Version: 0.1.0 | Deployment Mode: Module Federation
+              </Content>
             </FlexItem>
           </Flex>
         </StackItem>
