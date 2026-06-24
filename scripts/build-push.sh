@@ -8,16 +8,20 @@ DEFAULT_VERSION="0.1.0"
 
 # Get the next semantic version tag
 get_next_version() {
-  local remote_tags
-  remote_tags=$(git ls-remote --tags origin 2>/dev/null | grep -oP 'refs/tags/v?\K[0-9]+\.[0-9]+\.[0-9]+' || true)
-
   local max_version="0.0.0"
+
+  # Check remote tags (macOS compatible - no -P flag)
+  local remote_tags
+  remote_tags=$(git ls-remote --tags origin 2>/dev/null | sed -nE 's|.*/(v?[0-9]+\.[0-9]+\.[0-9]+)$|\1|p' || true)
+
   if [[ -n "$remote_tags" ]]; then
     while IFS= read -r tag; do
-      # Compare semver: check major, then minor, then patch
-      local IFS='.'
-      read -r major minor patch <<< "$tag"
-      read -r max_major max_minor max_patch <<< "$max_version"
+      # Strip leading 'v' if present
+      tag="${tag#v}"
+      local major minor patch
+      IFS='.' read -r major minor patch <<< "$tag"
+      local max_major max_minor max_patch
+      IFS='.' read -r max_major max_minor max_patch <<< "$max_version"
 
       if [[ "$major" -gt "$max_major" ]] || \
          [[ "$major" -eq "$max_major" && "$minor" -gt "$max_minor" ]] || \
@@ -32,11 +36,11 @@ get_next_version() {
   local_tags=$(git tag -l 'v?[0-9]*.[0-9]*.[0-9]*' 2>/dev/null || true)
   if [[ -n "$local_tags" ]]; then
     while IFS= read -r tag; do
-      # Strip leading 'v' if present
       tag="${tag#v}"
-      local IFS='.'
-      read -r major minor patch <<< "$tag"
-      read -r max_major max_minor max_patch <<< "$max_version"
+      local major minor patch
+      IFS='.' read -r major minor patch <<< "$tag"
+      local max_major max_minor max_patch
+      IFS='.' read -r max_major max_minor max_patch <<< "$max_version"
 
       if [[ "$major" -gt "$max_major" ]] || \
          [[ "$major" -eq "$max_major" && "$minor" -gt "$max_minor" ]] || \
@@ -47,8 +51,8 @@ get_next_version() {
   fi
 
   # Increment minor version
-  local IFS='.'
-  read -r major minor patch <<< "$max_version"
+  local major minor patch
+  IFS='.' read -r major minor patch <<< "$max_version"
   echo "$major.$((minor + 1)).0"
 }
 
