@@ -1,10 +1,10 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { ModuleFederationPlugin } = require('webpack').container;
 const path = require('path');
-const { name, version, moduleFederation } = require('../package.json');
+const { name, version, 'module-federation': moduleFederation } = require('../package.json');
 const stylePaths = require('./stylePaths');
 
-const remoteEntry = path.posix.join(moduleFederation.filename);
+const remoteEntry = path.posix.join(moduleFederation.remoteEntry);
 
 module.exports = {
   entry: './src/index.ts',
@@ -16,8 +16,17 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: true,
+            compilerOptions: {
+              noEmit: false,
+            },
+          },
+        },
+        include: /src/,
+        exclude: /\.test\.(ts|tsx)$/,
       },
       {
         test: /\.css$/,
@@ -47,7 +56,7 @@ module.exports = {
       template: path.resolve(__dirname, '../src/index.html'),
     }),
     new ModuleFederationPlugin({
-      name,
+      name: "helloWorld",
       filename: remoteEntry,
       exposes: {
         './extensions': './src/rhoai/extensions.ts',
