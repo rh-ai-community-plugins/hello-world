@@ -31,7 +31,7 @@ const HelloWorldPage: React.FC = () => {
           <Flex justifyContent={{ default: 'justifyContentCenter' }}>
             <FlexItem>
               <Title headingLevel="h1" size="xl">
-                <TerminalIcon color="#6b21a8" /> Hello World Plugin
+                <TerminalIcon color="#6b21a8" /> Hello Plugin World!
               </Title>
             </FlexItem>
           </Flex>

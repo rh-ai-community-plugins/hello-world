@@ -3,9 +3,9 @@ import { render, screen } from '@testing-library/react';
 import App from './App';
 
 describe('App Component', () => {
-  it('should render the page title "Hello World Plugin"', () => {
+  it('should render the page title "Hello Plugin World!"', () => {
     render(<App />);
-    expect(screen.getByText('Hello World Plugin')).toBeInTheDocument();
+    expect(screen.getByText('Hello Plugin World!')).toBeInTheDocument();
   });
 
   it('should render the description text', () => {

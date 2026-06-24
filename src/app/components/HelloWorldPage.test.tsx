@@ -13,7 +13,7 @@ describe('HelloWorldPage Component', () => {
 
   it('should render the page title', () => {
     render(<HelloWorldPage />);
-    expect(screen.getByText('Hello World Plugin')).toBeInTheDocument();
+    expect(screen.getByText('Hello Plugin World!')).toBeInTheDocument();
   });
 
   it('should render the description text', () => {
