@@ -59,7 +59,7 @@ hello-plugin-world/
 │   ├── webpack.prod.js       # Production webpack config
 │   ├── moduleFederation.js   # Module Federation plugin config
 │   └── stylePaths.js         # Style path configuration
-├── Dockerfile                # Container build definition
+├── Containerfile             # Container build definition (podman)
 ├── package.json              # Dependencies and scripts
 ├── tsconfig.json             # TypeScript configuration
 ├── .env.development          # Development environment variables
@@ -96,10 +96,10 @@ npm run build
 
 This produces a production build in the `dist/` directory.
 
-### Docker Build
+### Container Build (Podman)
 
 ```bash
-docker build -t quay.io/<your-username>/hello-plugin-world:0.1.0 .
+podman build -t quay.io/rh-ai-community-plugins/rhoai-hello-world:0.1.0 .
 ```
 
 ## Integration with RHOAI Dashboard
@@ -147,7 +147,7 @@ const remotes = [
 This plugin follows OpenShift security best practices:
 
 - Runs as non-root user (UID 1001+)
-- Uses UBI9 base images
+- Uses Alpine-based images
 - No privileged containers
 - Read-only root filesystem (recommended)
 

@@ -1,5 +1,5 @@
 # Build stage
-FROM registry.redhat.io/ubi9/nodejs-20:latest AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -16,22 +16,16 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM registry.redhat.io/ubi9/nginx-122:latest
-
-# Run as non-root user (OpenShift security requirement)
-RUN chown 1001:0 /opt/app-root/src && \
-    chmod 755 /opt/app-root/src
-
-WORKDIR /opt/app-root/src
+FROM nginx:alpine
 
 # Copy built files from builder
-COPY --from=builder /app/dist /opt/app-root/src
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy nginx configuration
 RUN echo 'server { \
     listen 8080; \
     server_name localhost; \
-    root /opt/app-root/src; \
+    root /usr/share/nginx/html; \
     index index.html; \
     \
     location / { \
@@ -46,7 +40,7 @@ RUN echo 'server { \
 # Expose port
 EXPOSE 8080
 
-# Run as non-root user (UID 1001+)
+# Run as non-root user (OpenShift security requirement)
 USER 1001
 
 CMD ["nginx", "-g", "daemon off;"]
