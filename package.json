@@ -1,0 +1,62 @@
+{
+  "name": "rhoai-hello-world",
+  "version": "0.1.0",
+  "description": "A simple Hello World plugin for the RHOAI Dashboard",
+  "private": true,
+  "module-federation": {
+    "name": "helloWorld",
+    "remoteEntry": "/remoteEntry.js",
+    "authorize": false,
+    "tls": false,
+    "proxy": [
+      {
+        "path": "/hello-world",
+        "pathRewrite": "/hello-world"
+      }
+    ],
+    "local": {
+      "host": "localhost",
+      "port": 9111
+    },
+    "service": {
+      "name": "odh-dashboard",
+      "port": 8843
+    }
+  },
+  "scripts": {
+    "build": "webpack --config config/webpack.prod.js",
+    "build:dev": "webpack --config config/webpack.dev.js",
+    "start:dev": "webpack serve --config config/webpack.dev.js",
+    "test-unit": "jest",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@openshift/dynamic-plugin-sdk": "^5",
+    "@patternfly/react-core": "^6",
+    "@patternfly/react-icons": "^6",
+    "@patternfly/react-table": "^6",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-router-dom": "^7",
+    "lodash-es": "^4.18.1"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/react-router-dom": "^5",
+    "@typescript-eslint/eslint-plugin": "^7",
+    "@typescript-eslint/parser": "^7",
+    "css-loader": "^7",
+    "eslint": "^8",
+    "html-webpack-plugin": "^5",
+    "mini-css-extract-plugin": "^2",
+    "style-loader": "^4",
+    "ts-loader": "^9",
+    "tsconfig-paths-webpack-plugin": "^4",
+    "typescript": "^5",
+    "webpack": "^5",
+    "webpack-cli": "^5",
+    "webpack-dev-server": "^5"
+  }
+}
