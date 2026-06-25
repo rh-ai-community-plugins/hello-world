@@ -4,7 +4,7 @@
 
 ## Checklist
 
-- [ ] I have read the [contributing guidelines](../docs/CONTRIBUTING.md)
+- [ ] I have read the [README](../README.md) and understand the project structure
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code where needed

@@ -128,9 +128,6 @@ podman build -t quay.io/rh-ai-community-plugins/rhoai-hello-world:0.1.0 .
 You can deploy the plugin using the included Helm chart:
 
 ```bash
-# Add the chart to your Helm repository
-helm repo add rhoai-plugins https://rh-ai-community-plugins.github.io/hello-plugin-world
-
 # Deploy with default values
 helm install hello-world ./chart
 

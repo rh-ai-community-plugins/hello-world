@@ -13,6 +13,8 @@ metadata:
     spec:
       name: helloWorld
       scope: helloWorld
+      # NOTE: Update this URL to point to your deployed container image.
+      # Example: https://your-openshift-route/hello-world/remoteEntry.js
       remoteEntry: https://<registry>/rhoai-hello-world/remoteEntry.js
       paths:
         - type: route
