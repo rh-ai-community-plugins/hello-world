@@ -1,0 +1,38 @@
+name: Build and Push
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    name: Build and push container image
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Quay.io
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      - name: Build and push image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: rhoai-hello-world
+          tags: ${{ github.ref_name }}
+          containerfiles: |
+            ./Containerfile
+
+      - name: Push to Quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: rhoai-hello-world
+          tags: ${{ github.ref_name }}
+          registry: quay.io/rh-ai-community-plugins

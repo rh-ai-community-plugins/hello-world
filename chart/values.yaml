@@ -1,0 +1,51 @@
+# Default values for hello-world-plugin.
+# This is a YAML-formatted file.
+
+image:
+  repository: quay.io/rh-ai-community-plugins/rhoai-hello-world
+  tag: latest
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /hello-world
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

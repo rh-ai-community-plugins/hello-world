@@ -61,10 +61,21 @@ hello-plugin-world/
 │   ├── webpack.prod.js       # Production webpack config
 │   ├── moduleFederation.js   # Module Federation plugin config
 │   └── stylePaths.js         # Style path configuration
-├── Containerfile             # Container build definition (podman)
-├── package.json              # Dependencies and scripts
-├── tsconfig.json             # TypeScript configuration
-├── .env.development          # Development environment variables
+├── chart/                    # Helm chart for Kubernetes deployment
+│   ├── Chart.yaml            # Helm chart metadata
+│   ├── values.yaml           # Default values
+│   └── templates/            # Kubernetes manifests
+├── .github/                    # GitHub configuration
+│   ├── pull_request_template.md  # PR template with checklist
+│   └── workflows/              # CI/CD workflows
+│       ├── ci.yml              # Linting and testing
+│       └── build-push.yml      # Build and push on release
+├── docs/                       # Documentation
+├── plugin.yaml                 # RHOAI plugin registration
+├── Containerfile               # Container build definition (podman)
+├── package.json                # Dependencies and scripts
+├── tsconfig.json               # TypeScript configuration
+├── .env.development            # Development environment variables
 └── .gitignore
 ```
 
@@ -111,6 +122,40 @@ Tests use semantic queries (`getByRole`, `getByText`) to verify real PatternFly 
 ```bash
 podman build -t quay.io/rh-ai-community-plugins/rhoai-hello-world:0.1.0 .
 ```
+
+### Helm Deployment
+
+You can deploy the plugin using the included Helm chart:
+
+```bash
+# Add the chart to your Helm repository
+helm repo add rhoai-plugins https://rh-ai-community-plugins.github.io/hello-plugin-world
+
+# Deploy with default values
+helm install hello-world ./chart
+
+# Deploy with custom image
+helm install hello-world ./chart --set image.tag=v0.1.0
+```
+
+#### Chart Configuration
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `image.repository` | Container image repository | `quay.io/rh-ai-community-plugins/rhoai-hello-world` |
+| `image.tag` | Container image tag | `latest` |
+| `image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `service.type` | Kubernetes service type | `ClusterIP` |
+| `service.port` | Service port | `8080` |
+| `replicaCount` | Number of replicas | `1` |
+| `ingress.enabled` | Enable ingress | `true` |
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+- **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): Runs on every PR and push to `main`. Executes tests and linting.
+- **Build & Push** ([`.github/workflows/build-push.yml`](.github/workflows/build-push.yml)): Builds and pushes the container image to `quay.io` on release or tag.
 
 ## Integration with RHOAI Dashboard
 

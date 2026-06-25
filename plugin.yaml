@@ -1,0 +1,23 @@
+apiVersion: backend.openshift.io/v1
+kind: Plugin
+metadata:
+  name: hello-world
+  displayName: Hello World
+  description: A simple Hello World plugin for the RHOAI Dashboard
+  version: 0.1.0
+  link:
+    url: https://github.com/rh-ai-community-plugins/hello-plugin-world
+  iconPath: ''
+  remote:
+    type: module-federation
+    spec:
+      name: helloWorld
+      scope: helloWorld
+      remoteEntry: https://<registry>/rhoai-hello-world/remoteEntry.js
+      paths:
+        - type: route
+          path: /hello-world
+          extensions:
+            - helloWorld/extensions
+        - type: icon
+          path: helloWorld/Icon

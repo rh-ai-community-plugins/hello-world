@@ -1,0 +1,14 @@
+apiVersion: v2
+name: hello-world-plugin
+description: A Helm chart for deploying the RHOAI Hello World Plugin
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - rhoai
+  - openshift-ai
+  - plugin
+  - hello-world
+home: https://github.com/rh-ai-community-plugins/hello-plugin-world
+sources:
+  - https://github.com/rh-ai-community-plugins/hello-plugin-world
