@@ -6,7 +6,7 @@ module.exports = merge(common, {
   mode: 'development',
   devtool: 'eval-source-map',
   devServer: {
-    port: 9111,
+    port: parseInt(process.env.PORT, 10) || 9112,
     historyApiFallback: true,
     hot: true,
     proxy: [
