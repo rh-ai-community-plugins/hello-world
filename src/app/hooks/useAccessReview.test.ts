@@ -30,6 +30,20 @@ describe('useAccessReview', () => {
     );
   });
 
+  it('should set error when API returns non-ok response', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+    });
+
+    const { result } = renderHook(() => useAccessReview('test-ns'));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.error).toBe('Access review failed: 500');
+    expect(result.current.results).toEqual([]);
+  });
+
   it('should handle denied permissions', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,

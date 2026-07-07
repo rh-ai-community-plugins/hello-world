@@ -50,7 +50,7 @@ const ResourceTable: React.FC<{
   resources: K8sResource[];
   kind: string;
   onDelete: (name: string) => void;
-  deleting: string | null;
+  deleting: { kind: string; name: string } | null;
 }> = ({ resources, kind, onDelete, deleting }) => {
   if (resources.length === 0) {
     return (
@@ -90,7 +90,7 @@ const ResourceTable: React.FC<{
                 variant="plain"
                 aria-label={`Delete ${r.metadata.name}`}
                 onClick={() => onDelete(r.metadata.name)}
-                isLoading={deleting === r.metadata.name}
+                isLoading={deleting?.kind === kind && deleting?.name === r.metadata.name}
                 isDisabled={deleting !== null}
                 icon={<TrashIcon />}
               />
@@ -114,6 +114,19 @@ const CreateDeploymentModal: React.FC<{
   const [port, setPort] = useState('8080');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const resetForm = () => {
+    setName('');
+    setImage('');
+    setReplicas('1');
+    setPort('8080');
+    setError(null);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
 
   const handleCreate = async () => {
     setCreating(true);
@@ -144,11 +157,7 @@ const CreateDeploymentModal: React.FC<{
         },
       );
       onCreated();
-      onClose();
-      setName('');
-      setImage('');
-      setReplicas('1');
-      setPort('8080');
+      handleClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to create deployment');
     } finally {
@@ -159,7 +168,7 @@ const CreateDeploymentModal: React.FC<{
   const isValid = name.length > 0 && image.length > 0;
 
   return (
-    <Modal variant="medium" isOpen={isOpen} onClose={onClose} aria-label="Create Deployment">
+    <Modal variant="medium" isOpen={isOpen} onClose={handleClose} aria-label="Create Deployment">
       <ModalHeader title="Create Deployment" />
       <ModalBody>
         <Form>
@@ -216,7 +225,7 @@ const CreateDeploymentModal: React.FC<{
         >
           Create
         </Button>
-        <Button variant="link" onClick={onClose} isDisabled={creating}>
+        <Button variant="link" onClick={handleClose} isDisabled={creating}>
           Cancel
         </Button>
       </ModalFooter>
@@ -235,6 +244,18 @@ const CreateServiceModal: React.FC<{
   const [targetPort, setTargetPort] = useState('8080');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const resetForm = () => {
+    setName('');
+    setPort('80');
+    setTargetPort('8080');
+    setError(null);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
 
   const handleCreate = async () => {
     setCreating(true);
@@ -256,10 +277,7 @@ const CreateServiceModal: React.FC<{
         },
       });
       onCreated();
-      onClose();
-      setName('');
-      setPort('80');
-      setTargetPort('8080');
+      handleClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to create service');
     } finally {
@@ -270,7 +288,7 @@ const CreateServiceModal: React.FC<{
   const isValid = name.length > 0;
 
   return (
-    <Modal variant="medium" isOpen={isOpen} onClose={onClose} aria-label="Create Service">
+    <Modal variant="medium" isOpen={isOpen} onClose={handleClose} aria-label="Create Service">
       <ModalHeader title="Create Service" />
       <ModalBody>
         <Form>
@@ -317,7 +335,7 @@ const CreateServiceModal: React.FC<{
         >
           Create
         </Button>
-        <Button variant="link" onClick={onClose} isDisabled={creating}>
+        <Button variant="link" onClick={handleClose} isDisabled={creating}>
           Cancel
         </Button>
       </ModalFooter>
@@ -354,35 +372,34 @@ const ClusterResourcesPage: React.FC = () => {
   const [isCreateDeployOpen, setIsCreateDeployOpen] = useState(false);
   const [isCreateServiceOpen, setIsCreateServiceOpen] = useState(false);
   const [deleteAlert, setDeleteAlert] = useState<{ variant: 'success' | 'danger'; message: string } | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState<{ kind: string; name: string } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ kind: string; name: string } | null>(null);
 
   const handleDeleteConfirm = (kind: string, name: string) => {
     setDeleteTarget({ kind, name });
-    setIsDeleteConfirmOpen(true);
   };
 
   const handleDelete = async () => {
     if (!deleteTarget || !selectedProject) return;
 
-    setIsDeleteConfirmOpen(false);
-    setDeleting(deleteTarget.name);
+    const target = deleteTarget;
+    setDeleteTarget(null);
+    setDeleting(target);
     setDeleteAlert(null);
 
     try {
       const path =
-        deleteTarget.kind === 'Deployment'
-          ? `/apis/apps/v1/namespaces/${selectedProject}/deployments/${deleteTarget.name}`
-          : `/api/v1/namespaces/${selectedProject}/services/${deleteTarget.name}`;
+        target.kind === 'Deployment'
+          ? `/apis/apps/v1/namespaces/${selectedProject}/deployments/${target.name}`
+          : `/api/v1/namespaces/${selectedProject}/services/${target.name}`;
 
       await deleteK8sResource(path);
       setDeleteAlert({
         variant: 'success',
-        message: `${deleteTarget.kind} "${deleteTarget.name}" deleted successfully.`,
+        message: `${target.kind} "${target.name}" deleted successfully.`,
       });
 
-      if (deleteTarget.kind === 'Deployment') {
+      if (target.kind === 'Deployment') {
         refreshDeployments();
       } else {
         refreshServices();
@@ -394,7 +411,6 @@ const ClusterResourcesPage: React.FC = () => {
       });
     } finally {
       setDeleting(null);
-      setDeleteTarget(null);
     }
   };
 
@@ -587,8 +603,8 @@ const ClusterResourcesPage: React.FC = () => {
 
             <Modal
               variant="small"
-              isOpen={isDeleteConfirmOpen}
-              onClose={() => setIsDeleteConfirmOpen(false)}
+              isOpen={deleteTarget !== null}
+              onClose={() => setDeleteTarget(null)}
               aria-label="Confirm deletion"
             >
               <ModalHeader title="Confirm Deletion" />
@@ -600,7 +616,7 @@ const ClusterResourcesPage: React.FC = () => {
                 <Button variant="danger" onClick={handleDelete}>
                   Delete
                 </Button>
-                <Button variant="link" onClick={() => setIsDeleteConfirmOpen(false)}>
+                <Button variant="link" onClick={() => setDeleteTarget(null)}>
                   Cancel
                 </Button>
               </ModalFooter>
