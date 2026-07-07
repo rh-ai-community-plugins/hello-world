@@ -1,7 +1,7 @@
 {
   "name": "rhoai-hello-world",
   "version": "0.1.0",
-  "description": "A simple Hello World plugin for the RHOAI Dashboard",
+  "description": "A reference implementation and scaffold plugin for the RHOAI Dashboard",
   "private": true,
   "module-federation": {
     "name": "helloWorld",
@@ -16,7 +16,7 @@
     ],
     "local": {
       "host": "localhost",
-      "port": 9111
+      "port": 9112
     },
     "service": {
       "name": "odh-dashboard",

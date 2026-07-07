@@ -3,7 +3,7 @@ kind: Plugin
 metadata:
   name: hello-world
   displayName: Hello World
-  description: A simple Hello World plugin for the RHOAI Dashboard
+  description: A reference implementation and scaffold plugin for the RHOAI Dashboard
   version: 0.1.0
   link:
     url: https://github.com/rh-ai-community-plugins/hello-plugin-world
