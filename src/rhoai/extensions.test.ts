@@ -1,17 +1,17 @@
 import {
   helloWorldAreaExtension,
-  helloWorldNavItemExtension,
-  helloWorldRouteExtension,
+  communityPluginsSectionExtension,
+  userProjectsNavExtension,
+  clusterResourcesNavExtension,
+  userProjectsRouteExtension,
+  clusterResourcesRouteExtension,
   extensions,
 } from './extensions';
 
 describe('RHOAI Plugin Extensions', () => {
   describe('helloWorldAreaExtension', () => {
-    it('should have the correct type', () => {
+    it('should have the correct type and id', () => {
       expect(helloWorldAreaExtension.type).toBe('app.area');
-    });
-
-    it('should have the correct id in properties', () => {
       expect(helloWorldAreaExtension.properties.id).toBe('hello-world');
     });
 
@@ -20,67 +20,69 @@ describe('RHOAI Plugin Extensions', () => {
     });
   });
 
-  describe('helloWorldNavItemExtension', () => {
-    it('should have the correct type', () => {
-      expect(helloWorldNavItemExtension.type).toBe('app.navigation/href');
+  describe('communityPluginsSectionExtension', () => {
+    it('should define the community-plugins section', () => {
+      expect(communityPluginsSectionExtension.type).toBe('app.navigation/section');
+      expect(communityPluginsSectionExtension.properties.id).toBe('community-plugins');
+      expect(communityPluginsSectionExtension.properties.title).toBe('Community plugins');
+      expect(communityPluginsSectionExtension.properties.group).toBe('9_plugins');
     });
 
-    it('should have the correct id in properties', () => {
-      expect(helloWorldNavItemExtension.properties.id).toBe('hello-world-nav');
-    });
-
-    it('should have the correct title', () => {
-      expect(helloWorldNavItemExtension.properties.title).toBe('Hello World');
-    });
-
-    it('should have the correct href', () => {
-      expect(helloWorldNavItemExtension.properties.href).toBe('/hello-world');
-    });
-
-    it('should be in the plugins group', () => {
-      expect(helloWorldNavItemExtension.properties.group).toBe('9_plugins');
+    it('should have an iconRef function', () => {
+      expect(typeof communityPluginsSectionExtension.properties.iconRef).toBe('function');
     });
   });
 
-  describe('helloWorldRouteExtension', () => {
-    it('should have the correct type', () => {
-      expect(helloWorldRouteExtension.type).toBe('app.route');
+  describe('navigation extensions', () => {
+    it('should define User & Projects nav item', () => {
+      expect(userProjectsNavExtension.type).toBe('app.navigation/href');
+      expect(userProjectsNavExtension.properties.id).toBe('hello-world-user-projects');
+      expect(userProjectsNavExtension.properties.title).toBe('User & Projects');
+      expect(userProjectsNavExtension.properties.href).toBe('/hello-world/user-projects');
+      expect(userProjectsNavExtension.properties.section).toBe('community-plugins');
+      expect(userProjectsNavExtension.properties.label).toBe('Community');
     });
 
-    it('should have the correct path', () => {
-      expect(helloWorldRouteExtension.properties.path).toBe('/hello-world/*');
+    it('should define Cluster Resources nav item', () => {
+      expect(clusterResourcesNavExtension.type).toBe('app.navigation/href');
+      expect(clusterResourcesNavExtension.properties.id).toBe('hello-world-cluster-resources');
+      expect(clusterResourcesNavExtension.properties.title).toBe('Cluster Resources');
+      expect(clusterResourcesNavExtension.properties.href).toBe('/hello-world/cluster-resources');
+      expect(clusterResourcesNavExtension.properties.section).toBe('community-plugins');
+      expect(clusterResourcesNavExtension.properties.label).toBe('Community');
+    });
+  });
+
+  describe('route extensions', () => {
+    it('should define user-projects route with lazy component', () => {
+      expect(userProjectsRouteExtension.type).toBe('app.route');
+      expect(userProjectsRouteExtension.properties.path).toBe('/hello-world/user-projects/*');
+      expect(typeof userProjectsRouteExtension.properties.component).toBe('function');
+      expect(userProjectsRouteExtension.properties.component()).toBeInstanceOf(Promise);
     });
 
-    it('should have a component function', () => {
-      expect(typeof helloWorldRouteExtension.properties.component).toBe('function');
-    });
-
-    it('should return a module when component is called', () => {
-      const result = helloWorldRouteExtension.properties.component();
-      expect(result).toBeInstanceOf(Promise);
+    it('should define cluster-resources route with lazy component', () => {
+      expect(clusterResourcesRouteExtension.type).toBe('app.route');
+      expect(clusterResourcesRouteExtension.properties.path).toBe('/hello-world/cluster-resources/*');
+      expect(typeof clusterResourcesRouteExtension.properties.component).toBe('function');
+      expect(clusterResourcesRouteExtension.properties.component()).toBeInstanceOf(Promise);
     });
   });
 
   describe('extensions array', () => {
-    it('should contain all three extensions', () => {
-      expect(extensions).toHaveLength(3);
+    it('should contain all six extensions', () => {
+      expect(extensions).toHaveLength(6);
     });
 
-    it('should include helloWorldAreaExtension', () => {
-      expect(extensions).toContain(helloWorldAreaExtension);
-    });
-
-    it('should include helloWorldNavItemExtension', () => {
-      expect(extensions).toContain(helloWorldNavItemExtension);
-    });
-
-    it('should include helloWorldRouteExtension', () => {
-      expect(extensions).toContain(helloWorldRouteExtension);
-    });
-
-    it('should export extensions as default', () => {
-      // The default export should be the same array
-      expect(extensions).toBeInstanceOf(Array);
+    it('should include all extensions in the correct order', () => {
+      expect(extensions).toEqual([
+        helloWorldAreaExtension,
+        communityPluginsSectionExtension,
+        userProjectsNavExtension,
+        clusterResourcesNavExtension,
+        userProjectsRouteExtension,
+        clusterResourcesRouteExtension,
+      ]);
     });
   });
 });
