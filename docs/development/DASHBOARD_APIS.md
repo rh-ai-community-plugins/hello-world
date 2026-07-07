@@ -70,6 +70,37 @@ If your plugin needs its own API backend (e.g., to talk to a third-party service
 
 **Example**: Your plugin makes `fetch('/my-plugin/api/data')` -> dashboard backend rewrites to `/api/data` -> forwards to `my-plugin-api.opendatahub.svc.cluster.local:3000/api/data` with the user's Bearer token (if `authorize: true`).
 
+To set this up, add a `proxyService` entry alongside your `backend` in the federation ConfigMap:
+
+```json
+{
+  "name": "myPlugin",
+  "backend": {
+    "remoteEntry": "/remoteEntry.js",
+    "authorize": false,
+    "tls": false,
+    "service": {
+      "name": "my-plugin",
+      "namespace": "opendatahub",
+      "port": 8080
+    }
+  },
+  "proxyService": [
+    {
+      "path": "/my-plugin/api",
+      "pathRewrite": "/api",
+      "authorize": true,
+      "tls": false,
+      "service": {
+        "name": "my-plugin-api",
+        "namespace": "opendatahub",
+        "port": 3000
+      }
+    }
+  ]
+}
+```
+
 Your BFF container can then:
 - Extract the user token from the `Authorization` header
 - Use it to call the Kubernetes API on the user's behalf
