@@ -19,7 +19,7 @@ npm run lint          # ESLint on src/
 
 To run a single test file:
 ```bash
-npx jest src/app/components/HelloWorldPage.test.tsx
+npx jest src/app/hooks/useCurrentUser.test.ts
 ```
 
 ## Architecture
@@ -28,10 +28,30 @@ npx jest src/app/components/HelloWorldPage.test.tsx
 
 The plugin exposes two remote modules to the RHOAI dashboard host via Webpack Module Federation (configured inline in `config/webpack.common.js`):
 
-- **`./extensions`** (`src/rhoai/extensions.ts`) — Defines three extension points: `app.area` (registers the plugin area), `app.navigation/href` (adds sidebar nav link to `/hello-world`), and `app.route` (mounts the page component).
+- **`./extensions`** (`src/rhoai/extensions.ts`) — Defines five extension points:
+  - `app.area` — registers the `hello-world` feature area
+  - `app.navigation/section` — defines the `community-plugins` sidebar section
+  - `app.navigation/href` (x2) — "User & Projects" and "Cluster Resources" nav items with `label: 'Community'`
+  - `app.route` — mounts the App component with wildcard routing at `/hello-world/*`
 - **`./Icon`** (`src/rhoai/HelloWorldNavIcon.tsx`) — SVG icon displayed in the dashboard sidebar.
 
 Shared singletons (react, react-dom, react-router-dom, @patternfly/react-core, @openshift/dynamic-plugin-sdk) are provided by the host and not bundled into the plugin.
+
+### Pages
+
+The plugin has two pages, routed under `/hello-world/*`:
+
+- **User & Projects page** (`src/app/pages/UserProjectsPage.tsx`) — Displays user info via `/api/status`, project listing, and RBAC permissions table.
+- **Cluster Resources page** (`src/app/pages/ClusterResourcesPage.tsx`) — Create, list, and delete Deployments and Services via the dashboard's K8s API pass-through.
+
+### Custom Hooks
+
+Four hooks in `src/app/hooks/` provide data fetching and API integration:
+
+- `useCurrentUser` — Fetches authenticated user info from `/api/status`.
+- `useProjects` — Fetches accessible projects from the OpenShift projects API.
+- `useK8sResources` — Generic hook for listing K8s resources with create/delete helpers.
+- `useAccessReview` — Checks RBAC permissions via SelfSubjectAccessReview.
 
 ### Entry Point Chain
 
@@ -56,6 +76,17 @@ Jest with `ts-jest` preset and `jsdom` environment. `jest.setup.tsx` mocks `reac
 - **Container**: Multi-stage build in `Containerfile` — Node 20 Alpine builder → Nginx Alpine serving `dist/` on port 8080 as UID 1001. Nginx adds CORS header on `remoteEntry.js`.
 - **Helm chart**: `chart/` deploys to Kubernetes with Deployment + Service. Image defaults to `quay.io/rh-ai-community-plugins/rhoai-hello-world:latest`.
 - **CI**: `.github/workflows/ci.yml` runs tests and lint on push/PR to main. `build-push.yml` builds and pushes the container image on release/tag.
+
+## Documentation
+
+Project documentation lives under `docs/` in semantic subfolders:
+
+```
+docs/architecture/   — Plugin system internals and extension contract
+docs/development/    — Local dev setup and dashboard API reference
+docs/deployment/     — Container build instructions
+docs/archives/       — Project plan and historical documents
+```
 
 ## Key Conventions
 
