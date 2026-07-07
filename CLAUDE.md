@@ -9,7 +9,7 @@ This is `hello-plugin-world`, a community plugin for the **Red Hat OpenShift AI 
 ## Build & Development Commands
 
 ```bash
-npm run start:dev     # Dev server on port 9111 with HMR
+npm run start:dev     # Dev server on port 9112 with HMR
 npm run build         # Production build to dist/
 npm test              # Run all tests (Jest + jsdom)
 npm run test:watch    # Watch mode
@@ -44,7 +44,7 @@ Shared singletons (react, react-dom, react-router-dom, @patternfly/react-core, @
 ### Webpack Configs
 
 - `config/webpack.common.js` — Shared config: entry point, loaders, Module Federation, path alias `~` → `./src`
-- `config/webpack.dev.js` — Dev server on port 9111, proxies `/hello-world` to `localhost:8843`
+- `config/webpack.dev.js` — Dev server on port 9112, proxies `/hello-world` to `localhost:8843`
 - `config/webpack.prod.js` — Output to `dist/`, CSS extraction, vendor chunk splitting
 
 ### Test Setup

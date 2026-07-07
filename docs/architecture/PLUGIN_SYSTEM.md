@@ -1,4 +1,8 @@
-# ODH Dashboard — Modular Architecture & Plugin System
+# RHOAI Dashboard Plugin System
+
+This document explains how the RHOAI Dashboard's modular architecture works and how to build your own plugin.
+
+---
 
 ## 1. How the System Works
 
@@ -92,7 +96,7 @@ The config supports two formats. The **new format** is recommended; the old form
 
 Key points:
 - `backend` controls how the frontend remote is loaded. The dashboard proxies `/_mf/{name}/*` to the `backend.service`.
-- Each `proxyService` entry has its **own** `service`, `authorize`, and `tls` settings — they are independent of `backend`.
+- Each `proxyService` entry has its **own** `service`, `authorize`, and `tls` settings -- they are independent of `backend`.
 - A module can have `proxyService` without `backend` (API-only proxy, no frontend remote).
 - `headers` (optional `Record<string, string>`) can be set on either `backend` or individual `proxyService` entries for custom header forwarding.
 
@@ -115,7 +119,7 @@ The backend automatically detects old-format entries (by checking for top-level 
 
 Looking at the current federation ConfigMap, plugins run in one of three ways:
 
-**A. Sidecar containers** — added to the same pod as the dashboard. Used by most internal plugins. The dashboard's Kubernetes Service exposes additional ports. In the federation config, the `service.name` points to `odh-dashboard`:
+**A. Sidecar containers** -- added to the same pod as the dashboard. Used by most internal plugins. The dashboard's Kubernetes Service exposes additional ports. In the federation config, the `service.name` points to `odh-dashboard`:
 
 | Plugin | Port |
 |---|---|
@@ -128,9 +132,9 @@ Looking at the current federation ConfigMap, plugins run in one of three ways:
 | autorag | 8743 |
 | agent-ops | 8843 |
 
-**B. Separate Kubernetes Services** — independent Deployments with their own Services. Used by `mlflowEmbedded` (`service.name: "mlflow"`, port 8443). The dashboard backend proxies to them via Kubernetes internal DNS.
+**B. Separate Kubernetes Services** -- independent Deployments with their own Services. Used by `mlflowEmbedded` (`service.name: "mlflow"`, port 8443). The dashboard backend proxies to them via Kubernetes internal DNS.
 
-**C. Proxy-only** — no frontend remote, only API proxying. Used by Perses (`service.name: "data-science-perses"`, port 8080). These entries have `proxyService` but no `backend`.
+**C. Proxy-only** -- no frontend remote, only API proxying. Used by Perses (`service.name: "data-science-perses"`, port 8080). These entries have `proxyService` but no `backend`.
 
 ### Who Manages the Config
 
@@ -155,7 +159,7 @@ cd packages
 npx mod-arch-installer -n my-module
 ```
 
-**Step 2**: Update identifiers — replace placeholder names with your module name in:
+**Step 2**: Update identifiers -- replace placeholder names with your module name in:
 - `packages/my-module/package.json` (name, module-federation config)
 - `packages/my-module/frontend/src/odh/extensions.ts`
 - `packages/my-module/frontend/config/moduleFederation.js`
@@ -243,7 +247,7 @@ cd packages/my-module && make dev-start-federated
 
 **Step 7**: Build the container image for your module and push it to a registry.
 
-**Step 8**: Deploy — add your module to the cluster:
+**Step 8**: Deploy -- add your module to the cluster:
   - Update the `federation-config` ConfigMap to include your module entry
   - Either add a sidecar container to the dashboard Deployment, or create a separate Deployment + Service for your module
   - If sidecar: add a port to the `odh-dashboard` Service
@@ -253,19 +257,19 @@ cd packages/my-module && make dev-start-federated
 
 If you want to extend an already-deployed ODH Dashboard without touching the monorepo code. Your plugin runs as its own container and is discovered at runtime.
 
-For working examples of this approach, see the [Example Community Plugins](#5-example-community-plugins) section.
+For working examples of this approach, see the [Community Plugins](COMMUNITY_PLUGINS.md) document.
 
 #### Critical constraint: unpublished type packages
 
 `@odh-dashboard/plugin-core` and `@odh-dashboard/internal` are both marked `"private": true` and **not published to npm**. This means a truly standalone plugin cannot `npm install` them. You have three workarounds:
 
-1. **Copy the type definitions** — The extension contract is a simple JSON shape. You can define the types yourself (see below). At runtime, the dashboard only checks `extension.type` string values and `extension.properties` shape — there is no class instantiation or instanceof check.
-2. **Reference the monorepo as a git dependency** — `npm install github:opendatahub-io/odh-dashboard#main` and import from the packages directory. Fragile but works.
-3. **Work within the monorepo** (Option A) — This is the path of least resistance and what all current plugins do.
+1. **Copy the type definitions** -- The extension contract is a simple JSON shape. You can define the types yourself (see below). At runtime, the dashboard only checks `extension.type` string values and `extension.properties` shape -- there is no class instantiation or instanceof check.
+2. **Reference the monorepo as a git dependency** -- `npm install github:opendatahub-io/odh-dashboard#main` and import from the packages directory. Fragile but works.
+3. **Work within the monorepo** (Option A) -- This is the path of least resistance and what all current plugins do.
 
 #### Extension type shapes (for standalone use)
 
-The dashboard loads your `./extensions` module and expects a default export of an array of objects with this shape. No special classes or SDK calls — just plain objects:
+The dashboard loads your `./extensions` module and expects a default export of an array of objects with this shape. No special classes or SDK calls -- just plain objects:
 
 ```typescript
 // Minimal type definitions you can copy into your standalone project.
@@ -360,7 +364,7 @@ You can also create your own section using a `NavSectionExtension` (see the kueu
 
 #### Step-by-step guide
 
-**Step 1 — Scaffold the project**
+**Step 1 -- Scaffold the project**
 
 Create a minimal webpack + React + TypeScript project. The critical file structure:
 
@@ -384,7 +388,7 @@ my-plugin/
 └── plugin.yaml                # Plugin metadata
 ```
 
-**Step 2 — Set up package.json with matching dependency versions**
+**Step 2 -- Set up package.json with matching dependency versions**
 
 You must match the versions used by the dashboard host for shared singleton dependencies. Check the dashboard's `frontend/package.json` for exact versions. As of this codebase:
 
@@ -426,9 +430,9 @@ You must match the versions used by the dashboard host for shared singleton depe
 }
 ```
 
-**Step 3 — Configure webpack**
+**Step 3 -- Configure webpack**
 
-Standalone plugins can use webpack's **built-in** `ModuleFederationPlugin` (from `webpack.container`) — you do not need `@module-federation/enhanced`. This is simpler and compatible with the dashboard host.
+Standalone plugins can use webpack's **built-in** `ModuleFederationPlugin` (from `webpack.container`) -- you do not need `@module-federation/enhanced`. This is simpler and compatible with the dashboard host.
 
 ```javascript
 // config/webpack.common.js
@@ -459,10 +463,10 @@ module.exports = {
       name: 'myPlugin',             // Must match the "name" in the ConfigMap
       filename: 'remoteEntry.js',
       exposes: {
-        './extensions': './src/rhoai/extensions.ts',  // Required — the host loads this
+        './extensions': './src/rhoai/extensions.ts',  // Required -- the host loads this
       },
       shared: {
-        // These are provided by the host at runtime — your plugin does NOT
+        // These are provided by the host at runtime -- your plugin does NOT
         // bundle them. The host shares them as singletons.
         react:                  { singleton: true, requiredVersion: '^18' },
         'react-dom':            { singleton: true, requiredVersion: '^18' },
@@ -478,22 +482,22 @@ module.exports = {
 ```
 
 Additional shared dependencies to add if your plugin uses them:
-- `@patternfly/react-icons` — shared as singleton by the host
-- `@patternfly/react-table` — if using PatternFly tables
-- `@patternfly/react-topology` — if using topology visualization
-- `react-router` — shared separately from `react-router-dom` by the host
+- `@patternfly/react-icons` -- shared as singleton by the host
+- `@patternfly/react-table` -- if using PatternFly tables
+- `@patternfly/react-topology` -- if using topology visualization
+- `react-router` -- shared separately from `react-router-dom` by the host
 
-**Step 4 — Set up the entry point (required for Module Federation)**
+**Step 4 -- Set up the entry point (required for Module Federation)**
 
 Module Federation requires an async bootstrap pattern. Your entry point must dynamically import the actual application:
 
 ```typescript
-// src/index.ts — thin entry
+// src/index.ts -- thin entry
 import('./bootstrap');
 ```
 
 ```tsx
-// src/bootstrap.tsx — actual app mount
+// src/bootstrap.tsx -- actual app mount
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './app/App';
@@ -502,12 +506,12 @@ const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(<App />);
 ```
 
-**Step 5 — Define your extensions**
+**Step 5 -- Define your extensions**
 
 ```typescript
 // src/rhoai/extensions.ts
 const extensions = [
-  // 1. Declare a feature area (optional — only if you need flag gating)
+  // 1. Declare a feature area (optional -- only if you need flag gating)
   {
     type: 'app.area' as const,
     properties: {
@@ -562,7 +566,7 @@ const MyPluginPage: React.FC = () => (
 export default MyPluginPage;
 ```
 
-**Step 6 — Containerize**
+**Step 6 -- Containerize**
 
 Your container needs to serve the built static files (especially `remoteEntry.js` and the JS chunks). Use nginx with non-root user for OpenShift compatibility:
 
@@ -604,9 +608,9 @@ podman build -t quay.io/myorg/my-plugin:latest -f Containerfile .
 podman push quay.io/myorg/my-plugin:latest
 ```
 
-**Step 7 — Deploy to the cluster**
+**Step 7 -- Deploy to the cluster**
 
-You can use raw Kubernetes manifests or a Helm chart. Both example community plugins use Helm charts — see their `chart/` directories for templates.
+You can use raw Kubernetes manifests or a Helm chart. Both example community plugins use Helm charts -- see their `chart/` directories for templates.
 
 With raw manifests:
 
@@ -676,7 +680,7 @@ spec:
 oc apply -f my-plugin-deployment.yaml
 ```
 
-**Step 8 — Register in the federation config**
+**Step 8 -- Register in the federation config**
 
 The dashboard discovers plugins via the `MODULE_FEDERATION_CONFIG` environment variable. If the ODH operator reconciles the `federation-config` ConfigMap, you may need to set the env var directly on the Deployment instead.
 
@@ -700,22 +704,6 @@ Add to the JSON array in `module-federation-config.json` (new format):
       "namespace": "opendatahub",
       "port": 8080
     }
-  }
-}
-```
-
-Or with the old format (still supported):
-
-```json
-{
-  "name": "myPlugin",
-  "remoteEntry": "/remoteEntry.js",
-  "authorize": false,
-  "tls": false,
-  "service": {
-    "name": "my-plugin",
-    "namespace": "opendatahub",
-    "port": 8080
   }
 }
 ```
@@ -747,38 +735,7 @@ print(json.dumps(current))
 oc set env deploy/rhods-dashboard -n redhat-ods-applications "MODULE_FEDERATION_CONFIG=$NEW"
 ```
 
-If your plugin also has its own API backend (BFF), add a `proxyService` entry:
-
-```json
-{
-  "name": "myPlugin",
-  "backend": {
-    "remoteEntry": "/remoteEntry.js",
-    "authorize": false,
-    "tls": false,
-    "service": {
-      "name": "my-plugin",
-      "namespace": "opendatahub",
-      "port": 8080
-    }
-  },
-  "proxyService": [
-    {
-      "path": "/my-plugin/api",
-      "pathRewrite": "/api",
-      "authorize": true,
-      "tls": false,
-      "service": {
-        "name": "my-plugin-api",
-        "namespace": "opendatahub",
-        "port": 3000
-      }
-    }
-  ]
-}
-```
-
-**Step 9 — Restart the dashboard**
+**Step 9 -- Restart the dashboard**
 
 ```bash
 oc rollout restart deployment/odh-dashboard -n opendatahub
@@ -825,427 +782,3 @@ Browser                     Dashboard Backend              Your Plugin Service
 - **Authorization**: Set `"authorize": true` if your plugin's backend needs the user's auth token. The dashboard backend will forward the user's OpenShift token in the `Authorization: Bearer <token>` header of the proxied request.
 - **No feature flag registration from outside**: A standalone plugin cannot add new entries to the dashboard's `SupportedArea` enum or `dashboardConfig`. If you need a feature flag, either don't use one (extensions are always shown), or coordinate with the dashboard team to add the flag upstream.
 - **OpenShift security**: Run containers as non-root (user 1001), drop all capabilities, and set `seccompProfile: RuntimeDefault` to comply with OpenShift's `restricted-v2` SCC.
-
----
-
-## 3. Dashboard Backend Features Available to Your Plugin
-
-Since your plugin's frontend code runs inside the same browser page as the dashboard, it shares the same origin and can call all dashboard backend APIs directly via `fetch()`. Your plugin can also optionally have its own backend (BFF) that receives the user's auth token.
-
-### 3.1 Authentication & the Token Flow
-
-The ODH Dashboard sits behind an OAuth proxy (or kube-rbac-proxy) that authenticates users. The flow:
-
-1. User authenticates via OpenShift OAuth
-2. The OAuth proxy sets the `x-forwarded-access-token` header with the user's OpenShift Bearer token on every request to the dashboard backend
-3. The dashboard backend extracts this token via `getDirectCallOptions()` (`backend/src/utils/directCallUtils.ts`) and uses it for Kubernetes API calls on the user's behalf
-4. When the dashboard backend proxies to your plugin's service and `authorize: true` is set, it calls `setAuthorizationHeader()` (`backend/src/utils/proxy.ts`) which converts the user's `x-forwarded-access-token` into an `Authorization: Bearer <token>` header on the proxied request
-
-**What your plugin's BFF receives** (when `authorize: true`):
-- `Authorization: Bearer <user-openshift-token>` — the actual user's OpenShift token, not a service account token
-- Any custom headers configured in the `headers` field of the ConfigMap entry
-
-**What your plugin's BFF can do with the token**:
-- Make Kubernetes API calls as the authenticated user (respecting their RBAC)
-- Call `GET /apis/user.openshift.io/v1/users/~` to get user details
-- Perform SelfSubjectAccessReview to check user permissions
-
-### 3.2 Dashboard Backend APIs (callable from your plugin's frontend)
-
-Your plugin's React components run in the browser at the same origin as the dashboard. This means they can call any `/api/*` endpoint directly. Key endpoints:
-
-#### User & Status
-| Endpoint | Method | Returns |
-|---|---|---|
-| `/api/status` | GET | `{ kube: { userName, userID, isAdmin, isAllowed, clusterID, clusterBranding, namespace, serverURL, currentContext, currentUser } }` |
-| `/api/config` | GET | Dashboard configuration |
-| `/api/dashboardConfig` | GET | `OdhDashboardConfig` CR (feature flags, settings) |
-
-#### Kubernetes Pass-Through
-| Endpoint | Method | Returns |
-|---|---|---|
-| `/api/k8s/*` | GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS | Direct proxy to the Kubernetes API. Actions are performed with the user's RBAC permissions. |
-
-Example: `fetch('/api/k8s/apis/project.openshift.io/v1/projects')` lists the user's projects.
-
-See [Section 4](#4-interacting-with-the-cluster-from-your-plugin) for detailed usage patterns.
-
-#### Other APIs
-| Endpoint | Purpose |
-|---|---|
-| `/api/components` | Dashboard components (OdhApplication CRs) |
-| `/api/namespaces` | Accessible namespaces |
-| `/api/notebooks` | Notebook resources |
-| `/api/servingRuntimes` | KServe serving runtimes |
-| `/api/route` | OpenShift routes |
-| `/api/prometheus` | Prometheus metrics |
-| `/api/cluster-settings` | Cluster config |
-| `/api/connection-types` | Connection type definitions |
-| `/api/health` | Backend health check |
-| `/api/dsc` | DataScienceCluster CR |
-| `/api/dsci` | DSCInitialization CR |
-| `/api/integrations` | Integration configurations |
-| `/api/modelRegistries` | Model Registry instances |
-| `/api/service/pipelines` | ML Pipelines service proxy |
-| `/api/service/modelregistry` | Model Registry service proxy |
-| `/api/service/trustyai` | TrustyAI service proxy |
-
-### 3.3 Using Your Own Backend (BFF Pattern)
-
-If your plugin needs its own API backend (e.g., to talk to a third-party service), add a `proxyService` entry in the ConfigMap. The dashboard backend will then proxy requests from a URL path you choose to your backend service.
-
-**Example**: Your plugin makes `fetch('/my-plugin/api/data')` → dashboard backend rewrites to `/api/data` → forwards to `my-plugin-api.opendatahub.svc.cluster.local:3000/api/data` with the user's Bearer token (if `authorize: true`).
-
-Your BFF container can then:
-- Extract the user token from the `Authorization` header
-- Use it to call the Kubernetes API on the user's behalf
-- Call external services (ML platforms, databases, etc.)
-
-### 3.4 What React Hooks and Packages Are Available
-
-**Available via Module Federation shared dependencies**: If a dependency is listed as `shared: { singleton: true }` in the host's webpack config, your plugin gets the host's instance at runtime. This includes React, react-router, PatternFly, and `@openshift/dynamic-plugin-sdk`.
-
-The host also shares all `@odh-dashboard/*` runtime packages as singletons (collected automatically by `frontend/config/getRuntimeOdhPackages.js`). At runtime, if your plugin requests any of these packages, the host provides its copy. However, since these packages are not published to npm, a standalone plugin cannot import them at **build time** for type checking.
-
-**Not directly available from outside the monorepo**:
-- `useUser()`, `useAccessReview()`, `useNotification()`, `useAppContext()` — these live in `@odh-dashboard/internal`, which is not published
-- Any hooks or components from `@odh-dashboard/internal`
-
-**Workarounds for a standalone plugin**:
-1. **Call `/api/status` directly** — Instead of `useUser()`, do `fetch('/api/status')` in your component to get user info
-2. **Use the K8s pass-through** — Instead of dedicated hooks, call `/api/k8s/...` endpoints (see [Section 4](#4-interacting-with-the-cluster-from-your-plugin))
-3. **Use PatternFly directly** — For notifications, use PatternFly's `Alert` or `AlertGroup` components instead of the dashboard's `useNotification()` hook
-
----
-
-## 4. Interacting with the Cluster from Your Plugin
-
-Your plugin's frontend runs inside the dashboard's browser page and can use the dashboard's backend as a proxy to the Kubernetes API. All requests through `/api/k8s/*` are authenticated as the logged-in user — the dashboard backend automatically forwards the user's OpenShift token.
-
-### 4.1 Getting User Information
-
-Call `/api/status` to get information about the currently logged-in user:
-
-```typescript
-type KubeStatus = {
-  currentContext: string;
-  currentUser: string;
-  namespace: string;
-  userName: string;
-  userID: string;
-  clusterID: string;
-  clusterBranding: string;
-  isAdmin: boolean;
-  isAllowed: boolean;
-  serverURL: string;
-};
-
-async function getCurrentUser(): Promise<KubeStatus> {
-  const response = await fetch('/api/status');
-  if (!response.ok) {
-    throw new Error(`Failed to fetch status: ${response.status}`);
-  }
-  const data = await response.json();
-  return data.kube;
-}
-```
-
-As a React hook:
-
-```typescript
-import { useState, useEffect } from 'react';
-
-function useCurrentUser() {
-  const [user, setUser] = useState<KubeStatus | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch('/api/status')
-      .then((res) => res.json())
-      .then((data) => { setUser(data.kube); setLoading(false); })
-      .catch((e) => { setError(e.message); setLoading(false); });
-  }, []);
-
-  return { user, loading, error };
-}
-```
-
-### 4.2 Reading Kubernetes Resources
-
-The `/api/k8s/*` endpoint is a pass-through proxy to the Kubernetes API. It supports all HTTP methods and the user's RBAC permissions are enforced by the cluster.
-
-The URL pattern is: `/api/k8s/{kubernetes-api-path}`
-
-Where `{kubernetes-api-path}` is the standard Kubernetes API path you would use with `kubectl` or `curl`.
-
-**Examples:**
-
-```typescript
-// List the user's projects
-const projects = await fetch('/api/k8s/apis/project.openshift.io/v1/projects')
-  .then((res) => res.json());
-
-// List pods in a namespace
-const pods = await fetch('/api/k8s/api/v1/namespaces/my-project/pods')
-  .then((res) => res.json());
-
-// Get a specific deployment
-const deployment = await fetch(
-  '/api/k8s/apis/apps/v1/namespaces/my-project/deployments/my-app'
-).then((res) => res.json());
-
-// List custom resources (e.g., Kueue ClusterQueues)
-const queues = await fetch(
-  '/api/k8s/apis/kueue.x-k8s.io/v1beta1/clusterqueues'
-).then((res) => res.json());
-```
-
-As a reusable React hook (pattern from the [kueue-visualizer](https://github.com/rh-ai-community-plugins/kueue-visualizer) plugin):
-
-```typescript
-import { useState, useEffect, useCallback } from 'react';
-
-function useK8sResource<T>(apiPath: string) {
-  const [items, setItems] = useState<T[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const refresh = useCallback(() => {
-    setLoading(true);
-    fetch(`/api/k8s${apiPath}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-        return res.json();
-      })
-      .then((list) => { setItems(list.items ?? []); setLoading(false); })
-      .catch((e) => { setError(e.message); setLoading(false); });
-  }, [apiPath]);
-
-  useEffect(() => { refresh(); }, [refresh]);
-
-  return { items, loading, error, refresh };
-}
-
-// Usage:
-const { items: pods, loading } = useK8sResource<Pod>(
-  '/api/v1/namespaces/my-project/pods'
-);
-```
-
-### 4.3 Creating and Modifying Kubernetes Resources
-
-The same `/api/k8s/*` proxy supports POST, PUT, PATCH, and DELETE. The user must have the appropriate RBAC permissions for the operation.
-
-**Creating a Deployment:**
-
-```typescript
-async function createDeployment(namespace: string, name: string, image: string) {
-  const deployment = {
-    apiVersion: 'apps/v1',
-    kind: 'Deployment',
-    metadata: { name, namespace },
-    spec: {
-      replicas: 1,
-      selector: { matchLabels: { app: name } },
-      template: {
-        metadata: { labels: { app: name } },
-        spec: {
-          containers: [{
-            name,
-            image,
-            ports: [{ containerPort: 8080 }],
-          }],
-        },
-      },
-    },
-  };
-
-  const response = await fetch(
-    `/api/k8s/apis/apps/v1/namespaces/${namespace}/deployments`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(deployment),
-    },
-  );
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || `Failed to create deployment: ${response.status}`);
-  }
-  return response.json();
-}
-```
-
-**Creating a Service:**
-
-```typescript
-async function createService(namespace: string, name: string, port: number) {
-  const service = {
-    apiVersion: 'v1',
-    kind: 'Service',
-    metadata: { name, namespace },
-    spec: {
-      selector: { app: name },
-      ports: [{ port, targetPort: port, protocol: 'TCP' }],
-    },
-  };
-
-  const response = await fetch(
-    `/api/k8s/api/v1/namespaces/${namespace}/services`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(service),
-    },
-  );
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || `Failed to create service: ${response.status}`);
-  }
-  return response.json();
-}
-```
-
-**Deleting a resource:**
-
-```typescript
-async function deleteDeployment(namespace: string, name: string) {
-  const response = await fetch(
-    `/api/k8s/apis/apps/v1/namespaces/${namespace}/deployments/${name}`,
-    { method: 'DELETE' },
-  );
-  if (!response.ok) {
-    throw new Error(`Failed to delete deployment: ${response.status}`);
-  }
-}
-```
-
-### 4.4 Checking User Permissions (RBAC)
-
-Before creating resources, check whether the user has the required permissions using a SelfSubjectAccessReview:
-
-```typescript
-async function canUserCreate(
-  namespace: string,
-  group: string,
-  resource: string,
-): Promise<boolean> {
-  const review = {
-    apiVersion: 'authorization.k8s.io/v1',
-    kind: 'SelfSubjectAccessReview',
-    spec: {
-      resourceAttributes: {
-        namespace,
-        verb: 'create',
-        group,
-        resource,
-      },
-    },
-  };
-
-  const response = await fetch(
-    '/api/k8s/apis/authorization.k8s.io/v1/selfsubjectaccessreviews',
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(review),
-    },
-  );
-
-  const result = await response.json();
-  return result.status?.allowed === true;
-}
-
-// Check if user can create deployments in a namespace
-const canDeploy = await canUserCreate('my-project', 'apps', 'deployments');
-```
-
-As a React hook:
-
-```typescript
-function useCanCreate(namespace: string, group: string, resource: string) {
-  const [allowed, setAllowed] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    canUserCreate(namespace, group, resource)
-      .then((result) => { setAllowed(result); setLoading(false); })
-      .catch(() => { setAllowed(false); setLoading(false); });
-  }, [namespace, group, resource]);
-
-  return { allowed, loading };
-}
-```
-
-### 4.5 Reading Dashboard Configuration
-
-```typescript
-// Get dashboard feature flags and settings
-const dashboardConfig = await fetch('/api/dashboardConfig').then((res) => res.json());
-
-// Get basic dashboard config
-const config = await fetch('/api/config').then((res) => res.json());
-```
-
----
-
-## 5. Example Community Plugins
-
-Two community plugins demonstrate the standalone approach:
-
-### hello-plugin-world
-
-**Repository**: [github.com/rh-ai-community-plugins/hello-plugin-world](https://github.com/rh-ai-community-plugins/hello-plugin-world)
-
-A minimal "Hello World" plugin that demonstrates:
-- Project structure with `src/rhoai/extensions.ts` for extension declarations
-- Webpack Module Federation config using `webpack.container.ModuleFederationPlugin`
-- Three extensions: `app.area`, `app.navigation/href`, `app.route`
-- `Containerfile` with nginx serving static files on port 8080 as non-root user 1001
-- Helm chart in `chart/` for deployment
-- No dashboard API interaction — purely presentational
-
-### kueue-visualizer
-
-**Repository**: [github.com/rh-ai-community-plugins/kueue-visualizer](https://github.com/rh-ai-community-plugins/kueue-visualizer)
-
-A more substantial plugin that demonstrates:
-- Multiple pages with separate routes (Queue Infrastructure, Workloads)
-- Creating a custom navigation section (`app.navigation/section`)
-- **Reading Kubernetes resources** via the `/api/k8s/*` pass-through proxy — fetches Kueue CRDs (ClusterQueues, LocalQueues, Workloads, ResourceFlavors) and core API resources (Namespaces)
-- React hooks pattern for K8s data fetching (`useKueueResources.ts`)
-- PatternFly Topology visualization
-- Helm chart with ClusterRole for read-only RBAC
-- OpenShift security best practices (restricted-v2 SCC compliance)
-
-The kueue-visualizer is the best reference for plugins that need to read cluster data. Its `src/app/hooks/useKueueResources.ts` shows the recommended pattern for calling `/api/k8s/*` endpoints.
-
----
-
-## Key Reference Files
-
-| File | Purpose |
-|---|---|
-| `manifests/modular-architecture/federation-configmap.yaml` | ConfigMap defining which modules are loaded at runtime |
-| `manifests/modular-architecture/deployment.yaml` | Kustomize patch injecting `MODULE_FEDERATION_CONFIG` env var + sidecar containers |
-| `packages/app-config/src/types.ts` | TypeScript types for `ModuleFederationConfig` and `ProxyService` |
-| `packages/app-config/src/module-federation.ts` | Config parsing and old→new format conversion |
-| `backend/src/routes/module-federation.ts` | Backend proxy registration for remotes and proxy services |
-| `backend/src/routes/root.ts` | HTML injection of remote list (`mf-remotes-json` script tag) |
-| `backend/src/utils/proxy.ts` | Proxy logic and auth header forwarding (`registerProxy`, `setAuthorizationHeader`) |
-| `backend/src/utils/directCallUtils.ts` | User token extraction from `x-forwarded-access-token` |
-| `backend/src/routes/api/k8s/index.ts` | Kubernetes API pass-through proxy |
-| `backend/src/routes/api/status/statusUtils.ts` | User status endpoint implementation |
-| `frontend/src/plugins/useAppExtensions.ts` | Frontend runtime module loading |
-| `frontend/config/moduleFederation.js` | Host Module Federation webpack config with shared singletons |
-| `frontend/config/getRuntimeOdhPackages.js` | Auto-collection of `@odh-dashboard/*` shared packages |
-| `frontend/src/app/navigation/ExtensibleNav.tsx` | Dynamic navigation rendering |
-| `frontend/src/app/AppRoutes.tsx` | Dynamic route rendering |
-| `packages/plugin-core/src/extension-points/` | Extension type definitions |
-| `docs/module-federation.md` | Official module federation docs |
-| `docs/extensibility.md` | Extension points, code refs, hooks, best practices |
-| `docs/onboard-modular-architecture.md` | Official onboarding guide for monorepo modules |
-
