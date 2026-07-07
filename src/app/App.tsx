@@ -1,32 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { Bullseye, Page, PageSection } from '@patternfly/react-core';
-import HelloWorldPage from './components/HelloWorldPage';
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import UserProjectsPage from './pages/UserProjectsPage';
+import ClusterResourcesPage from './pages/ClusterResourcesPage';
 
-const App: React.FC = () => {
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    // Simulate initialization
-    setIsReady(true);
-  }, []);
-
-  if (!isReady) {
-    return (
-      <Page>
-        <PageSection>
-          <Bullseye>Loading...</Bullseye>
-        </PageSection>
-      </Page>
-    );
-  }
-
-  return (
-    <Routes>
-      <Route path="/" element={<HelloWorldPage />} />
-      <Route path="/hello-world" element={<HelloWorldPage />} />
-    </Routes>
-  );
-};
+const App: React.FC = () => (
+  <Routes>
+    <Route path="/" element={<Navigate to="/hello-world/user-projects" replace />} />
+    <Route path="/hello-world" element={<Navigate to="/hello-world/user-projects" replace />} />
+    <Route path="/hello-world/user-projects" element={<UserProjectsPage />} />
+    <Route path="/hello-world/cluster-resources" element={<ClusterResourcesPage />} />
+  </Routes>
+);
 
 export default App;

@@ -28,6 +28,7 @@ jest.mock('react-router-dom', () => {
       state: undefined,
     }),
     Outlet: () => null,
+    Navigate: ({ to }: { to: string }) => <div data-testid="navigate" data-to={to} />,
     Routes: ({ children }: { children: React.ReactNode }) => {
       const childrenArray = Array.isArray(children) ? children : [children];
       const firstChild = childrenArray[0] as React.ReactElement;

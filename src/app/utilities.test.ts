@@ -1,17 +1,11 @@
-import { helloWorldPath } from './utilities';
+import { userProjectsPath, clusterResourcesPath } from './utilities';
 
 describe('utilities', () => {
-  describe('helloWorldPath', () => {
-    it('should export the correct path', () => {
-      expect(helloWorldPath).toBe('/hello-world');
-    });
+  it('should export the correct user-projects path', () => {
+    expect(userProjectsPath).toBe('/hello-world/user-projects');
+  });
 
-    it('should be a string', () => {
-      expect(typeof helloWorldPath).toBe('string');
-    });
-
-    it('should start with a forward slash', () => {
-      expect(helloWorldPath.startsWith('/')).toBe(true);
-    });
+  it('should export the correct cluster-resources path', () => {
+    expect(clusterResourcesPath).toBe('/hello-world/cluster-resources');
   });
 });
