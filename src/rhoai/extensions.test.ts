@@ -3,8 +3,7 @@ import {
   communityPluginsSectionExtension,
   userProjectsNavExtension,
   clusterResourcesNavExtension,
-  userProjectsRouteExtension,
-  clusterResourcesRouteExtension,
+  helloWorldRouteExtension,
   extensions,
 } from './extensions';
 
@@ -53,25 +52,18 @@ describe('RHOAI Plugin Extensions', () => {
     });
   });
 
-  describe('route extensions', () => {
-    it('should define user-projects route with lazy component', () => {
-      expect(userProjectsRouteExtension.type).toBe('app.route');
-      expect(userProjectsRouteExtension.properties.path).toBe('/hello-world/user-projects/*');
-      expect(typeof userProjectsRouteExtension.properties.component).toBe('function');
-      expect(userProjectsRouteExtension.properties.component()).toBeInstanceOf(Promise);
-    });
-
-    it('should define cluster-resources route with lazy component', () => {
-      expect(clusterResourcesRouteExtension.type).toBe('app.route');
-      expect(clusterResourcesRouteExtension.properties.path).toBe('/hello-world/cluster-resources/*');
-      expect(typeof clusterResourcesRouteExtension.properties.component).toBe('function');
-      expect(clusterResourcesRouteExtension.properties.component()).toBeInstanceOf(Promise);
+  describe('route extension', () => {
+    it('should define a single wildcard route with lazy component', () => {
+      expect(helloWorldRouteExtension.type).toBe('app.route');
+      expect(helloWorldRouteExtension.properties.path).toBe('/hello-world/*');
+      expect(typeof helloWorldRouteExtension.properties.component).toBe('function');
+      expect(helloWorldRouteExtension.properties.component()).toBeInstanceOf(Promise);
     });
   });
 
   describe('extensions array', () => {
-    it('should contain all six extensions', () => {
-      expect(extensions).toHaveLength(6);
+    it('should contain all five extensions', () => {
+      expect(extensions).toHaveLength(5);
     });
 
     it('should include all extensions in the correct order', () => {
@@ -80,8 +72,7 @@ describe('RHOAI Plugin Extensions', () => {
         communityPluginsSectionExtension,
         userProjectsNavExtension,
         clusterResourcesNavExtension,
-        userProjectsRouteExtension,
-        clusterResourcesRouteExtension,
+        helloWorldRouteExtension,
       ]);
     });
   });

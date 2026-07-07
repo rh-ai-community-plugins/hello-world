@@ -1,3 +1,5 @@
+import { userProjectsPath, clusterResourcesPath } from '~/app/utilities';
+
 export const helloWorldAreaExtension = {
   type: 'app.area' as const,
   properties: {
@@ -21,7 +23,7 @@ export const userProjectsNavExtension = {
   properties: {
     id: 'hello-world-user-projects',
     title: 'User & Projects',
-    href: '/hello-world/user-projects',
+    href: userProjectsPath,
     section: 'community-plugins',
     label: 'Community',
   },
@@ -32,25 +34,17 @@ export const clusterResourcesNavExtension = {
   properties: {
     id: 'hello-world-cluster-resources',
     title: 'Cluster Resources',
-    href: '/hello-world/cluster-resources',
+    href: clusterResourcesPath,
     section: 'community-plugins',
     label: 'Community',
   },
 };
 
-export const userProjectsRouteExtension = {
+export const helloWorldRouteExtension = {
   type: 'app.route' as const,
   properties: {
-    path: '/hello-world/user-projects/*',
-    component: () => import('../app/pages/UserProjectsPage'),
-  },
-};
-
-export const clusterResourcesRouteExtension = {
-  type: 'app.route' as const,
-  properties: {
-    path: '/hello-world/cluster-resources/*',
-    component: () => import('../app/pages/ClusterResourcesPage'),
+    path: '/hello-world/*',
+    component: () => import('~/app/App'),
   },
 };
 
@@ -59,8 +53,7 @@ export const extensions = [
   communityPluginsSectionExtension,
   userProjectsNavExtension,
   clusterResourcesNavExtension,
-  userProjectsRouteExtension,
-  clusterResourcesRouteExtension,
+  helloWorldRouteExtension,
 ];
 
 export default extensions;

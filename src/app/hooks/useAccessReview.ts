@@ -30,6 +30,10 @@ async function checkAccess(
     },
   );
 
+  if (!response.ok) {
+    throw new Error(`Access review failed: ${response.status}`);
+  }
+
   const result = await response.json();
   return result.status?.allowed === true;
 }
@@ -56,6 +60,7 @@ export function useAccessReview(namespace: string | null) {
       return;
     }
 
+    let cancelled = false;
     setLoading(true);
     setError(null);
 
@@ -73,9 +78,11 @@ export function useAccessReview(namespace: string | null) {
         })),
       ),
     )
-      .then(setResults)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .then((r) => { if (!cancelled) setResults(r); })
+      .catch((e) => { if (!cancelled) setError(e.message); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+
+    return () => { cancelled = true; };
   }, [namespace]);
 
   return { results, loading, error };

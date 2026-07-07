@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export type K8sResource = {
   apiVersion: string;
@@ -20,6 +20,7 @@ export function useK8sResources<T extends K8sResource = K8sResource>(
   const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const controllerRef = useRef<AbortController | null>(null);
 
   const refresh = useCallback(() => {
     if (!apiPath) {
@@ -27,9 +28,13 @@ export function useK8sResources<T extends K8sResource = K8sResource>(
       return;
     }
 
+    controllerRef.current?.abort();
+    const controller = new AbortController();
+    controllerRef.current = controller;
+
     setLoading(true);
     setError(null);
-    fetch(`/api/k8s${apiPath}`)
+    fetch(`/api/k8s${apiPath}`, { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
         return res.json();
@@ -39,6 +44,7 @@ export function useK8sResources<T extends K8sResource = K8sResource>(
         setLoading(false);
       })
       .catch((e) => {
+        if (e.name === 'AbortError') return;
         setError(e.message);
         setLoading(false);
       });
@@ -46,6 +52,7 @@ export function useK8sResources<T extends K8sResource = K8sResource>(
 
   useEffect(() => {
     refresh();
+    return () => controllerRef.current?.abort();
   }, [refresh]);
 
   return { items, loading, error, refresh };
