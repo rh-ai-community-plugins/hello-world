@@ -1,11 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useProjects } from '~/app/hooks/useProjects';
-import {
-  useK8sResources,
-  createK8sResource,
-  deleteK8sResource,
-} from '~/app/hooks/useK8sResources';
+import { useK8sResources } from '~/app/hooks/useK8sResources';
 import ClusterResourcesPage from './ClusterResourcesPage';
 
 jest.mock('~/app/hooks/useProjects');
@@ -65,8 +61,6 @@ function setupK8sMock(deployments: unknown[] = [], services: unknown[] = []) {
 describe('ClusterResourcesPage', () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    (createK8sResource as jest.Mock).mockResolvedValue({});
-    (deleteK8sResource as jest.Mock).mockResolvedValue(undefined);
   });
 
   it('shows project selector', () => {
