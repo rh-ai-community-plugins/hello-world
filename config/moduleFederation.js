@@ -5,7 +5,7 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env.development') });
 
 module.exports = {
-  name: 'helloWorld',
+  name: 'helloWorld', // [PLUGIN-SPECIFIC] must match package.json and plugin.yaml
   filename: 'remoteEntry.js',
   exposes: {
     './extensions': './src/rhoai/extensions.ts',

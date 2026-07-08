@@ -94,3 +94,4 @@ docs/archives/       — Project plan and historical documents
 - UI components use **PatternFly 6** (`@patternfly/react-core`, `@patternfly/react-icons`).
 - TypeScript strict mode is enabled. Target is ES2020 with ESNext modules and `react-jsx` transform.
 - No standalone ESLint config file — uses `@typescript-eslint` defaults via dev dependencies.
+- Plugin-specific identifiers are annotated with `[PLUGIN-SPECIFIC]` comments; shared conventions use `[SHARED]`. See `docs/development/CUSTOMIZATION.md` for the full reference.

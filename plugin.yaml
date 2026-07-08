@@ -1,25 +1,25 @@
 apiVersion: backend.openshift.io/v1
 kind: Plugin
 metadata:
-  name: hello-world
-  displayName: Hello World
+  name: hello-world              # [PLUGIN-SPECIFIC] unique plugin name in the registry
+  displayName: Hello World       # [PLUGIN-SPECIFIC] human-readable name
   description: A reference implementation and scaffold plugin for the RHOAI Dashboard
   version: 0.1.0
   link:
-    url: https://github.com/rh-ai-community-plugins/hello-plugin-world
+    url: https://github.com/rh-ai-community-plugins/hello-plugin-world  # [PLUGIN-SPECIFIC]
   iconPath: ''
   remote:
     type: module-federation
     spec:
-      name: helloWorld
-      scope: helloWorld
+      name: helloWorld           # [PLUGIN-SPECIFIC] Module Federation container name (camelCase)
+      scope: helloWorld          # [PLUGIN-SPECIFIC] must match name above
       # NOTE: Update this URL to point to your deployed container image.
       # Example: https://your-openshift-route/hello-world/remoteEntry.js
-      remoteEntry: https://<registry>/rhoai-hello-world/remoteEntry.js
+      remoteEntry: https://<registry>/rhoai-hello-world/remoteEntry.js  # [PLUGIN-SPECIFIC]
       paths:
         - type: route
-          path: /hello-world
+          path: /hello-world     # [PLUGIN-SPECIFIC] must match route prefix in extensions.ts
           extensions:
-            - helloWorld/extensions
+            - helloWorld/extensions  # [PLUGIN-SPECIFIC] {scope}/extensions
         - type: icon
-          path: helloWorld/Icon
+          path: helloWorld/Icon  # [PLUGIN-SPECIFIC] {scope}/Icon

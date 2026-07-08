@@ -56,7 +56,7 @@ npm run lint            # ESLint on src/
 See the [docs/](docs/) directory for detailed guides:
 
 - **[Architecture](docs/architecture/)** -- Plugin system internals, extension contract, and community plugin examples
-- **[Development](docs/development/)** -- Local environment setup, dashboard integration, and backend API reference
+- **[Development](docs/development/)** -- Local environment setup, [customization guide](docs/development/CUSTOMIZATION.md), and backend API reference
 - **[Deployment](docs/deployment/)** -- Container image build and push instructions
 
 ## License

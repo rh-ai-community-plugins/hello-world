@@ -3,22 +3,23 @@ import React from 'react';
 /**
  * Navigation icon for the Hello World plugin
  */
-const HelloIcon: React.FC<{ className?: string }> = ({ className }) => (
+const HelloIcon: React.FC = () => (
   <svg
-    className={className}
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
+    className="pf-v6-svg"
+    viewBox="0 0 32 32"
     fill="none"
-    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    role="img"
+    width="1em"
+    height="1em"
   >
-    <rect width="24" height="24" rx="4" fill="#6b21a8" />
+    <rect x="1" y="1" width="30" height="30" rx="5" fill="#6b21a8" />
     <text
-      x="12"
-      y="16"
+      x="16"
+      y="21"
       textAnchor="middle"
       fill="white"
-      fontSize="12"
+      fontSize="14"
       fontWeight="bold"
       fontFamily="Arial, sans-serif"
     >

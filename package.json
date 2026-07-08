@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "description": "A reference implementation and scaffold plugin for the RHOAI Dashboard",
   "private": true,
+  "_comment_name": "[PLUGIN-SPECIFIC] package name — change to rhoai-{your-plugin}",
+  "_comment_mf": "[PLUGIN-SPECIFIC] module-federation.name — camelCase, must match webpack and plugin.yaml",
   "module-federation": {
     "name": "helloWorld",
     "remoteEntry": "remoteEntry.js",
@@ -14,10 +16,12 @@
         "pathRewrite": "/hello-world"
       }
     ],
+    "_comment_proxy": "[PLUGIN-SPECIFIC] proxy path must match route prefix in extensions.ts",
     "local": {
       "host": "localhost",
       "port": 9112
     },
+    "_comment_port": "[PLUGIN-SPECIFIC] dev port — pick an unused port (9112+)",
     "service": {
       "name": "odh-dashboard",
       "port": 8843

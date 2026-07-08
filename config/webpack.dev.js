@@ -6,12 +6,12 @@ module.exports = merge(common, {
   mode: 'development',
   devtool: 'eval-source-map',
   devServer: {
-    port: parseInt(process.env.PORT, 10) || 9112,
+    port: parseInt(process.env.PORT, 10) || 9112, // [PLUGIN-SPECIFIC] dev port
     historyApiFallback: true,
     hot: true,
     proxy: [
       {
-        context: ['/hello-world'],
+        context: ['/hello-world'], // [PLUGIN-SPECIFIC] must match route prefix
         target: 'http://localhost:8843',
         pathRewrite: { '^/hello-world': '/hello-world' },
       },

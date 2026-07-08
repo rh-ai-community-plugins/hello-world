@@ -1,6 +1,7 @@
 import {
   helloWorldAreaExtension,
   communityPluginsSectionExtension,
+  helloWorldSectionExtension,
   userProjectsNavExtension,
   clusterResourcesNavExtension,
   helloWorldRouteExtension,
@@ -32,23 +33,34 @@ describe('RHOAI Plugin Extensions', () => {
     });
   });
 
+  describe('helloWorldSectionExtension', () => {
+    it('should define a subsection nested under community-plugins', () => {
+      expect(helloWorldSectionExtension.type).toBe('app.navigation/section');
+      expect(helloWorldSectionExtension.properties.id).toBe('hello-world');
+      expect(helloWorldSectionExtension.properties.title).toBe('Hello World');
+      expect(helloWorldSectionExtension.properties.group).toBe('1_hello_world');
+      expect(helloWorldSectionExtension.properties.section).toBe('community-plugins');
+      expect(typeof helloWorldSectionExtension.properties.iconRef).toBe('function');
+    });
+  });
+
   describe('navigation extensions', () => {
-    it('should define User & Projects nav item', () => {
+    it('should define User & Projects nav item under hello-world section', () => {
       expect(userProjectsNavExtension.type).toBe('app.navigation/href');
       expect(userProjectsNavExtension.properties.id).toBe('hello-world-user-projects');
       expect(userProjectsNavExtension.properties.title).toBe('User & Projects');
       expect(userProjectsNavExtension.properties.href).toBe('/hello-world/user-projects');
-      expect(userProjectsNavExtension.properties.section).toBe('community-plugins');
-      expect(userProjectsNavExtension.properties.label).toBe('Community');
+      expect(userProjectsNavExtension.properties.section).toBe('hello-world');
+      expect(userProjectsNavExtension.properties.path).toBe('/hello-world/user-projects/*');
     });
 
-    it('should define Cluster Resources nav item', () => {
+    it('should define Cluster Resources nav item under hello-world section', () => {
       expect(clusterResourcesNavExtension.type).toBe('app.navigation/href');
       expect(clusterResourcesNavExtension.properties.id).toBe('hello-world-cluster-resources');
       expect(clusterResourcesNavExtension.properties.title).toBe('Cluster Resources');
       expect(clusterResourcesNavExtension.properties.href).toBe('/hello-world/cluster-resources');
-      expect(clusterResourcesNavExtension.properties.section).toBe('community-plugins');
-      expect(clusterResourcesNavExtension.properties.label).toBe('Community');
+      expect(clusterResourcesNavExtension.properties.section).toBe('hello-world');
+      expect(clusterResourcesNavExtension.properties.path).toBe('/hello-world/cluster-resources/*');
     });
   });
 
@@ -62,14 +74,15 @@ describe('RHOAI Plugin Extensions', () => {
   });
 
   describe('extensions array', () => {
-    it('should contain all five extensions', () => {
-      expect(extensions).toHaveLength(5);
+    it('should contain all six extensions', () => {
+      expect(extensions).toHaveLength(6);
     });
 
     it('should include all extensions in the correct order', () => {
       expect(extensions).toEqual([
         helloWorldAreaExtension,
         communityPluginsSectionExtension,
+        helloWorldSectionExtension,
         userProjectsNavExtension,
         clusterResourcesNavExtension,
         helloWorldRouteExtension,

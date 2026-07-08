@@ -1,0 +1,77 @@
+# Customizing This Plugin
+
+When forking this repository to create your own community plugin, you need to replace all plugin-specific identifiers with values unique to your plugin. Files containing these identifiers are annotated with `[PLUGIN-SPECIFIC]` and `[SHARED]` comments throughout the codebase.
+
+- **`[PLUGIN-SPECIFIC]`** — Must be unique per plugin. Change when forking.
+- **`[SHARED]`** — Common convention across all community plugins. Do not change.
+
+---
+
+## Quick Reference
+
+Pick a short, descriptive kebab-case name for your plugin (e.g. `my-plugin`). The camelCase form (`myPlugin`) is used for Module Federation identifiers.
+
+### Identifiers to change
+
+| File | Identifier | Current value | Replace with |
+|---|---|---|---|
+| `package.json` | `name` | `rhoai-hello-world` | `rhoai-{your-plugin}` |
+| `package.json` | `module-federation.name` | `helloWorld` | `{yourPlugin}` (camelCase) |
+| `package.json` | `module-federation.proxy[].path` | `/hello-world` | `/{your-plugin}` |
+| `package.json` | `module-federation.proxy[].pathRewrite` | `/hello-world` | `/{your-plugin}` |
+| `package.json` | `module-federation.local.port` | `9112` | Unused port (see [Port allocation](#port-allocation)) |
+| `plugin.yaml` | `metadata.name` | `hello-world` | `{your-plugin}` |
+| `plugin.yaml` | `metadata.displayName` | `Hello World` | Your plugin name |
+| `plugin.yaml` | `remote.spec.name` | `helloWorld` | `{yourPlugin}` (camelCase) |
+| `plugin.yaml` | `remote.spec.scope` | `helloWorld` | `{yourPlugin}` (must match `name`) |
+| `plugin.yaml` | `remote.spec.remoteEntry` | `.../rhoai-hello-world/...` | Your deployed image URL |
+| `plugin.yaml` | `paths[0].path` | `/hello-world` | `/{your-plugin}` |
+| `plugin.yaml` | `paths[0].extensions` | `helloWorld/extensions` | `{yourPlugin}/extensions` |
+| `plugin.yaml` | `paths[1].path` | `helloWorld/Icon` | `{yourPlugin}/Icon` |
+| `src/rhoai/extensions.ts` | area `id` | `hello-world` | `{your-plugin}` |
+| `src/rhoai/extensions.ts` | plugin section `id` | `hello-world` | `{your-plugin}` |
+| `src/rhoai/extensions.ts` | plugin section `title` | `Hello World` | Your plugin name |
+| `src/rhoai/extensions.ts` | plugin section `group` | `1_hello_world` | `{N}_{your_plugin}` |
+| `src/rhoai/extensions.ts` | nav item `id`s | `hello-world-*` | `{your-plugin}-{page}` |
+| `src/rhoai/extensions.ts` | nav item `href`/`path` | `/hello-world/*` | `/{your-plugin}/*` |
+| `src/rhoai/extensions.ts` | route `path` | `/hello-world/*` | `/{your-plugin}/*` |
+| `src/bootstrap.tsx` | `Router basename` | `/hello-world` | `/{your-plugin}` |
+| `config/webpack.common.js` | MF plugin `name` | `helloWorld` | `{yourPlugin}` (camelCase) |
+| `config/moduleFederation.js` | `name` | `helloWorld` | `{yourPlugin}` (camelCase) |
+| `config/webpack.dev.js` | proxy `context` | `/hello-world` | `/{your-plugin}` |
+| `config/webpack.dev.js` | `port` | `9112` | Same as `package.json` port |
+| `.env.development` | `URL_PREFIX` | `/hello-world` | `/{your-plugin}` |
+| `chart/Chart.yaml` | `name` | `hello-world-plugin` | `{your-plugin}-plugin` |
+| `chart/values.yaml` | `image.repository` | `.../rhoai-hello-world` | Your image repository |
+| `chart/values.yaml` | `ingress.path` | `/hello-world` | `/{your-plugin}` |
+
+### Identifiers to keep (shared)
+
+These are shared conventions that all community plugins should use identically:
+
+| File | Identifier | Value | Purpose |
+|---|---|---|---|
+| `src/rhoai/extensions.ts` | community section `id` | `community-plugins` | Groups all community plugins in one sidebar section |
+| `src/rhoai/extensions.ts` | community section `title` | `Community plugins` | Display name for the shared section |
+| `src/rhoai/extensions.ts` | community section `group` | `9_plugins` | Sort position in the dashboard sidebar |
+| `src/rhoai/extensions.ts` | plugin section `section` ref | `community-plugins` | Nests your plugin under the shared section |
+| `config/webpack.common.js` | MF `filename` | `remoteEntry.js` | Standard Module Federation entry filename |
+| `config/webpack.common.js` | expose keys | `./extensions`, `./Icon` | Standard module names expected by the host |
+
+---
+
+## Naming Conventions
+
+- **Route prefix, IDs, section IDs**: kebab-case (`my-plugin`)
+- **Module Federation name/scope**: camelCase (`myPlugin`)
+- **Nav item IDs**: prefix with your plugin name (`my-plugin-page-name`)
+- **Section group sort key**: `{number}_{snake_case}` (e.g. `1_my_plugin`)
+- **npm package name**: `rhoai-{your-plugin}`
+
+All route prefixes, hrefs, and path patterns in `extensions.ts` must use the same prefix as the route extension's `path` (e.g. `/my-plugin/*`).
+
+---
+
+## Port Allocation
+
+The RHOAI dashboard modules occupy ports 9100-9111. Community plugins should use port **9112 and above**. If you run multiple plugins locally at the same time, each needs a unique port.

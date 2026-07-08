@@ -8,6 +8,7 @@ const root = ReactDOM.createRoot(document.getElementById('root')!);
 
 root.render(
   <React.StrictMode>
+    {/* [PLUGIN-SPECIFIC] basename must match route prefix — standalone dev only */}
     <Router basename="/hello-world">
       <App />
     </Router>
