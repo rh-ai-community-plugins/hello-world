@@ -28,12 +28,12 @@ npx jest src/app/hooks/useCurrentUser.test.ts
 
 The plugin exposes two remote modules to the RHOAI dashboard host via Webpack Module Federation (configured inline in `config/webpack.common.js`):
 
-- **`./extensions`** (`src/rhoai/extensions.ts`) — Defines five extension points:
+- **`./extensions`** (`src/rhoai/extensions.ts`) — Defines six extension points:
   - `app.area` — registers the `hello-world` feature area
-  - `app.navigation/section` — defines the `community-plugins` sidebar section
-  - `app.navigation/href` (x2) — "User Info" and "Cluster Resources" nav items with `label: 'Community'`
+  - `app.navigation/section` (x2) — `community-plugins` shared parent section (with `CommunityNavIcon`) and `hello-world` plugin subsection (with `HelloWorldNavIcon`)
+  - `app.navigation/href` (x2) — "User Info" and "Cluster Resources" nav items under the `hello-world` section
   - `app.route` — mounts the App component with wildcard routing at `/hello-world/*`
-- **`./Icon`** (`src/rhoai/HelloWorldNavIcon.tsx`) — SVG icon displayed in the dashboard sidebar.
+- **`./Icon`** (`src/rhoai/HelloWorldNavIcon.tsx`) — SVG icon for the plugin's nav subsection. A separate `CommunityNavIcon.tsx` provides the icon for the shared `community-plugins` parent section.
 
 Shared singletons (react, react-dom, react-router-dom, @patternfly/react-core, @openshift/dynamic-plugin-sdk) are provided by the host and not bundled into the plugin.
 
@@ -69,7 +69,7 @@ Four hooks in `src/app/hooks/` provide data fetching and API integration:
 
 ### Test Setup
 
-Jest with `ts-jest` preset and `jsdom` environment. `jest.setup.tsx` mocks `react-router-dom` (useNavigate, useParams, useLocation, Outlet, Routes, Route) and polyfills TextEncoder/TextDecoder. CSS modules are proxied to return property names as class names (`jest.style-mock.js`).
+Jest with `ts-jest` preset and `jsdom` environment (`jest.config.js`). `jest.setup.tsx` mocks `react-router-dom` (useNavigate, useParams, useLocation, Outlet, Routes, Route, Navigate) and polyfills TextEncoder/TextDecoder. CSS modules are proxied to return property names as class names (`jest.style-mock.js`).
 
 ### Deployment
 
