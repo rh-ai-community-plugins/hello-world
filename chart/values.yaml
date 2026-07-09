@@ -49,3 +49,23 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# BFF (Backend For Frontend) service
+bff:
+  enabled: true
+  image:
+    repository: quay.io/rh-ai-community-plugins/hello-world-bff
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi

@@ -22,16 +22,27 @@ To run a single test file:
 npx jest src/app/hooks/useCurrentUser.test.ts
 ```
 
+### BFF Service Commands
+
+```bash
+cd bff
+K8S_API_BASE=$(oc whoami --show-server) npm run start:dev  # Dev server on port 3000 (K8S_API_BASE required for local dev)
+npm run build         # Compile TypeScript to dist/
+npm start             # Run compiled server (in-cluster, K8S_API_BASE not needed)
+npm test              # Run BFF tests (Jest + node)
+npm run lint          # ESLint on bff/src/
+```
+
 ## Architecture
 
 ### Module Federation Plugin System
 
 The plugin exposes two remote modules to the RHOAI dashboard host via Webpack Module Federation (configured inline in `config/webpack.common.js`):
 
-- **`./extensions`** (`src/rhoai/extensions.ts`) — Defines six extension points:
+- **`./extensions`** (`src/rhoai/extensions.ts`) — Defines seven extension points:
   - `app.area` — registers the `hello-world` feature area
   - `app.navigation/section` (x2) — `community-plugins` shared parent section (with `CommunityNavIcon`) and `hello-world` plugin subsection (with `HelloWorldNavIcon`)
-  - `app.navigation/href` (x2) — "User Info" and "Cluster Resources" nav items under the `hello-world` section
+  - `app.navigation/href` (x3) — "User Info", "Cluster Resources", and "Namespace Summary" nav items under the `hello-world` section
   - `app.route` — mounts the App component with wildcard routing at `/hello-world/*`
 - **`./Icon`** (`src/rhoai/HelloWorldNavIcon.tsx`) — SVG icon for the plugin's nav subsection. A separate `CommunityNavIcon.tsx` provides the icon for the shared `community-plugins` parent section.
 
@@ -39,19 +50,25 @@ Shared singletons (react, react-dom, react-router-dom, @patternfly/react-core, @
 
 ### Pages
 
-The plugin has two pages, routed under `/hello-world/*`:
+The plugin has three pages, routed under `/hello-world/*`, each demonstrating a different integration pattern:
 
-- **User Info page** (`src/app/pages/UserInfoPage.tsx`) — Displays the authenticated user's information via `/api/status`.
-- **Cluster Resources page** (`src/app/pages/ClusterResourcesPage.tsx`) — Create and list Deployments and Services via the dashboard's K8s API pass-through.
+- **User Info page** (`src/app/pages/UserInfoPage.tsx`) — Displays the authenticated user's information via `/api/status` (dashboard API pattern).
+- **Cluster Resources page** (`src/app/pages/ClusterResourcesPage.tsx`) — Create and list Deployments and Services via the dashboard's K8s API pass-through (`/api/k8s/*` pattern).
+- **Namespace Summary page** (`src/app/pages/NamespaceSummaryPage.tsx`) — Displays aggregated namespace and pod data via the plugin's own BFF service (BFF pattern).
 
 ### Custom Hooks
 
-Four hooks in `src/app/hooks/` provide data fetching and API integration:
+Five hooks in `src/app/hooks/` provide data fetching and API integration:
 
 - `useCurrentUser` — Fetches authenticated user info from `/api/status`.
 - `useProjects` — Fetches accessible projects from the OpenShift projects API.
 - `useK8sResources` — Generic hook for listing K8s resources with create/delete helpers.
 - `useAccessReview` — Checks RBAC permissions via SelfSubjectAccessReview.
+- `useNamespaceSummary` — Fetches aggregated namespace and pod summary from the BFF endpoint.
+
+### BFF Service
+
+The `bff/` directory contains a standalone Express.js + TypeScript backend service that demonstrates the BFF pattern. The dashboard proxies requests from `/hello-world/api/*` to this service, forwarding the user's Bearer token. See `docs/architecture/BFF_PATTERN.md` for details.
 
 ### Entry Point Chain
 
@@ -64,7 +81,7 @@ Four hooks in `src/app/hooks/` provide data fetching and API integration:
 ### Webpack Configs
 
 - `config/webpack.common.js` — Shared config: entry point, loaders, Module Federation, path alias `~` → `./src`
-- `config/webpack.dev.js` — Dev server on port 9500, proxies `/hello-world` to `localhost:8443`
+- `config/webpack.dev.js` — Dev server on port 9500, proxies `/hello-world/api` to BFF at `localhost:3000` and `/hello-world` to dashboard at `localhost:8443`
 - `config/webpack.prod.js` — Output to `dist/`, CSS extraction, vendor chunk splitting
 
 ### Test Setup
@@ -73,9 +90,10 @@ Jest with `ts-jest` preset and `jsdom` environment (`jest.config.js`). `jest.set
 
 ### Deployment
 
-- **Container**: Multi-stage build in `Containerfile` — Node 20 Alpine builder → Nginx Alpine serving `dist/` on port 8080 as UID 1001. Nginx adds CORS header on `remoteEntry.js`.
-- **Helm chart**: `chart/` deploys to Kubernetes with Deployment + Service. Image defaults to `quay.io/rh-ai-community-plugins/hello-plugin-world:latest`.
-- **CI**: `.github/workflows/ci.yml` runs tests and lint on push/PR to main. `build-push.yml` builds and pushes the container image on release/tag.
+- **Frontend container**: Multi-stage build in `Containerfile` — Node 20 Alpine builder → Nginx Alpine serving `dist/` on port 8080 as UID 1001. Nginx adds CORS header on `remoteEntry.js`.
+- **BFF container**: Multi-stage build in `bff/Containerfile` — Node 20 Alpine builder → Node 20 Alpine runtime on port 3000 as UID 1001.
+- **Helm chart**: `chart/` deploys to Kubernetes with Deployment + Service for both frontend and BFF. Frontend defaults to `quay.io/rh-ai-community-plugins/hello-plugin-world:latest`, BFF to `quay.io/rh-ai-community-plugins/hello-world-bff:latest`.
+- **CI**: `.github/workflows/ci.yml` runs tests and lint for both frontend and BFF on push/PR to main. `build-push.yml` builds and pushes both container images on release/tag.
 
 ## Documentation
 

@@ -4,6 +4,66 @@ This document covers the dashboard backend features available to plugins and how
 
 ---
 
+## Integration Patterns
+
+This reference plugin demonstrates three integration patterns. Each one covers a different way for your plugin to interact with the cluster and external services. Choose the pattern that fits your use case — most plugins will use a combination of them.
+
+### Pattern 1: Dashboard API — for dashboard-managed data
+
+Call the dashboard's own backend endpoints (`/api/status`, `/api/config`, `/api/dashboardConfig`, etc.) to get user info, feature flags, and dashboard configuration. These endpoints are managed by the dashboard and return pre-processed data.
+
+**When to use:** You need user identity, dashboard settings, or information the dashboard already aggregates.
+
+**Example page:** [User Info](../../src/app/pages/UserInfoPage.tsx) — calls `/api/status` to display the authenticated user's details.
+
+**How it works:** Your frontend code calls `fetch('/api/status')` directly. The dashboard backend handles authentication and returns JSON. No additional backend service needed.
+
+See [section 1.2](#12-dashboard-backend-apis-callable-from-your-plugins-frontend) for the full API reference.
+
+### Pattern 2: K8s API pass-through — for direct Kubernetes operations
+
+Use the dashboard's `/api/k8s/*` proxy to read, create, update, and delete any Kubernetes resource. Requests are forwarded to the cluster API server with the user's RBAC permissions — no cluster-admin needed, users only see and modify what their roles allow.
+
+**When to use:** You need to interact with Kubernetes resources (pods, deployments, services, custom resources, etc.) and the standard K8s API is sufficient.
+
+**Example page:** [Cluster Resources](../../src/app/pages/ClusterResourcesPage.tsx) — creates and lists Deployments and Services in the user's namespaces.
+
+**How it works:** Your frontend code calls `fetch('/api/k8s/apis/apps/v1/namespaces/my-ns/deployments')`. The dashboard backend proxies the request to the K8s API server, forwarding the user's token. The response is the standard Kubernetes API response.
+
+See [section 2](#2-interacting-with-the-cluster-from-your-plugin) for code examples (listing resources, creating deployments, checking RBAC permissions).
+
+### Pattern 3: BFF (Backend For Frontend) — for server-side logic
+
+Deploy your own backend service alongside the plugin. The dashboard proxies requests to it and forwards the user's authentication token. Your BFF can make multiple K8s API calls, talk to external services, keep credentials server-side, or perform any logic that doesn't belong in the browser.
+
+**When to use:**
+- You need to aggregate multiple API calls into one response (reduce frontend round-trips)
+- You need to call external services (ML platforms, databases, third-party APIs)
+- You need to keep API keys or credentials server-side
+- You need server-side business logic or heavy data processing
+
+**Example page:** [Namespace Summary](../../src/app/pages/NamespaceSummaryPage.tsx) — calls the plugin's BFF, which lists the user's projects and counts pods per namespace server-side, returning a single aggregated response.
+
+**How it works:** Your frontend calls `fetch('/hello-world/api/namespace-summary')`. The dashboard matches the path against the `proxyService` configuration, rewrites it to `/api/namespace-summary`, and forwards the request to your BFF service with the user's Bearer token. Your BFF uses the token to make K8s API calls as the user.
+
+See [section 1.3](#13-using-your-own-backend-bff-pattern) below and the full [BFF Pattern guide](../architecture/BFF_PATTERN.md) for setup details, token flow, and deployment configuration.
+
+### Choosing the right pattern
+
+| I need to... | Pattern |
+|---|---|
+| Get user info or dashboard settings | Dashboard API |
+| List, create, update, or delete K8s resources | K8s pass-through |
+| Aggregate multiple K8s calls into one response | BFF |
+| Call an external API with server-side credentials | BFF |
+| Check user RBAC permissions | K8s pass-through (SelfSubjectAccessReview) |
+| Read dashboard feature flags | Dashboard API |
+| Perform server-side data processing | BFF |
+
+Most plugins start with patterns 1 and 2, which require no additional backend service. Add a BFF (pattern 3) when you need server-side logic.
+
+---
+
 ## 1. Dashboard Backend Features Available to Your Plugin
 
 Since your plugin's frontend code runs inside the same browser page as the dashboard, it shares the same origin and can call all dashboard backend APIs directly via `fetch()`. Your plugin can also optionally have its own backend (BFF) that receives the user's auth token.
