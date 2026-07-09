@@ -28,12 +28,11 @@ import {
   SelectOption,
 
 } from '@patternfly/react-core';
-import { CubesIcon, PlusCircleIcon, TrashIcon, SyncAltIcon } from '@patternfly/react-icons';
+import { CubesIcon, PlusCircleIcon, SyncAltIcon } from '@patternfly/react-icons';
 import { useProjects } from '~/app/hooks/useProjects';
 import {
   useK8sResources,
   createK8sResource,
-  deleteK8sResource,
   K8sResource,
 } from '~/app/hooks/useK8sResources';
 
@@ -49,9 +48,7 @@ type ServiceResource = K8sResource & {
 const ResourceTable: React.FC<{
   resources: K8sResource[];
   kind: string;
-  onDelete: (name: string) => void;
-  deleting: { kind: string; name: string } | null;
-}> = ({ resources, kind, onDelete, deleting }) => {
+}> = ({ resources, kind }) => {
   if (resources.length === 0) {
     return (
       <Content component="p" className="pf-v6-u-color-200">
@@ -67,15 +64,14 @@ const ResourceTable: React.FC<{
           <th>Name</th>
           <th>Created</th>
           <th>Status</th>
-          <th />
         </tr>
       </thead>
       <tbody>
         {resources.map((r) => (
           <tr key={r.metadata.uid}>
-            <td>{r.metadata.name}</td>
-            <td>{new Date(r.metadata.creationTimestamp).toLocaleString()}</td>
-            <td>
+            <td style={{ paddingTop: '8px', paddingBottom: '8px' }}>{r.metadata.name}</td>
+            <td style={{ paddingTop: '8px', paddingBottom: '8px' }}>{new Date(r.metadata.creationTimestamp).toLocaleString()}</td>
+            <td style={{ paddingTop: '8px', paddingBottom: '8px' }}>
               {kind === 'Deployment' ? (
                 <Label color="blue">
                   {(r as DeploymentResource).status?.readyReplicas ?? 0}/
@@ -84,16 +80,6 @@ const ResourceTable: React.FC<{
               ) : (
                 <Label color="blue">Active</Label>
               )}
-            </td>
-            <td>
-              <Button
-                variant="plain"
-                aria-label={`Delete ${r.metadata.name}`}
-                onClick={() => onDelete(r.metadata.name)}
-                isLoading={deleting?.kind === kind && deleting?.name === r.metadata.name}
-                isDisabled={deleting !== null}
-                icon={<TrashIcon />}
-              />
             </td>
           </tr>
         ))}
@@ -371,48 +357,6 @@ const ClusterResourcesPage: React.FC = () => {
 
   const [isCreateDeployOpen, setIsCreateDeployOpen] = useState(false);
   const [isCreateServiceOpen, setIsCreateServiceOpen] = useState(false);
-  const [deleteAlert, setDeleteAlert] = useState<{ variant: 'success' | 'danger'; message: string } | null>(null);
-  const [deleting, setDeleting] = useState<{ kind: string; name: string } | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<{ kind: string; name: string } | null>(null);
-
-  const handleDeleteConfirm = (kind: string, name: string) => {
-    setDeleteTarget({ kind, name });
-  };
-
-  const handleDelete = async () => {
-    if (!deleteTarget || !selectedProject) return;
-
-    const target = deleteTarget;
-    setDeleteTarget(null);
-    setDeleting(target);
-    setDeleteAlert(null);
-
-    try {
-      const path =
-        target.kind === 'Deployment'
-          ? `/apis/apps/v1/namespaces/${selectedProject}/deployments/${target.name}`
-          : `/api/v1/namespaces/${selectedProject}/services/${target.name}`;
-
-      await deleteK8sResource(path);
-      setDeleteAlert({
-        variant: 'success',
-        message: `${target.kind} "${target.name}" deleted successfully.`,
-      });
-
-      if (target.kind === 'Deployment') {
-        refreshDeployments();
-      } else {
-        refreshServices();
-      }
-    } catch (e) {
-      setDeleteAlert({
-        variant: 'danger',
-        message: e instanceof Error ? e.message : 'Delete failed',
-      });
-    } finally {
-      setDeleting(null);
-    }
-  };
 
   return (
     <PageSection>
@@ -422,23 +366,11 @@ const ClusterResourcesPage: React.FC = () => {
             <CubesIcon /> Cluster Resources
           </Title>
           <Content component="p">
-            This page demonstrates how to create, list, and delete Kubernetes resources through
-            the dashboard&apos;s K8s API pass-through. All operations respect the authenticated
+            This page demonstrates how to create and list Kubernetes resources through the
+            dashboard&apos;s K8s API pass-through. All operations respect the authenticated
             user&apos;s RBAC permissions.
           </Content>
         </StackItem>
-
-        {deleteAlert && (
-          <StackItem>
-            <Alert
-              variant={deleteAlert.variant}
-              title={deleteAlert.message}
-              isInline
-              timeout={5000}
-              onTimeout={() => setDeleteAlert(null)}
-            />
-          </StackItem>
-        )}
 
         <StackItem>
           <Card>
@@ -533,8 +465,6 @@ const ClusterResourcesPage: React.FC = () => {
                     <ResourceTable
                       resources={deployments}
                       kind="Deployment"
-                      onDelete={(name) => handleDeleteConfirm('Deployment', name)}
-                      deleting={deleting}
                     />
                   )}
                 </CardBody>
@@ -579,8 +509,6 @@ const ClusterResourcesPage: React.FC = () => {
                     <ResourceTable
                       resources={services}
                       kind="Service"
-                      onDelete={(name) => handleDeleteConfirm('Service', name)}
-                      deleting={deleting}
                     />
                   )}
                 </CardBody>
@@ -601,26 +529,6 @@ const ClusterResourcesPage: React.FC = () => {
               onCreated={refreshServices}
             />
 
-            <Modal
-              variant="small"
-              isOpen={deleteTarget !== null}
-              onClose={() => setDeleteTarget(null)}
-              aria-label="Confirm deletion"
-            >
-              <ModalHeader title="Confirm Deletion" />
-              <ModalBody>
-                Are you sure you want to delete {deleteTarget?.kind.toLowerCase()}{' '}
-                <strong>{deleteTarget?.name}</strong>? This action cannot be undone.
-              </ModalBody>
-              <ModalFooter>
-                <Button variant="danger" onClick={handleDelete}>
-                  Delete
-                </Button>
-                <Button variant="link" onClick={() => setDeleteTarget(null)}>
-                  Cancel
-                </Button>
-              </ModalFooter>
-            </Modal>
           </>
         )}
       </Stack>

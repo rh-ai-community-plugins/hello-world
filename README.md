@@ -6,8 +6,8 @@ A community plugin for the **Red Hat OpenShift AI (RHOAI) Dashboard** that serve
 
 The plugin provides two pages demonstrating real dashboard integration patterns:
 
-- **User & Projects** — Displays the authenticated user's information, lists accessible projects, and shows RBAC permissions for the selected namespace
-- **Cluster Resources** — Create, list, and delete Kubernetes Deployments and Services through the dashboard's K8s API pass-through
+- **User Info** — Displays the authenticated user's information retrieved through the dashboard's backend APIs
+- **Cluster Resources** — Create and list Kubernetes Deployments and Services through the dashboard's K8s API pass-through
 
 All cluster interactions use the dashboard's backend APIs (`/api/status`, `/api/k8s/*`), demonstrating the recommended pattern for plugin development.
 

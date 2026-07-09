@@ -27,14 +27,14 @@ export const helloWorldSectionExtension = {
   },
 };
 
-export const userProjectsNavExtension = {
+export const userInfoNavExtension = {
   type: 'app.navigation/href' as const,
   properties: {
-    id: 'hello-world-user-projects', // [PLUGIN-SPECIFIC] unique nav item ID
-    title: 'User & Projects',
-    href: '/hello-world/user-projects', // [PLUGIN-SPECIFIC] must match route prefix
+    id: 'hello-world-user-info', // [PLUGIN-SPECIFIC] unique nav item ID
+    title: 'User Info',
+    href: '/hello-world/user-info', // [PLUGIN-SPECIFIC] must match route prefix
     section: 'hello-world', // [PLUGIN-SPECIFIC] references this plugin's section ID
-    path: '/hello-world/user-projects/*', // [PLUGIN-SPECIFIC] route-matching pattern
+    path: '/hello-world/user-info/*', // [PLUGIN-SPECIFIC] route-matching pattern
   },
 };
 
@@ -61,7 +61,7 @@ export const extensions = [
   helloWorldAreaExtension,
   communityPluginsSectionExtension,
   helloWorldSectionExtension,
-  userProjectsNavExtension,
+  userInfoNavExtension,
   clusterResourcesNavExtension,
   helloWorldRouteExtension,
 ];

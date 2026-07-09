@@ -31,7 +31,7 @@ The plugin exposes two remote modules to the RHOAI dashboard host via Webpack Mo
 - **`./extensions`** (`src/rhoai/extensions.ts`) — Defines five extension points:
   - `app.area` — registers the `hello-world` feature area
   - `app.navigation/section` — defines the `community-plugins` sidebar section
-  - `app.navigation/href` (x2) — "User & Projects" and "Cluster Resources" nav items with `label: 'Community'`
+  - `app.navigation/href` (x2) — "User Info" and "Cluster Resources" nav items with `label: 'Community'`
   - `app.route` — mounts the App component with wildcard routing at `/hello-world/*`
 - **`./Icon`** (`src/rhoai/HelloWorldNavIcon.tsx`) — SVG icon displayed in the dashboard sidebar.
 
@@ -41,8 +41,8 @@ Shared singletons (react, react-dom, react-router-dom, @patternfly/react-core, @
 
 The plugin has two pages, routed under `/hello-world/*`:
 
-- **User & Projects page** (`src/app/pages/UserProjectsPage.tsx`) — Displays user info via `/api/status`, project listing, and RBAC permissions table.
-- **Cluster Resources page** (`src/app/pages/ClusterResourcesPage.tsx`) — Create, list, and delete Deployments and Services via the dashboard's K8s API pass-through.
+- **User Info page** (`src/app/pages/UserInfoPage.tsx`) — Displays the authenticated user's information via `/api/status`.
+- **Cluster Resources page** (`src/app/pages/ClusterResourcesPage.tsx`) — Create and list Deployments and Services via the dashboard's K8s API pass-through.
 
 ### Custom Hooks
 

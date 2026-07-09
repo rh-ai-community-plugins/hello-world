@@ -39,7 +39,7 @@ oc project redhat-ods-applications
 ```bash
 cp ~/.kube/config /tmp/kubeconfig && chmod 644 /tmp/kubeconfig
 
-podman run --network=host \
+podman run --rm --network=host \
   -v /tmp/kubeconfig:/tmp/kubeconfig:ro \
   -e KUBECONFIG=/tmp/kubeconfig \
   -e APP_ENV=development \

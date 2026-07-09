@@ -2,7 +2,7 @@ import {
   helloWorldAreaExtension,
   communityPluginsSectionExtension,
   helloWorldSectionExtension,
-  userProjectsNavExtension,
+  userInfoNavExtension,
   clusterResourcesNavExtension,
   helloWorldRouteExtension,
   extensions,
@@ -45,13 +45,13 @@ describe('RHOAI Plugin Extensions', () => {
   });
 
   describe('navigation extensions', () => {
-    it('should define User & Projects nav item under hello-world section', () => {
-      expect(userProjectsNavExtension.type).toBe('app.navigation/href');
-      expect(userProjectsNavExtension.properties.id).toBe('hello-world-user-projects');
-      expect(userProjectsNavExtension.properties.title).toBe('User & Projects');
-      expect(userProjectsNavExtension.properties.href).toBe('/hello-world/user-projects');
-      expect(userProjectsNavExtension.properties.section).toBe('hello-world');
-      expect(userProjectsNavExtension.properties.path).toBe('/hello-world/user-projects/*');
+    it('should define User Info nav item under hello-world section', () => {
+      expect(userInfoNavExtension.type).toBe('app.navigation/href');
+      expect(userInfoNavExtension.properties.id).toBe('hello-world-user-info');
+      expect(userInfoNavExtension.properties.title).toBe('User Info');
+      expect(userInfoNavExtension.properties.href).toBe('/hello-world/user-info');
+      expect(userInfoNavExtension.properties.section).toBe('hello-world');
+      expect(userInfoNavExtension.properties.path).toBe('/hello-world/user-info/*');
     });
 
     it('should define Cluster Resources nav item under hello-world section', () => {
@@ -83,7 +83,7 @@ describe('RHOAI Plugin Extensions', () => {
         helloWorldAreaExtension,
         communityPluginsSectionExtension,
         helloWorldSectionExtension,
-        userProjectsNavExtension,
+        userInfoNavExtension,
         clusterResourcesNavExtension,
         helloWorldRouteExtension,
       ]);

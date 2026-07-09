@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-jest.mock('./pages/UserProjectsPage', () => {
-  const MockPage = () => <div data-testid="user-projects-page">User Projects Page</div>;
-  MockPage.displayName = 'MockUserProjectsPage';
+jest.mock('./pages/UserInfoPage', () => {
+  const MockPage = () => <div data-testid="user-info-page">User Info Page</div>;
+  MockPage.displayName = 'MockUserInfoPage';
   return { __esModule: true, default: MockPage };
 });
 
