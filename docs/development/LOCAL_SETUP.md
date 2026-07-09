@@ -50,7 +50,7 @@ podman run --rm --network=host \
     "backend": {
       "remoteEntry": "/remoteEntry.js",
       "tls": false,
-      "localService": { "host": "localhost", "port": 9112 },
+      "localService": { "host": "localhost", "port": 9500 },
       "service": { "name": "placeholder", "namespace": "opendatahub", "port": 8080 }
     }
   }]' \
@@ -72,7 +72,7 @@ Open **http://localhost:4010** in your browser. You should see the RHOAI Dashboa
 
 ### How it works
 
-- The backend reads `MODULE_FEDERATION_CONFIG`, registers a proxy `/_mf/helloWorld/*` that routes to `http://localhost:9112/*`.
+- The backend reads `MODULE_FEDERATION_CONFIG`, registers a proxy `/_mf/helloWorld/*` that routes to `http://localhost:9500/*`.
 - The backend injects the plugin metadata into the HTML via `<script id="mf-remotes-json">`.
 - The frontend discovers and loads your plugin at runtime via `@module-federation/runtime`.
 - `--network=host` means the container's `localhost` is your host's `localhost`, so the proxy reaches your plugin dev server.
@@ -83,8 +83,7 @@ Open **http://localhost:4010** in your browser. You should see the RHOAI Dashboa
 |---|---|---|
 | Plugin loads in dashboard | Yes | Runtime MF discovery + backend proxy |
 | Plugin auto-rebuild on save | Yes | Your plugin's webpack dev server handles this |
-| Plugin changes visible on refresh | Yes | Browser refresh loads fresh `remoteEntry.js` |
-| True HMR (no refresh) for plugin | No | HMR doesn't propagate through the MF proxy |
+| Plugin changes visible automatically | Yes | Webpack dev server rebuilds on save and the browser picks up changes |
 | Dashboard auto-reload | No | Container serves pre-built static assets |
 | Cluster API access | Yes | Via mounted kubeconfig |
 | Plugin menu items / nav | Yes | Extensions are loaded at runtime |
@@ -150,7 +149,7 @@ oc auth can-i create pods --all-namespaces   # Should return "yes" for cluster-a
 Edit `env.local` in the odh-dashboard root and add (or update) the `MODULE_FEDERATION_CONFIG` variable with your plugin's entry:
 
 ```
-MODULE_FEDERATION_CONFIG=[{"name":"helloWorld","backend":{"remoteEntry":"/remoteEntry.js","tls":false,"localService":{"host":"localhost","port":9112},"service":{"name":"placeholder","namespace":"opendatahub","port":8080}}}]
+MODULE_FEDERATION_CONFIG=[{"name":"helloWorld","backend":{"remoteEntry":"/remoteEntry.js","tls":false,"localService":{"host":"localhost","port":9500},"service":{"name":"placeholder","namespace":"opendatahub","port":8080}}}]
 ```
 
 Or in readable JSON form, the entry looks like:
@@ -161,7 +160,7 @@ Or in readable JSON form, the entry looks like:
   "backend": {
     "remoteEntry": "/remoteEntry.js",
     "tls": false,
-    "localService": { "host": "localhost", "port": 9112 },
+    "localService": { "host": "localhost", "port": 9500 },
     "service": { "name": "placeholder", "namespace": "opendatahub", "port": 8080 }
   }
 }
@@ -224,7 +223,7 @@ Regardless of which method you chose above, the plugin development workflow is t
 2. Start the plugin dev server with `npm run start:dev`
 3. Open `http://localhost:4010` in your browser
 4. Navigate to the plugin's page in the dashboard sidebar
-5. Edit plugin source files -- with Method 1 you refresh to see changes; with Method 2 changes appear automatically via HMR
+5. Edit plugin source files -- changes are picked up automatically with both methods
 
 The dev server supports a custom port via the `PORT` environment variable:
 
@@ -234,21 +233,9 @@ PORT=9200 npm run start:dev
 
 ### Port conventions
 
-Each RHOAI plugin uses a unique dev port to avoid conflicts. When running the dashboard monorepo locally, these ports are used:
+This project defaults to port **9500**. The port only matters if you run multiple plugin dev servers at the same time — each needs a unique port. Otherwise, any free port works. You can override it with the `PORT` environment variable.
 
-| Port | Plugin |
-|---|---|
-| 9100 | modelRegistry |
-| 9102 | genAi |
-| 9104 | maas |
-| 9105 | notebooks |
-| 9106 | evalHub |
-| 9107 | autorag |
-| 9108 | automl |
-| 9110 | mlflow |
-| 9111 | agentOps |
-
-This project defaults to port **9112** to avoid conflicts with all of the above. If you are developing multiple community plugins simultaneously, choose a port above 9112 for each.
+> **Note:** The official RHOAI plugins in the dashboard monorepo occupy ports 9100–9111. Community plugins use a different range to avoid any potential collision.
 
 ---
 
@@ -256,7 +243,7 @@ This project defaults to port **9112** to avoid conflicts with all of the above.
 
 ### Plugin does not appear in the dashboard sidebar
 
-- Verify the plugin dev server is running and accessible at `http://localhost:9112/remoteEntry.js`
+- Verify the plugin dev server is running and accessible at `http://localhost:9500/remoteEntry.js`
 - Check the `MODULE_FEDERATION_CONFIG` -- the `name` must match the plugin's webpack config
 - Ensure the `localService.port` matches the port your plugin dev server is running on
 - **Method 1**: Restart the container after changing `MODULE_FEDERATION_CONFIG`
@@ -277,4 +264,3 @@ This project defaults to port **9112** to avoid conflicts with all of the above.
 - Check the browser console for errors
 - Ensure the plugin dev server is running (not just built)
 - Try a hard refresh (Ctrl+Shift+R) if the module cache is stale
-- **Method 1**: True HMR is not available; you need to refresh the browser to see plugin changes

@@ -9,7 +9,7 @@ This is `hello-plugin-world`, a community plugin for the **Red Hat OpenShift AI 
 ## Build & Development Commands
 
 ```bash
-npm run start:dev     # Dev server on port 9112 with HMR
+npm run start:dev     # Dev server on port 9500 with HMR
 npm run build         # Production build to dist/
 npm test              # Run all tests (Jest + jsdom)
 npm run test:watch    # Watch mode
@@ -64,7 +64,7 @@ Four hooks in `src/app/hooks/` provide data fetching and API integration:
 ### Webpack Configs
 
 - `config/webpack.common.js` — Shared config: entry point, loaders, Module Federation, path alias `~` → `./src`
-- `config/webpack.dev.js` — Dev server on port 9112, proxies `/hello-world` to `localhost:8843`
+- `config/webpack.dev.js` — Dev server on port 9500, proxies `/hello-world` to `localhost:8443`
 - `config/webpack.prod.js` — Output to `dist/`, CSS extraction, vendor chunk splitting
 
 ### Test Setup
@@ -74,7 +74,7 @@ Jest with `ts-jest` preset and `jsdom` environment (`jest.config.js`). `jest.set
 ### Deployment
 
 - **Container**: Multi-stage build in `Containerfile` — Node 20 Alpine builder → Nginx Alpine serving `dist/` on port 8080 as UID 1001. Nginx adds CORS header on `remoteEntry.js`.
-- **Helm chart**: `chart/` deploys to Kubernetes with Deployment + Service. Image defaults to `quay.io/rh-ai-community-plugins/rhoai-hello-world:latest`.
+- **Helm chart**: `chart/` deploys to Kubernetes with Deployment + Service. Image defaults to `quay.io/rh-ai-community-plugins/hello-plugin-world:latest`.
 - **CI**: `.github/workflows/ci.yml` runs tests and lint on push/PR to main. `build-push.yml` builds and pushes the container image on release/tag.
 
 ## Documentation

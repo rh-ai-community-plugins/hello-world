@@ -19,12 +19,12 @@
     "_comment_proxy": "[PLUGIN-SPECIFIC] proxy path must match route prefix in extensions.ts",
     "local": {
       "host": "localhost",
-      "port": 9112
+      "port": 9500
     },
-    "_comment_port": "[PLUGIN-SPECIFIC] dev port — pick an unused port (9112+)",
+    "_comment_port": "[PLUGIN-SPECIFIC] dev port — any unused port works",
     "service": {
       "name": "odh-dashboard",
-      "port": 8843
+      "port": 8443
     }
   },
   "scripts": {

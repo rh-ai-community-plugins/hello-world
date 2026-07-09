@@ -19,7 +19,7 @@ Pick a short, descriptive kebab-case name for your plugin (e.g. `my-plugin`). Th
 | `package.json` | `module-federation.name` | `helloWorld` | `{yourPlugin}` (camelCase) |
 | `package.json` | `module-federation.proxy[].path` | `/hello-world` | `/{your-plugin}` |
 | `package.json` | `module-federation.proxy[].pathRewrite` | `/hello-world` | `/{your-plugin}` |
-| `package.json` | `module-federation.local.port` | `9112` | Unused port (see [Port allocation](#port-allocation)) |
+| `package.json` | `module-federation.local.port` | `9500` | Any unused port (see [Port allocation](#port-allocation)) |
 | `plugin.yaml` | `metadata.name` | `hello-world` | `{your-plugin}` |
 | `plugin.yaml` | `metadata.displayName` | `Hello World` | Your plugin name |
 | `plugin.yaml` | `remote.spec.name` | `helloWorld` | `{yourPlugin}` (camelCase) |
@@ -39,7 +39,7 @@ Pick a short, descriptive kebab-case name for your plugin (e.g. `my-plugin`). Th
 | `config/webpack.common.js` | MF plugin `name` | `helloWorld` | `{yourPlugin}` (camelCase) |
 | `config/moduleFederation.js` | `name` | `helloWorld` | `{yourPlugin}` (camelCase) |
 | `config/webpack.dev.js` | proxy `context` | `/hello-world` | `/{your-plugin}` |
-| `config/webpack.dev.js` | `port` | `9112` | Same as `package.json` port |
+| `config/webpack.dev.js` | `port` | `9500` | Same as `package.json` port |
 | `.env.development` | `URL_PREFIX` | `/hello-world` | `/{your-plugin}` |
 | `chart/Chart.yaml` | `name` | `hello-world-plugin` | `{your-plugin}-plugin` |
 | `chart/values.yaml` | `image.repository` | `.../rhoai-hello-world` | Your image repository |
@@ -74,4 +74,4 @@ All route prefixes, hrefs, and path patterns in `extensions.ts` must use the sam
 
 ## Port Allocation
 
-The RHOAI dashboard modules occupy ports 9100-9111. Community plugins should use port **9112 and above**. If you run multiple plugins locally at the same time, each needs a unique port.
+The dev server port only matters if you run multiple plugin dev servers simultaneously — each needs a unique port. Otherwise, any free port works. This project defaults to **9500**. The official RHOAI plugins in the dashboard monorepo occupy ports 9100–9111; community plugins use a different range to avoid any potential collision.
