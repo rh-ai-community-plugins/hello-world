@@ -52,13 +52,37 @@ podman run --rm --network=host \
       "tls": false,
       "localService": { "host": "localhost", "port": 9500 },
       "service": { "name": "placeholder", "namespace": "opendatahub", "port": 8080 }
-    }
+    },
+    "proxyService": [{
+      "path": "/hello-world/api",
+      "pathRewrite": "/api",
+      "authorize": true,
+      "tls": false,
+      "localService": { "host": "localhost", "port": 3000 },
+      "service": { "name": "placeholder", "namespace": "opendatahub", "port": 3000 }
+    }]
   }]' \
   quay.io/opendatahub/odh-dashboard:main \
   bash -c "npm install pino-pretty && npm run start"
 ```
 
-### Step 3: Start the plugin dev server
+### Step 3: Start the BFF service
+
+The BFF is a separate Node.js server that runs alongside the plugin's webpack dev server. It needs to know the cluster API server URL so it can make Kubernetes API calls with the user's forwarded token.
+
+In a **separate terminal**, from the plugin project root:
+
+```bash
+cd bff
+npm install   # first time only
+K8S_API_BASE=$(oc whoami --show-server) npm run start:dev
+```
+
+You should see `BFF listening on port 3000`. The `K8S_API_BASE` env var tells the BFF where to find the Kubernetes API server. Without it, the BFF cannot make any cluster calls and all requests will fail with a 502 error.
+
+> **Note:** The `proxyService` entry in the `MODULE_FEDERATION_CONFIG` (Step 2) is what tells the dashboard to forward `/hello-world/api/*` requests to the BFF at `localhost:3000`. If you omit the `proxyService` block, those requests will hit the dashboard's SPA fallback and return HTML instead of JSON.
+
+### Step 4: Start the plugin dev server
 
 In another terminal, from the plugin project root:
 
@@ -66,9 +90,17 @@ In another terminal, from the plugin project root:
 npm run start:dev
 ```
 
-### Step 4: Verify
+### Step 5: Verify
 
-Open **http://localhost:4010** in your browser. You should see the RHOAI Dashboard with your plugin loaded in the sidebar.
+You should now have **three processes** running:
+
+| Process | Port | Purpose |
+|---|---|---|
+| Dashboard container | 8080 | Host application, proxies to plugin and BFF |
+| BFF service | 3000 | Plugin backend (namespace summary aggregation) |
+| Plugin dev server | 9500 | Plugin frontend (webpack dev server with HMR) |
+
+Open the dashboard URL in your browser. You should see the RHOAI Dashboard with your plugin loaded in the sidebar, including the Namespace Summary page under the Hello World section.
 
 ### How it works
 
@@ -149,7 +181,7 @@ oc auth can-i create pods --all-namespaces   # Should return "yes" for cluster-a
 Edit `env.local` in the odh-dashboard root and add (or update) the `MODULE_FEDERATION_CONFIG` variable with your plugin's entry:
 
 ```
-MODULE_FEDERATION_CONFIG=[{"name":"helloWorld","backend":{"remoteEntry":"/remoteEntry.js","tls":false,"localService":{"host":"localhost","port":9500},"service":{"name":"placeholder","namespace":"opendatahub","port":8080}}}]
+MODULE_FEDERATION_CONFIG=[{"name":"helloWorld","backend":{"remoteEntry":"/remoteEntry.js","tls":false,"localService":{"host":"localhost","port":9500},"service":{"name":"placeholder","namespace":"opendatahub","port":8080}},"proxyService":[{"path":"/hello-world/api","pathRewrite":"/api","authorize":true,"tls":false,"localService":{"host":"localhost","port":3000},"service":{"name":"placeholder","namespace":"opendatahub","port":3000}}]}]
 ```
 
 Or in readable JSON form, the entry looks like:
@@ -162,7 +194,15 @@ Or in readable JSON form, the entry looks like:
     "tls": false,
     "localService": { "host": "localhost", "port": 9500 },
     "service": { "name": "placeholder", "namespace": "opendatahub", "port": 8080 }
-  }
+  },
+  "proxyService": [{
+    "path": "/hello-world/api",
+    "pathRewrite": "/api",
+    "authorize": true,
+    "tls": false,
+    "localService": { "host": "localhost", "port": 3000 },
+    "service": { "name": "placeholder", "namespace": "opendatahub", "port": 3000 }
+  }]
 }
 ```
 
@@ -182,7 +222,21 @@ cd frontend
 npm run start:dev
 ```
 
-### Step 8: Start the plugin dev server
+### Step 8: Start the BFF service
+
+The BFF is a separate Node.js server. In a **separate terminal**, from the plugin project root:
+
+```bash
+cd bff
+npm install   # first time only
+K8S_API_BASE=$(oc whoami --show-server) npm run start:dev
+```
+
+You should see `BFF listening on port 3000`. The `K8S_API_BASE` env var tells the BFF where to find the Kubernetes API server (required for local dev since the BFF is not running in-cluster).
+
+> **Note:** The `proxyService` entry in `env.local` (Step 6) tells the dashboard to forward `/hello-world/api/*` requests to the BFF. Without it, those requests return HTML instead of JSON.
+
+### Step 9: Start the plugin dev server
 
 From the plugin project root:
 
@@ -190,7 +244,7 @@ From the plugin project root:
 npm run start:dev
 ```
 
-### Step 9: Verify
+### Step 10: Verify
 
 Open **http://localhost:4010** in your browser. You should see the RHOAI Dashboard with your plugin loaded in the sidebar.
 
@@ -211,6 +265,22 @@ Both methods use the same `MODULE_FEDERATION_CONFIG` format:
 | `backend.service.namespace` | Kubernetes namespace. Set to `opendatahub` (or your RHOAI namespace). |
 | `backend.service.port` | Service port in production. Not used when `localService` is set. |
 
+### BFF Proxy Fields (`proxyService[]`)
+
+If your plugin has its own backend service (BFF pattern), add a `proxyService` array alongside `backend`:
+
+| Field | Description |
+|---|---|
+| `proxyService[].path` | URL path prefix the dashboard intercepts (e.g. `/hello-world/api`). |
+| `proxyService[].pathRewrite` | Replacement prefix forwarded to the BFF (e.g. `/api`). |
+| `proxyService[].authorize` | When `true`, the dashboard forwards the user's Bearer token as `Authorization` header. |
+| `proxyService[].tls` | Whether the BFF uses HTTPS. Set to `false` for local development. |
+| `proxyService[].localService.host` | BFF hostname for local dev (typically `localhost`). |
+| `proxyService[].localService.port` | BFF port for local dev (e.g. `3000`). |
+| `proxyService[].service.name` | Kubernetes Service name for the BFF in production. |
+| `proxyService[].service.namespace` | Kubernetes namespace. |
+| `proxyService[].service.port` | BFF Service port in production. |
+
 When `localService` is present, the dashboard backend proxies to that host/port instead of looking up the Kubernetes Service. This is what makes local plugin development work.
 
 ---
@@ -219,11 +289,12 @@ When `localService` is present, the dashboard backend proxies to that host/port 
 
 Regardless of which method you chose above, the plugin development workflow is the same:
 
-1. Start the dashboard (container or source)
-2. Start the plugin dev server with `npm run start:dev`
-3. Open `http://localhost:4010` in your browser
-4. Navigate to the plugin's page in the dashboard sidebar
-5. Edit plugin source files -- changes are picked up automatically with both methods
+1. Start the dashboard (container or source) -- ensure `MODULE_FEDERATION_CONFIG` includes the `proxyService` entry
+2. Start the BFF service with `cd bff && K8S_API_BASE=$(oc whoami --show-server) npm run start:dev`
+3. Start the plugin dev server with `npm run start:dev`
+4. Open the dashboard URL in your browser
+5. Navigate to the plugin's page in the dashboard sidebar
+6. Edit plugin source files -- changes are picked up automatically with both methods
 
 The dev server supports a custom port via the `PORT` environment variable:
 
@@ -264,3 +335,26 @@ This project defaults to port **9500**. The port only matters if you run multipl
 - Check the browser console for errors
 - Ensure the plugin dev server is running (not just built)
 - Try a hard refresh (Ctrl+Shift+R) if the module cache is stale
+
+### BFF: "Failed to load namespace summary" with HTML parse error
+
+The frontend receives HTML instead of JSON. This means the request to `/hello-world/api/*` is not being proxied to the BFF and is hitting the SPA fallback instead.
+
+- Ensure your `MODULE_FEDERATION_CONFIG` includes the `proxyService` block (see the config examples above)
+- Restart the dashboard after changing `MODULE_FEDERATION_CONFIG`
+
+### BFF: "Failed to fetch namespace summary: 502"
+
+The dashboard is correctly proxying to the BFF, but the BFF is returning an error.
+
+- **BFF not running**: Ensure the BFF is running (`cd bff && K8S_API_BASE=$(oc whoami --show-server) npm run start:dev`). You should see `BFF listening on port 3000`.
+- **Missing `K8S_API_BASE`**: The BFF needs to know the cluster API URL. Without `K8S_API_BASE`, it cannot make Kubernetes API calls. Set it with `K8S_API_BASE=$(oc whoami --show-server)`.
+- **Cluster unreachable**: Verify you can reach the cluster API from your machine with `oc whoami`. If your login session has expired, run `oc login` again.
+- Check the BFF terminal for error messages -- they will indicate whether the issue is with the K8s API connection, token, or RBAC permissions.
+
+### BFF: ECONNREFUSED on port 3000
+
+The dashboard log shows `connect ECONNREFUSED ... :3000`. The dashboard is trying to proxy to the BFF but nothing is listening on port 3000.
+
+- Start the BFF: `cd bff && K8S_API_BASE=$(oc whoami --show-server) npm run start:dev`
+- If using a container without `--network=host`, `localhost` inside the container won't reach the host. Use `--network=host` or set `localService.host` to `host.containers.internal` in the `proxyService` config.

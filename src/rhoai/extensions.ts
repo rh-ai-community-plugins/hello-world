@@ -49,6 +49,17 @@ export const clusterResourcesNavExtension = {
   },
 };
 
+export const namespaceSummaryNavExtension = {
+  type: 'app.navigation/href' as const,
+  properties: {
+    id: 'hello-world-namespace-summary',
+    title: 'Namespace Summary',
+    href: '/hello-world/namespace-summary',
+    section: 'hello-world',
+    path: '/hello-world/namespace-summary/*',
+  },
+};
+
 export const helloWorldRouteExtension = {
   type: 'app.route' as const,
   properties: {
@@ -63,6 +74,7 @@ export const extensions = [
   helloWorldSectionExtension,
   userInfoNavExtension,
   clusterResourcesNavExtension,
+  namespaceSummaryNavExtension,
   helloWorldRouteExtension,
 ];
 

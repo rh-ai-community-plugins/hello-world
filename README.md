@@ -4,14 +4,17 @@ A community plugin for the **Red Hat OpenShift AI (RHOAI) Dashboard** that serve
 
 ## What's Inside
 
-The plugin provides two pages demonstrating how a community plugin works using proper dashboard integration patterns:
+The plugin provides three pages, each demonstrating a different way to integrate with the dashboard and the cluster. These are the three patterns you will use when building your own plugin:
 
-- **User Info** — Displays the authenticated user's information retrieved through the dashboard's backend APIs
-- **Cluster Resources** — Create and list Kubernetes Deployments and Services through the dashboard's K8s API pass-through
+| Page | Pattern | What it shows |
+|---|---|---|
+| **User Info** | Dashboard API | Call the dashboard's own backend endpoints (`/api/status`) to get user info, config, and other dashboard-managed data |
+| **Cluster Resources** | K8s API pass-through | Read and write Kubernetes resources directly via the dashboard's `/api/k8s/*` proxy — CRUD on Deployments, Services, and any K8s resource the user has RBAC access to |
+| **Namespace Summary** | BFF (Backend For Frontend) | Call the plugin's own backend service, which aggregates multiple K8s API calls server-side and returns a single response — useful for server-side logic, external service integration, or keeping credentials out of the browser |
 
-All cluster interactions use the dashboard's backend APIs (`/api/status`, `/api/k8s/*`), demonstrating the recommended pattern for plugin development.
+The first two patterns require no additional backend — your plugin's frontend code calls dashboard endpoints directly. The BFF pattern adds a separate Node.js service (`bff/` directory) that the dashboard proxies to, forwarding the user's authentication token.
 
-Those pages are only basic examples, all possible interactions and accessible APIs are described in the [Architecture](docs/architecture/README.md) and [Development](docs/development/README.md) documents.
+For a detailed guide on choosing the right pattern for your use case, see the [Integration Patterns](docs/development/DASHBOARD_APIS.md#integration-patterns) section. All available APIs are documented in the [Development](docs/development/README.md) guides.
 
 ## Quick Start
 
@@ -100,11 +103,19 @@ There are two approaches to set up this environment:
 Both methods require Node.js 20+, `oc` CLI access to the cluster, and cluster-admin privileges. Once the environment is running:
 
 ```bash
-npm install              # Install dependencies
+npm install              # Install plugin dependencies
 npm run start:dev        # Start the plugin dev server on port 9500
 ```
 
-See the full [Local Setup Guide](docs/development/LOCAL_SETUP.md) for step-by-step instructions on both methods.
+If you want to work with the BFF pattern (Namespace Summary page), you also need to start the BFF service:
+
+```bash
+cd bff
+npm install              # Install BFF dependencies (first time only)
+K8S_API_BASE=$(oc whoami --show-server) npm run start:dev   # Start BFF on port 3000
+```
+
+See the full [Local Setup Guide](docs/development/LOCAL_SETUP.md) for step-by-step instructions on both methods, including dashboard proxy configuration for the BFF.
 
 #### Build & Test
 

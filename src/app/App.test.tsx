@@ -13,6 +13,12 @@ jest.mock('./pages/ClusterResourcesPage', () => {
   return { __esModule: true, default: MockPage };
 });
 
+jest.mock('./pages/NamespaceSummaryPage', () => {
+  const MockPage = () => <div data-testid="namespace-summary-page">Namespace Summary Page</div>;
+  MockPage.displayName = 'MockNamespaceSummaryPage';
+  return { __esModule: true, default: MockPage };
+});
+
 describe('App Component', () => {
   it('should render the first route element', () => {
     render(<App />);

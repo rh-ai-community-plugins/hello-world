@@ -11,6 +11,11 @@ module.exports = merge(common, {
     hot: true,
     proxy: [
       {
+        context: ['/hello-world/api'], // [PLUGIN-SPECIFIC] BFF proxy — must come before the general proxy
+        target: 'http://localhost:3000',
+        pathRewrite: { '^/hello-world/api': '/api' },
+      },
+      {
         context: ['/hello-world'], // [PLUGIN-SPECIFIC] must match route prefix
         target: 'http://localhost:8443',
         pathRewrite: { '^/hello-world': '/hello-world' },

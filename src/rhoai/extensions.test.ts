@@ -4,6 +4,7 @@ import {
   helloWorldSectionExtension,
   userInfoNavExtension,
   clusterResourcesNavExtension,
+  namespaceSummaryNavExtension,
   helloWorldRouteExtension,
   extensions,
 } from './extensions';
@@ -62,6 +63,15 @@ describe('RHOAI Plugin Extensions', () => {
       expect(clusterResourcesNavExtension.properties.section).toBe('hello-world');
       expect(clusterResourcesNavExtension.properties.path).toBe('/hello-world/cluster-resources/*');
     });
+
+    it('should define Namespace Summary nav item under hello-world section', () => {
+      expect(namespaceSummaryNavExtension.type).toBe('app.navigation/href');
+      expect(namespaceSummaryNavExtension.properties.id).toBe('hello-world-namespace-summary');
+      expect(namespaceSummaryNavExtension.properties.title).toBe('Namespace Summary');
+      expect(namespaceSummaryNavExtension.properties.href).toBe('/hello-world/namespace-summary');
+      expect(namespaceSummaryNavExtension.properties.section).toBe('hello-world');
+      expect(namespaceSummaryNavExtension.properties.path).toBe('/hello-world/namespace-summary/*');
+    });
   });
 
   describe('route extension', () => {
@@ -74,8 +84,8 @@ describe('RHOAI Plugin Extensions', () => {
   });
 
   describe('extensions array', () => {
-    it('should contain all six extensions', () => {
-      expect(extensions).toHaveLength(6);
+    it('should contain all seven extensions', () => {
+      expect(extensions).toHaveLength(7);
     });
 
     it('should include all extensions in the correct order', () => {
@@ -85,6 +95,7 @@ describe('RHOAI Plugin Extensions', () => {
         helloWorldSectionExtension,
         userInfoNavExtension,
         clusterResourcesNavExtension,
+        namespaceSummaryNavExtension,
         helloWorldRouteExtension,
       ]);
     });
