@@ -37,6 +37,7 @@ See [section 2](#2-interacting-with-the-cluster-from-your-plugin) for code examp
 Deploy your own backend service alongside the plugin. The dashboard proxies requests to it and forwards the user's authentication token. Your BFF can make multiple K8s API calls, talk to external services, keep credentials server-side, or perform any logic that doesn't belong in the browser.
 
 **When to use:**
+
 - You need to aggregate multiple API calls into one response (reduce frontend round-trips)
 - You need to call external services (ML platforms, databases, third-party APIs)
 - You need to keep API keys or credentials server-side
@@ -78,10 +79,12 @@ The ODH Dashboard sits behind an OAuth proxy (or kube-rbac-proxy) that authentic
 4. When the dashboard backend proxies to your plugin's service and `authorize: true` is set, it calls `setAuthorizationHeader()` (`backend/src/utils/proxy.ts`) which converts the user's `x-forwarded-access-token` into an `Authorization: Bearer <token>` header on the proxied request
 
 **What your plugin's BFF receives** (when `authorize: true`):
+
 - `Authorization: Bearer <user-openshift-token>` -- the actual user's OpenShift token, not a service account token
 - Any custom headers configured in the `headers` field of the ConfigMap entry
 
 **What your plugin's BFF can do with the token**:
+
 - Make Kubernetes API calls as the authenticated user (respecting their RBAC)
 - Call `GET /apis/user.openshift.io/v1/users/~` to get user details
 - Perform SelfSubjectAccessReview to check user permissions
@@ -91,6 +94,7 @@ The ODH Dashboard sits behind an OAuth proxy (or kube-rbac-proxy) that authentic
 Your plugin's React components run in the browser at the same origin as the dashboard. This means they can call any `/api/*` endpoint directly. Key endpoints:
 
 #### User and Status
+
 | Endpoint | Method | Returns |
 |---|---|---|
 | `/api/status` | GET | `{ kube: { userName, userID, isAdmin, isAllowed, clusterID, clusterBranding, namespace, serverURL, currentContext, currentUser } }` |
@@ -98,6 +102,7 @@ Your plugin's React components run in the browser at the same origin as the dash
 | `/api/dashboardConfig` | GET | `OdhDashboardConfig` CR (feature flags, settings) |
 
 #### Kubernetes Pass-Through
+
 | Endpoint | Method | Returns |
 |---|---|---|
 | `/api/k8s/*` | GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS | Direct proxy to the Kubernetes API. Actions are performed with the user's RBAC permissions. |
@@ -105,6 +110,7 @@ Your plugin's React components run in the browser at the same origin as the dash
 Example: `fetch('/api/k8s/apis/project.openshift.io/v1/projects')` lists the user's projects.
 
 #### Other APIs
+
 | Endpoint | Purpose |
 |---|---|
 | `/api/components` | Dashboard components (OdhApplication CRs) |
@@ -162,6 +168,7 @@ To set this up, add a `proxyService` entry alongside your `backend` in the feder
 ```
 
 Your BFF container can then:
+
 - Extract the user token from the `Authorization` header
 - Use it to call the Kubernetes API on the user's behalf
 - Call external services (ML platforms, databases, etc.)
@@ -173,10 +180,12 @@ Your BFF container can then:
 The host also shares all `@odh-dashboard/*` runtime packages as singletons (collected automatically by `frontend/config/getRuntimeOdhPackages.js`). At runtime, if your plugin requests any of these packages, the host provides its copy. However, since these packages are not published to npm, a standalone plugin cannot import them at **build time** for type checking.
 
 **Not directly available from outside the monorepo**:
+
 - `useUser()`, `useAccessReview()`, `useNotification()`, `useAppContext()` -- these live in `@odh-dashboard/internal`, which is not published
 - Any hooks or components from `@odh-dashboard/internal`
 
 **Workarounds for a standalone plugin**:
+
 1. **Call `/api/status` directly** -- Instead of `useUser()`, do `fetch('/api/status')` in your component to get user info
 2. **Use the K8s pass-through** -- Instead of dedicated hooks, call `/api/k8s/...` endpoints (see section 2 below)
 3. **Use PatternFly directly** -- For notifications, use PatternFly's `Alert` or `AlertGroup` components instead of the dashboard's `useNotification()` hook

@@ -18,6 +18,7 @@ npm run lint          # ESLint on src/
 ```
 
 To run a single test file:
+
 ```bash
 npx jest src/app/hooks/useCurrentUser.test.ts
 ```
@@ -99,7 +100,7 @@ Jest with `ts-jest` preset and `jsdom` environment (`jest.config.js`). `jest.set
 
 Project documentation lives under `docs/` in semantic subfolders:
 
-```
+```text
 docs/architecture/   — Plugin system internals and extension contract
 docs/development/    — Local dev setup and dashboard API reference
 docs/deployment/     — Container build instructions

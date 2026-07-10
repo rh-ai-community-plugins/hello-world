@@ -62,7 +62,7 @@ The plugin will define these extensions (in `src/rhoai/extensions.ts`):
 
 All documentation lives under `docs/` with semantic subfolders. Every document is referenced in a README — no orphans.
 
-```
+```text
 docs/
 ├── README.md                        # Top-level index with pointers to subfolders
 ├── architecture/
@@ -114,6 +114,7 @@ This is the development workflow that needs to be properly documented:
 
 1. Run the plugin in dev mode: `npm run start:dev` (listens on configured port)
 2. In the dashboard's `env.local`, add the plugin to `MODULE_FEDERATION_CONFIG`:
+
    ```json
    {
      "name": "helloWorld",
@@ -125,12 +126,14 @@ This is the development workflow that needs to be properly documented:
      }
    }
    ```
+
 3. Restart the dashboard backend, then frontend
 4. Plugin appears in the dashboard with live reload
 
 ### Port Conventions
 
 The plugin's dev port is configurable. Default in this project is 9112. Standard RHOAI plugin ports (avoid conflicts):
+
 - 9100: modelRegistry
 - 9102: genAi
 - 9104: maas

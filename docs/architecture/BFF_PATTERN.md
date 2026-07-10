@@ -27,7 +27,7 @@ The BFF (Backend For Frontend) pattern gives a plugin its own backend service. I
 
 ### Token Flow
 
-```
+```text
 Browser                    Dashboard Backend              Plugin BFF              K8s API
   |                              |                            |                     |
   |-- fetch('/hello-world/api/namespace-summary') ----------->|                     |
@@ -54,6 +54,7 @@ Browser                    Dashboard Backend              Plugin BFF            
 ```
 
 Key points:
+
 1. The frontend calls a path like `/hello-world/api/namespace-summary` at the same origin
 2. The dashboard backend matches this against `proxyService` entries in the federation ConfigMap
 3. When `authorize: true`, the dashboard converts the user's `x-forwarded-access-token` into an `Authorization: Bearer <token>` header
@@ -93,7 +94,7 @@ The dashboard discovers BFF services via the `proxyService` field in the federat
 
 ### Directory Structure
 
-```
+```text
 bff/
   package.json              # Express + TypeScript project
   tsconfig.json
@@ -121,6 +122,7 @@ bff/
 ### K8s Client
 
 The `k8sClient.ts` utility makes authenticated requests to the K8s API server:
+
 - **In-cluster**: Uses `KUBERNETES_SERVICE_HOST` and `KUBERNETES_SERVICE_PORT` env vars, reads the CA cert from the service account mount
 - **Local dev**: Uses the `K8S_API_BASE` env var to point at the cluster API
 

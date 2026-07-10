@@ -18,7 +18,7 @@ For a detailed guide on choosing the right pattern for your use case, see the [I
 
 ## Quick Start
 
-### Deploy on an Existing Dashboard
+### Deploy this Plugin on an Existing Dashboard
 
 If you have an OpenShift cluster with RHOAI already running, you can deploy this plugin in three steps using the pre-built container image.
 

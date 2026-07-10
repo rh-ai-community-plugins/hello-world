@@ -95,6 +95,7 @@ The config supports two formats. The **new format** is recommended; the old form
 ```
 
 Key points:
+
 - `backend` controls how the frontend remote is loaded. The dashboard proxies `/_mf/{name}/*` to the `backend.service`.
 - Each `proxyService` entry has its **own** `service`, `authorize`, and `tls` settings -- they are independent of `backend`.
 - A module can have `proxyService` without `backend` (API-only proxy, no frontend remote).
@@ -141,6 +142,7 @@ Looking at the current federation ConfigMap, plugins run in one of three ways:
 The `federation-config` ConfigMap is maintained in the dashboard's own Git manifests and applied by kustomize during deployment. The ODH operator deploys the dashboard using these manifests, so it transitively applies the federation config.
 
 To modify which plugins are loaded, you update the ConfigMap either by:
+
 - Editing the manifest YAML in Git and redeploying
 - Directly editing the ConfigMap on the cluster with `oc edit configmap federation-config`
 - Setting `MODULE_FEDERATION_CONFIG` as an environment variable on the dashboard Deployment (useful when the operator reconciles the ConfigMap)
@@ -154,17 +156,20 @@ To modify which plugins are loaded, you update the ConfigMap either by:
 This is the standard approach used by all current plugins. Your module lives in `packages/` and is both bundled at build time and loadable at runtime.
 
 **Step 1**: Scaffold the module from the repo root:
+
 ```bash
 cd packages
 npx mod-arch-installer -n my-module
 ```
 
 **Step 2**: Update identifiers -- replace placeholder names with your module name in:
+
 - `packages/my-module/package.json` (name, module-federation config)
 - `packages/my-module/frontend/src/odh/extensions.ts`
 - `packages/my-module/frontend/config/moduleFederation.js`
 
 **Step 3**: Configure `module-federation` in `packages/my-module/package.json`:
+
 ```json
 "module-federation": {
   "name": "myModule",
@@ -199,6 +204,7 @@ npx mod-arch-installer -n my-module
 ```
 
 **Step 4**: Define your extensions in `packages/my-module/extensions.ts`:
+
 ```typescript
 import type { AreaExtension, HrefNavItemExtension, RouteExtension } from '@odh-dashboard/plugin-core/extension-points';
 
@@ -236,6 +242,7 @@ export default extensions;
 **Step 5**: Add a feature flag in `frontend/src/concepts/areas/const.ts` if gating is needed.
 
 **Step 6**: Run locally:
+
 ```bash
 # Terminal 1
 cd frontend && npm run start:dev
@@ -248,10 +255,11 @@ cd packages/my-module && make dev-start-federated
 **Step 7**: Build the container image for your module and push it to a registry.
 
 **Step 8**: Deploy -- add your module to the cluster:
-  - Update the `federation-config` ConfigMap to include your module entry
-  - Either add a sidecar container to the dashboard Deployment, or create a separate Deployment + Service for your module
-  - If sidecar: add a port to the `odh-dashboard` Service
-  - Restart/redeploy the dashboard pod
+
+- Update the `federation-config` ConfigMap to include your module entry
+- Either add a sidecar container to the dashboard Deployment, or create a separate Deployment + Service for your module
+- If sidecar: add a port to the `odh-dashboard` Service
+- Restart/redeploy the dashboard pod
 
 ### Option B: Standalone plugin (runtime only, no monorepo changes)
 
@@ -352,6 +360,7 @@ type Extension = RouteExtension | HrefNavItemExtension | NavSectionExtension
 ```
 
 The existing dashboard navigation sections you can slot into (the `section` property) include:
+
 - `home`
 - `ai-hub`
 - `develop-and-train`
@@ -364,11 +373,11 @@ You can also create your own section using a `NavSectionExtension` (see the kueu
 
 #### Step-by-step guide
 
-**Step 1 -- Scaffold the project**
+#### Step 1 -- Scaffold the project
 
 Create a minimal webpack + React + TypeScript project. The critical file structure:
 
-```
+```text
 my-plugin/
 ├── src/
 │   ├── rhoai/
@@ -388,7 +397,7 @@ my-plugin/
 └── plugin.yaml                # Plugin metadata
 ```
 
-**Step 2 -- Set up package.json with matching dependency versions**
+#### Step 2 -- Set up package.json with matching dependency versions
 
 You must match the versions used by the dashboard host for shared singleton dependencies. Check the dashboard's `frontend/package.json` for exact versions. As of this codebase:
 
@@ -430,7 +439,7 @@ You must match the versions used by the dashboard host for shared singleton depe
 }
 ```
 
-**Step 3 -- Configure webpack**
+#### Step 3 -- Configure webpack
 
 Standalone plugins can use webpack's **built-in** `ModuleFederationPlugin` (from `webpack.container`) -- you do not need `@module-federation/enhanced`. This is simpler and compatible with the dashboard host.
 
@@ -482,12 +491,13 @@ module.exports = {
 ```
 
 Additional shared dependencies to add if your plugin uses them:
+
 - `@patternfly/react-icons` -- shared as singleton by the host
 - `@patternfly/react-table` -- if using PatternFly tables
 - `@patternfly/react-topology` -- if using topology visualization
 - `react-router` -- shared separately from `react-router-dom` by the host
 
-**Step 4 -- Set up the entry point (required for Module Federation)**
+#### Step 4 -- Set up the entry point (required for Module Federation)
 
 Module Federation requires an async bootstrap pattern. Your entry point must dynamically import the actual application:
 
@@ -506,7 +516,7 @@ const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(<App />);
 ```
 
-**Step 5 -- Define your extensions**
+#### Step 5 -- Define your extensions
 
 ```typescript
 // src/rhoai/extensions.ts
@@ -566,7 +576,7 @@ const MyPluginPage: React.FC = () => (
 export default MyPluginPage;
 ```
 
-**Step 6 -- Containerize**
+#### Step 6 -- Containerize
 
 Your container needs to serve the built static files (especially `remoteEntry.js` and the JS chunks). Use nginx with non-root user for OpenShift compatibility:
 
@@ -603,12 +613,13 @@ CMD ["nginx", "-g", "daemon off;"]
 ```
 
 Build and push:
+
 ```bash
 podman build -t quay.io/myorg/my-plugin:latest -f Containerfile .
 podman push quay.io/myorg/my-plugin:latest
 ```
 
-**Step 7 -- Deploy to the cluster**
+#### Step 7 -- Deploy to the cluster
 
 You can use raw Kubernetes manifests or a Helm chart. Both example community plugins use Helm charts -- see their `chart/` directories for templates.
 
@@ -680,7 +691,7 @@ spec:
 oc apply -f my-plugin-deployment.yaml
 ```
 
-**Step 8 -- Register in the federation config**
+#### Step 8 -- Register in the federation config
 
 The dashboard discovers plugins via the `MODULE_FEDERATION_CONFIG` environment variable. If the ODH operator reconciles the `federation-config` ConfigMap, you may need to set the env var directly on the Deployment instead.
 
@@ -735,13 +746,14 @@ print(json.dumps(current))
 oc set env deploy/rhods-dashboard -n redhat-ods-applications "MODULE_FEDERATION_CONFIG=$NEW"
 ```
 
-**Step 9 -- Restart the dashboard**
+#### Step 9 -- Restart the dashboard
 
 ```bash
 oc rollout restart deployment/odh-dashboard -n opendatahub
 ```
 
 After restart, the dashboard backend will:
+
 - Proxy `/_mf/myPlugin/*` to `my-plugin.opendatahub.svc.cluster.local:8080`
 - Load `remoteEntry.js` from your service
 - Dynamically import your `./extensions` module
@@ -749,7 +761,7 @@ After restart, the dashboard backend will:
 
 #### What happens at runtime (request flow)
 
-```
+```text
 Browser                     Dashboard Backend              Your Plugin Service
   |                              |                              |
   |  GET /                       |                              |

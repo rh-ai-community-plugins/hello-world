@@ -9,6 +9,7 @@ Two community plugins demonstrate the standalone approach for building RHOAI Das
 **Repository**: [github.com/rh-ai-community-plugins/hello-plugin-world](https://github.com/rh-ai-community-plugins/hello-plugin-world)
 
 A minimal "Hello World" plugin that demonstrates:
+
 - Project structure with `src/rhoai/extensions.ts` for extension declarations
 - Webpack Module Federation config using `webpack.container.ModuleFederationPlugin`
 - Three extensions: `app.area`, `app.navigation/href`, `app.route`
@@ -21,6 +22,7 @@ A minimal "Hello World" plugin that demonstrates:
 **Repository**: [github.com/rh-ai-community-plugins/kueue-visualizer](https://github.com/rh-ai-community-plugins/kueue-visualizer)
 
 A more substantial plugin that demonstrates:
+
 - Multiple pages with separate routes (Queue Infrastructure, Workloads)
 - Creating a custom navigation section (`app.navigation/section`)
 - **Reading Kubernetes resources** via the `/api/k8s/*` pass-through proxy -- fetches Kueue CRDs (ClusterQueues, LocalQueues, Workloads, ResourceFlavors) and core API resources (Namespaces)

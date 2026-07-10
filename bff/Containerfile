@@ -1,15 +1,23 @@
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
+ARG BASE_IMAGE="registry.access.redhat.com/ubi9/nodejs-22:latest"
+
+# Build stage
+FROM ${BASE_IMAGE} AS builder
+
+COPY --chown=default:root package*.json ./
 RUN npm ci
-COPY . .
+
+COPY --chown=default:root . .
 RUN npm run build
 
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
+# Production stage
+FROM ${BASE_IMAGE}
+
+COPY --from=builder --chown=1001:0 /opt/app-root/src/dist ./dist
+COPY --from=builder --chown=1001:0 /opt/app-root/src/node_modules ./node_modules
+COPY --from=builder --chown=1001:0 /opt/app-root/src/package.json ./
+
 EXPOSE 3000
-USER 1001
+
+USER 1001:0
+
 CMD ["node", "dist/server.js"]

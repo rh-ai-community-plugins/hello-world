@@ -180,7 +180,7 @@ oc auth can-i create pods --all-namespaces   # Should return "yes" for cluster-a
 
 Edit `env.local` in the odh-dashboard root and add (or update) the `MODULE_FEDERATION_CONFIG` variable with your plugin's entry:
 
-```
+```bash
 MODULE_FEDERATION_CONFIG=[{"name":"helloWorld","backend":{"remoteEntry":"/remoteEntry.js","tls":false,"localService":{"host":"localhost","port":9500},"service":{"name":"placeholder","namespace":"opendatahub","port":8080}},"proxyService":[{"path":"/hello-world/api","pathRewrite":"/api","authorize":true,"tls":false,"localService":{"host":"localhost","port":3000},"service":{"name":"placeholder","namespace":"opendatahub","port":3000}}]}]
 ```
 
@@ -246,7 +246,7 @@ npm run start:dev
 
 ### Step 10: Verify
 
-Open **http://localhost:4010** in your browser. You should see the RHOAI Dashboard with your plugin loaded in the sidebar.
+Open <http://localhost:4010> in your browser. You should see the RHOAI Dashboard with your plugin loaded in the sidebar.
 
 ---
 
