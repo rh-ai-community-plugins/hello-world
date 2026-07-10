@@ -74,7 +74,7 @@ The config supports two formats. The **new format** is recommended; the old form
     "tls": false,
     "service": {
       "name": "my-plugin",
-      "namespace": "opendatahub",
+      "namespace": "redhat-ods-applications",
       "port": 8080
     }
   },
@@ -86,7 +86,7 @@ The config supports two formats. The **new format** is recommended; the old form
       "tls": false,
       "service": {
         "name": "my-plugin-api",
-        "namespace": "opendatahub",
+        "namespace": "redhat-ods-applications",
         "port": 3000
       }
     }
@@ -109,7 +109,7 @@ Key points:
   "remoteEntry": "/remoteEntry.js",
   "authorize": true,
   "tls": false,
-  "service": { "name": "my-plugin", "namespace": "opendatahub", "port": 8080 },
+  "service": { "name": "my-plugin", "namespace": "redhat-ods-applications", "port": 8080 },
   "proxy": [{ "path": "/my-plugin/api", "pathRewrite": "/api" }]
 }
 ```
@@ -150,6 +150,8 @@ To modify which plugins are loaded, you update the ConfigMap either by:
 ---
 
 ## 2. Recipe: How to Add Your Own Extension
+
+> **ODH vs RHOAI:** The examples below use the RHOAI dashboard namespace `redhat-ods-applications` and deployment name `rhods-dashboard`. If you are running the Open Data Hub (ODH) upstream distribution instead, substitute `opendatahub` for the namespace and `odh-dashboard` for the deployment name throughout.
 
 ### Option A: Add to the monorepo (build-time + runtime)
 
@@ -631,7 +633,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: my-plugin
-  namespace: opendatahub
+  namespace: my-plugin
   labels:
     app: my-plugin
 spec:
@@ -677,7 +679,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: my-plugin
-  namespace: opendatahub
+  namespace: my-plugin
 spec:
   selector:
     app: my-plugin
@@ -693,12 +695,12 @@ oc apply -f my-plugin-deployment.yaml
 
 #### Step 8 -- Register in the federation config
 
-The dashboard discovers plugins via the `MODULE_FEDERATION_CONFIG` environment variable. If the ODH operator reconciles the `federation-config` ConfigMap, you may need to set the env var directly on the Deployment instead.
+The dashboard discovers plugins via the `MODULE_FEDERATION_CONFIG` environment variable. If the RHOAI operator reconciles the `federation-config` ConfigMap, you may need to set the env var directly on the Deployment instead.
 
 **Option A: Edit the ConfigMap** (if the operator doesn't reconcile it):
 
 ```bash
-oc edit configmap federation-config -n opendatahub
+oc edit configmap federation-config -n redhat-ods-applications
 ```
 
 Add to the JSON array in `module-federation-config.json` (new format):
@@ -712,7 +714,7 @@ Add to the JSON array in `module-federation-config.json` (new format):
     "tls": false,
     "service": {
       "name": "my-plugin",
-      "namespace": "opendatahub",
+      "namespace": "my-plugin",
       "port": 8080
     }
   }
@@ -736,7 +738,7 @@ current.append({
     'remoteEntry': '/remoteEntry.js',
     'authorize': False,
     'tls': False,
-    'service': {'name': 'my-plugin', 'namespace': 'opendatahub', 'port': 8080}
+    'service': {'name': 'my-plugin', 'namespace': 'my-plugin', 'port': 8080}
   }
 })
 print(json.dumps(current))
@@ -749,12 +751,12 @@ oc set env deploy/rhods-dashboard -n redhat-ods-applications "MODULE_FEDERATION_
 #### Step 9 -- Restart the dashboard
 
 ```bash
-oc rollout restart deployment/odh-dashboard -n opendatahub
+oc rollout restart deployment/rhods-dashboard -n redhat-ods-applications
 ```
 
 After restart, the dashboard backend will:
 
-- Proxy `/_mf/myPlugin/*` to `my-plugin.opendatahub.svc.cluster.local:8080`
+- Proxy `/_mf/myPlugin/*` to `my-plugin.my-plugin.svc.cluster.local:8080`
 - Load `remoteEntry.js` from your service
 - Dynamically import your `./extensions` module
 - Merge your nav items and routes into the dashboard UI

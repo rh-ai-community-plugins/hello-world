@@ -78,7 +78,7 @@ oc set env deployment/rhods-dashboard -n redhat-ods-applications --list \
   | python3 -c "import json,sys; d=json.loads(sys.stdin.read().split('=',1)[1]); print([e['name'] for e in d])"
 ```
 
-To deploy your own plugin image instead, see [Build & Push](docs/deployment/BUILD_AND_PUSH.md).
+To deploy your own plugin image instead, see [Build & Push](docs/development/BUILD_AND_PUSH.md). For the full deployment guide with Helm chart customization and BFF registration, see [Deploying on OpenShift](docs/deployment/OPENSHIFT_DEPLOY.md).
 
 ### Developing a New Plugin
 
@@ -133,7 +133,7 @@ See the [docs/](docs/) directory for detailed guides:
 
 - **[Architecture](docs/architecture/)** -- Plugin system internals, extension contract, and community plugin examples
 - **[Development](docs/development/)** -- Local environment setup, [customization guide](docs/development/CUSTOMIZATION.md), and backend API reference
-- **[Deployment](docs/deployment/)** -- Container image build and push instructions
+- **[Deployment](docs/deployment/)** -- Deploying the plugin on OpenShift with Helm and dashboard registration
 
 ## License
 

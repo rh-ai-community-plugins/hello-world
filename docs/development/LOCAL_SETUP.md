@@ -262,7 +262,7 @@ Both methods use the same `MODULE_FEDERATION_CONFIG` format:
 | `backend.localService.host` | Hostname of the plugin dev server. Use `localhost` for local development. |
 | `backend.localService.port` | Port the plugin dev server listens on. Must match the plugin's webpack dev server port. |
 | `backend.service.name` | Kubernetes Service name used in production. Set to `placeholder` for local dev (the `localService` overrides it). |
-| `backend.service.namespace` | Kubernetes namespace. Set to `opendatahub` (or your RHOAI namespace). |
+| `backend.service.namespace` | Kubernetes namespace. Set to `opendatahub` (or `redhat-ods-applications` for RHOAI). |
 | `backend.service.port` | Service port in production. Not used when `localService` is set. |
 
 ### BFF Proxy Fields (`proxyService[]`)

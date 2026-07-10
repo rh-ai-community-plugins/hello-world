@@ -134,7 +134,7 @@ Example: `fetch('/api/k8s/apis/project.openshift.io/v1/projects')` lists the use
 
 If your plugin needs its own API backend (e.g., to talk to a third-party service), add a `proxyService` entry in the ConfigMap. The dashboard backend will then proxy requests from a URL path you choose to your backend service.
 
-**Example**: Your plugin makes `fetch('/my-plugin/api/data')` -> dashboard backend rewrites to `/api/data` -> forwards to `my-plugin-api.opendatahub.svc.cluster.local:3000/api/data` with the user's Bearer token (if `authorize: true`).
+**Example**: Your plugin makes `fetch('/my-plugin/api/data')` -> dashboard backend rewrites to `/api/data` -> forwards to `my-plugin-api.redhat-ods-applications.svc.cluster.local:3000/api/data` with the user's Bearer token (if `authorize: true`).
 
 To set this up, add a `proxyService` entry alongside your `backend` in the federation ConfigMap:
 
@@ -147,7 +147,7 @@ To set this up, add a `proxyService` entry alongside your `backend` in the feder
     "tls": false,
     "service": {
       "name": "my-plugin",
-      "namespace": "opendatahub",
+      "namespace": "redhat-ods-applications",
       "port": 8080
     }
   },
@@ -159,7 +159,7 @@ To set this up, add a `proxyService` entry alongside your `backend` in the feder
       "tls": false,
       "service": {
         "name": "my-plugin-api",
-        "namespace": "opendatahub",
+        "namespace": "redhat-ods-applications",
         "port": 3000
       }
     }

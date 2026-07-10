@@ -69,14 +69,14 @@ The dashboard discovers BFF services via the `proxyService` field in the federat
   "name": "helloWorld",
   "backend": {
     "remoteEntry": "/remoteEntry.js",
-    "service": { "name": "hello-world-plugin", "namespace": "opendatahub", "port": 8080 }
+    "service": { "name": "hello-world-plugin", "namespace": "hello-world", "port": 8080 }
   },
   "proxyService": [{
     "path": "/hello-world/api",
     "pathRewrite": "/api",
     "authorize": true,
     "tls": false,
-    "service": { "name": "hello-world-plugin-bff", "namespace": "opendatahub", "port": 3000 }
+    "service": { "name": "hello-world-plugin-bff", "namespace": "hello-world", "port": 3000 }
   }]
 }
 ```

@@ -14,7 +14,7 @@ Local development environment setup, dashboard integration workflow, and referen
 
 ### [Deployment](deployment/)
 
-Building container images and pushing them to a registry.
+Deploying the plugin on OpenShift with Helm, registering it with the RHOAI Dashboard, and configuring the BFF proxy.
 
 ### [Archives](archives/)
 

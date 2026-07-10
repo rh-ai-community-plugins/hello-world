@@ -103,7 +103,7 @@ Project documentation lives under `docs/` in semantic subfolders:
 ```text
 docs/architecture/   — Plugin system internals and extension contract
 docs/development/    — Local dev setup and dashboard API reference
-docs/deployment/     — Container build instructions
+docs/deployment/     — OpenShift deployment with Helm and dashboard registration
 docs/archives/       — Project plan and historical documents
 ```
 

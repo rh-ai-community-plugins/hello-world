@@ -1,7 +1,7 @@
 # Deployment
 
-Guides for building and publishing container images.
+Guides for deploying the plugin on OpenShift.
 
 ## Documents
 
-- [BUILD_AND_PUSH.md](BUILD_AND_PUSH.md) -- Step-by-step instructions for building the container image with Podman, Buildah, or Docker and pushing it to Quay.io.
+- [OPENSHIFT_DEPLOY.md](OPENSHIFT_DEPLOY.md) -- Complete guide to deploying the plugin with Helm, registering it with the RHOAI Dashboard, and configuring the BFF proxy.
