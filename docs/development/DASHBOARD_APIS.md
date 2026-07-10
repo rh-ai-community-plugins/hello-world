@@ -454,7 +454,38 @@ function useCanCreate(namespace: string, group: string, resource: string) {
 }
 ```
 
-### 2.5 Reading Dashboard Configuration
+### 2.5 Role-Based UI Visibility
+
+Use the `isAdmin` field from `/api/status` to conditionally render content that only RHOAI administrators should see. This is straightforward conditional rendering — the component fetches the user's role and shows or hides a section based on it.
+
+```tsx
+import { Card, CardTitle, CardBody } from '@patternfly/react-core';
+import { LockIcon } from '@patternfly/react-icons';
+import { useCurrentUser } from '~/app/hooks/useCurrentUser';
+
+const MyPage: React.FC = () => {
+  const { user } = useCurrentUser();
+
+  return (
+    <>
+      {/* Content visible to all users */}
+
+      {user?.isAdmin && (
+        <Card>
+          <CardTitle><LockIcon /> Admin Settings</CardTitle>
+          <CardBody>This section is only visible to RHOAI admins.</CardBody>
+        </Card>
+      )}
+    </>
+  );
+};
+```
+
+The same approach works with `isAllowed` or with fine-grained RBAC checks via `useAccessReview` (see [section 2.4](#24-checking-user-permissions-rbac)) — for example, hiding a "Create" button when the user lacks `create` permission on a specific resource.
+
+**Live example:** The [User Info page](../../src/app/pages/UserInfoPage.tsx) includes an admin-only card that is only rendered when `user.isAdmin` is `true`.
+
+### 2.6 Reading Dashboard Configuration
 
 ```typescript
 // Get dashboard feature flags and settings

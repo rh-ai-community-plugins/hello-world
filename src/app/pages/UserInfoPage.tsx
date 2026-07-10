@@ -17,7 +17,7 @@ import {
   Alert,
   Label,
 } from '@patternfly/react-core';
-import { UserIcon } from '@patternfly/react-icons';
+import { UserIcon, LockIcon } from '@patternfly/react-icons';
 import { useCurrentUser } from '~/app/hooks/useCurrentUser';
 
 const UserInfoPage: React.FC = () => {
@@ -91,6 +91,19 @@ const UserInfoPage: React.FC = () => {
                     <DescriptionListDescription>{user.namespace}</DescriptionListDescription>
                   </DescriptionListGroup>
                 </DescriptionList>
+              </CardBody>
+            </Card>
+          </StackItem>
+        )}
+
+        {user?.isAdmin && (
+          <StackItem>
+            <Card>
+              <CardTitle>
+                <LockIcon /> Admin-Only Section
+              </CardTitle>
+              <CardBody>
+                If you can see this section, you are logged in as a RHOAI admin.
               </CardBody>
             </Card>
           </StackItem>

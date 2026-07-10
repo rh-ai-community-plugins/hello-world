@@ -63,4 +63,31 @@ describe('UserInfoPage', () => {
     expect(screen.getByText('default')).toBeInTheDocument();
     expect(screen.getByText('No')).toBeInTheDocument();
   });
+
+  it('hides admin-only section for non-admin users', () => {
+    (useCurrentUser as jest.Mock).mockReturnValue({
+      user: mockUser,
+      loading: false,
+      error: null,
+    });
+
+    render(<UserInfoPage />);
+
+    expect(screen.queryByText('Admin-Only Section')).not.toBeInTheDocument();
+  });
+
+  it('shows admin-only section for admin users', () => {
+    (useCurrentUser as jest.Mock).mockReturnValue({
+      user: { ...mockUser, isAdmin: true },
+      loading: false,
+      error: null,
+    });
+
+    render(<UserInfoPage />);
+
+    expect(screen.getByText('Admin-Only Section')).toBeInTheDocument();
+    expect(
+      screen.getByText('If you can see this section, you are logged in as a RHOAI admin.'),
+    ).toBeInTheDocument();
+  });
 });
