@@ -23,7 +23,7 @@ export const helloWorldSectionExtension = {
     title: 'Hello World', // [PLUGIN-SPECIFIC] display name in sidebar
     group: '1_hello_world', // [PLUGIN-SPECIFIC] sort key within community-plugins
     section: 'community-plugins', // [SHARED] parent section reference
-    iconRef: () => import('./HelloWorldNavIcon'),
+    iconRef: () => import('~/app/components/HelloWorldNavIcon'),
   },
 };
 

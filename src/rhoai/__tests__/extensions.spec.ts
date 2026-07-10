@@ -7,7 +7,7 @@ import {
   namespaceSummaryNavExtension,
   helloWorldRouteExtension,
   extensions,
-} from './extensions';
+} from '../extensions';
 
 describe('RHOAI Plugin Extensions', () => {
   describe('helloWorldAreaExtension', () => {

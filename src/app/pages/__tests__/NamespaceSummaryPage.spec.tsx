@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { useNamespaceSummary } from '~/app/hooks/useNamespaceSummary';
-import NamespaceSummaryPage from './NamespaceSummaryPage';
+import NamespaceSummaryPage from '../NamespaceSummaryPage';
 
 jest.mock('~/app/hooks/useNamespaceSummary');
 

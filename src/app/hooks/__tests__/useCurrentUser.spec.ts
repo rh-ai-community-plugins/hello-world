@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { useCurrentUser } from './useCurrentUser';
+import { useCurrentUser } from '../useCurrentUser';
 
 const mockUser = {
   userName: 'test-user',

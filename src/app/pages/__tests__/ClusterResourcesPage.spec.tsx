@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useProjects } from '~/app/hooks/useProjects';
 import { useK8sResources } from '~/app/hooks/useK8sResources';
-import ClusterResourcesPage from './ClusterResourcesPage';
+import ClusterResourcesPage from '../ClusterResourcesPage';
 
 jest.mock('~/app/hooks/useProjects');
 jest.mock('~/app/hooks/useK8sResources');

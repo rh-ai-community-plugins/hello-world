@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { useK8sResources, createK8sResource, deleteK8sResource } from './useK8sResources';
+import { useK8sResources, createK8sResource, deleteK8sResource } from '../useK8sResources';
 
 const mockDeployments = [
   {

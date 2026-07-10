@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import HelloIcon from './HelloWorldNavIcon';
+import HelloIcon from '../HelloWorldNavIcon';
 
 describe('HelloWorldNavIcon (HelloIcon) Component', () => {
   it('should render the SVG icon', () => {

@@ -60,7 +60,7 @@ module.exports = {
       filename: remoteEntry,
       exposes: {
         './extensions': './src/rhoai/extensions.ts',
-        './Icon': './src/rhoai/HelloWorldNavIcon.tsx',
+        './Icon': './src/app/components/HelloWorldNavIcon.tsx',
       },
       shared: {
         react: {
