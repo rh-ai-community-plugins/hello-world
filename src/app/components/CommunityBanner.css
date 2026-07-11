@@ -1,3 +1,5 @@
+/* [SHARED] Do not remove or modify — these styles support the CommunityBanner
+   component used by all community plugins. */
 .community-plugin-layout {
   display: flex;
   flex-direction: column;

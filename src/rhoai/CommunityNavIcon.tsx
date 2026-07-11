@@ -1,3 +1,5 @@
+// [SHARED] Do not remove or modify — this icon is the common sidebar icon
+// for all community plugins. Changes here affect every plugin's navigation.
 import React from 'react';
 
 const CommunityIcon: React.FC = () => (

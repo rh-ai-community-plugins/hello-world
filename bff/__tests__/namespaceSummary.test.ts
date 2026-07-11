@@ -140,6 +140,7 @@ describe('namespaceSummaryHandler', () => {
   });
 
   it('returns 502 when projects call fails', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     const { req, res } = createMockReqRes({
       authorization: 'Bearer valid-token',
     });
@@ -150,5 +151,6 @@ describe('namespaceSummaryHandler', () => {
 
     expect(res.status).toHaveBeenCalledWith(502);
     expect(res.json).toHaveBeenCalledWith({ error: 'connection refused' });
+    consoleSpy.mockRestore();
   });
 });

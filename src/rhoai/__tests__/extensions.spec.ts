@@ -90,8 +90,8 @@ describe('RHOAI Plugin Extensions', () => {
 
     it('should include all extensions in the correct order', () => {
       expect(extensions).toEqual([
-        helloWorldAreaExtension,
         communityPluginsSectionExtension,
+        helloWorldAreaExtension,
         helloWorldSectionExtension,
         userInfoNavExtension,
         clusterResourcesNavExtension,
