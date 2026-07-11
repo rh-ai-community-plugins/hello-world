@@ -1,8 +1,5 @@
 import React from 'react';
 
-/**
- * Navigation icon for the Hello World plugin
- */
 const HelloIcon: React.FC = () => (
   <svg
     className="pf-v6-svg"

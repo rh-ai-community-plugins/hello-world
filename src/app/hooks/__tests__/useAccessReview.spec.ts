@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { useAccessReview } from './useAccessReview';
+import { useAccessReview } from '../useAccessReview';
 
 describe('useAccessReview', () => {
   beforeEach(() => {

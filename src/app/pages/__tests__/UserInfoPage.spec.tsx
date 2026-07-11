@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { useCurrentUser } from '~/app/hooks/useCurrentUser';
-import UserInfoPage from './UserInfoPage';
+import UserInfoPage from '../UserInfoPage';
 
 jest.mock('~/app/hooks/useCurrentUser');
 
