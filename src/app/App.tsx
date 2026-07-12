@@ -7,6 +7,7 @@ import NamespaceSummaryPage from './pages/NamespaceSummaryPage';
 
 const App: React.FC = () => (
   <div className="community-plugin-layout">
+    {/* [SHARED] Do not remove — all community plugins must display the CommunityBanner */}
     <CommunityBanner />
     <div className="community-plugin-content">
       <Routes>
