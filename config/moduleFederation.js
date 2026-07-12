@@ -9,7 +9,7 @@ module.exports = {
   filename: 'remoteEntry.js',
   exposes: {
     './extensions': './src/rhoai/extensions.ts',
-    './Icon': './src/rhoai/HelloWorldNavIcon.tsx',
+    './Icon': './src/app/components/HelloWorldNavIcon.tsx',
   },
   optimization: {
     runtimeChunk: false,
