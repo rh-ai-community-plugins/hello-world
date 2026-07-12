@@ -35,11 +35,13 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test-unit": "jest",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run typecheck && npm run lint && npm test",
     "lint": "npm run lint:ts && npm run lint:md",
     "lint:ts": "eslint --ext .ts,.tsx src/",
     "lint:md": "markdownlint-cli2 '**/*.md'",
     "sync-chart-version": "node scripts/sync-chart-version.js",
-    "version": "npm run sync-chart-version && git add chart/Chart.yaml"
+    "version": "npm run sync-chart-version && git add chart/Chart.yaml bff/package.json"
   },
   "dependencies": {
     "@openshift/dynamic-plugin-sdk": "^5",

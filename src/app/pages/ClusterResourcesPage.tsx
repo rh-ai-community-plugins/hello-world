@@ -22,14 +22,9 @@ import {
   Form,
   FormGroup,
   TextInput,
-  MenuToggle,
-  Select,
-  SelectList,
-  SelectOption,
-
 } from '@patternfly/react-core';
 import { CubesIcon, PlusCircleIcon, SyncAltIcon } from '@patternfly/react-icons';
-import { useProjects } from '~/app/hooks/useProjects';
+import { ProjectSelector } from '~/app/components/ProjectSelector';
 import {
   useK8sResources,
   createK8sResource,
@@ -330,9 +325,7 @@ const CreateServiceModal: React.FC<{
 };
 
 const ClusterResourcesPage: React.FC = () => {
-  const { projects, loading: projectsLoading, error: projectsError } = useProjects();
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const [isProjectSelectOpen, setIsProjectSelectOpen] = useState(false);
 
   const deploymentPath = selectedProject
     ? `/apis/apps/v1/namespaces/${selectedProject}/deployments`
@@ -382,43 +375,10 @@ const ClusterResourcesPage: React.FC = () => {
                   </Content>
                 </StackItem>
                 <StackItem>
-                  {projectsError ? (
-                    <Alert variant="danger" title="Failed to load projects" isInline>
-                      {projectsError}
-                    </Alert>
-                  ) : projectsLoading ? (
-                    <Spinner size="md" aria-label="Loading projects" />
-                  ) : (
-                    <Select
-                      isOpen={isProjectSelectOpen}
-                      selected={selectedProject ?? undefined}
-                      onSelect={(_event, value) => {
-                        setSelectedProject(value as string);
-                        setIsProjectSelectOpen(false);
-                      }}
-                      onOpenChange={setIsProjectSelectOpen}
-                      toggle={(toggleRef) => (
-                        <MenuToggle
-                          ref={toggleRef}
-                          onClick={() => setIsProjectSelectOpen(!isProjectSelectOpen)}
-                          isExpanded={isProjectSelectOpen}
-                          style={{ minWidth: '300px' }}
-                          aria-label="Select a project"
-                        >
-                          {selectedProject || 'Select a project'}
-                        </MenuToggle>
-                      )}
-                      shouldFocusToggleOnSelect
-                    >
-                      <SelectList>
-                        {projects.map((p) => (
-                          <SelectOption key={p.metadata.uid} value={p.metadata.name}>
-                            {p.metadata.name}
-                          </SelectOption>
-                        ))}
-                      </SelectList>
-                    </Select>
-                  )}
+                  <ProjectSelector
+                    selectedProject={selectedProject}
+                    onSelect={setSelectedProject}
+                  />
                 </StackItem>
               </Stack>
             </CardBody>

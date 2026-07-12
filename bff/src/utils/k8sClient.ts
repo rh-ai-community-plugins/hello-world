@@ -15,7 +15,7 @@ export function getK8sBaseUrl(): string {
   );
 }
 
-export function k8sRequest(token: string, path: string): Promise<any> {
+export function k8sRequest<T = unknown>(token: string, path: string): Promise<T> {
   return new Promise((resolve, reject) => {
     const baseUrl = getK8sBaseUrl();
     const url = new URL(path, baseUrl);

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { k8sRequest } from '../utils/k8sClient';
-import { PodCounts, NamespaceInfo, NamespaceSummaryResponse } from '../types';
+import { K8sResource, K8sList, PodCounts, NamespaceInfo, NamespaceSummaryResponse } from '../types';
 
-function countPods(items: any[]): PodCounts {
+function countPods(items: K8sResource[]): PodCounts {
   const counts: PodCounts = {
     total: items.length,
     running: 0,
@@ -49,16 +49,16 @@ export async function namespaceSummaryHandler(
   const token = authHeader.slice(7);
 
   try {
-    const projectsData = await k8sRequest(
+    const projectsData = await k8sRequest<K8sList>(
       token,
       '/apis/project.openshift.io/v1/projects',
     );
 
     const results = await Promise.allSettled(
-      projectsData.items.map(async (project: any) => {
+      projectsData.items.map(async (project) => {
         const name = project.metadata.name;
         const phase = project.status?.phase || 'Active';
-        const podsData = await k8sRequest(
+        const podsData = await k8sRequest<K8sList>(
           token,
           `/api/v1/namespaces/${name}/pods`,
         );
