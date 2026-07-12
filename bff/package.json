@@ -1,14 +1,16 @@
 {
   "name": "hello-world-bff",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "BFF service for the Hello World RHOAI dashboard plugin",
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
     "start:dev": "npx tsx watch src/server.ts",
+    "typecheck": "tsc --noEmit",
     "test": "jest",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "validate": "npm run typecheck && npm run lint && npm test"
   },
   "dependencies": {
     "express": "^4.21.0"
@@ -28,7 +30,12 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "testMatch": ["**/__tests__/**/*.test.ts"],
-    "collectCoverageFrom": ["src/**/*.ts", "!src/**/*.d.ts"]
+    "testMatch": [
+      "**/__tests__/**/*.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts"
+    ]
   }
 }
