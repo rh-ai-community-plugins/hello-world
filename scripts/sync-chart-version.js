@@ -17,3 +17,12 @@ let plugin = fs.readFileSync(pluginPath, 'utf8');
 plugin = plugin.replace(/^version:.*/m, `version: ${version}`);
 plugin = plugin.replace(/^(\s+tag:)\s.*/m, `$1 "${version}"`);
 fs.writeFileSync(pluginPath, plugin);
+
+const versionFlag = /--version \S+/g;
+for (const docPath of ['README.md', 'docs/development/BUILD_AND_PUSH.md', 'docs/deployment/OPENSHIFT_DEPLOY.md']) {
+  const content = fs.readFileSync(docPath, 'utf8');
+  const updated = content.replace(versionFlag, `--version ${version}`);
+  if (updated !== content) {
+    fs.writeFileSync(docPath, updated);
+  }
+}

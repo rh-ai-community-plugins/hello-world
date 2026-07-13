@@ -3,7 +3,7 @@
 
 image:
   repository: quay.io/rh-ai-community-plugins/hello-world
-  tag: latest
+  tag: ""
   pullPolicy: IfNotPresent
 
 # Overrides .Chart.Name so deployed resources use the plugin name, not the
@@ -44,7 +44,6 @@ resources:
 
 securityContext:
   runAsNonRoot: true
-  runAsUser: 1001
 
 nodeSelector: {}
 
@@ -57,7 +56,7 @@ bff:
   enabled: true
   image:
     repository: quay.io/rh-ai-community-plugins/hello-world-bff
-    tag: latest
+    tag: ""
     pullPolicy: IfNotPresent
   replicaCount: 1
   service:

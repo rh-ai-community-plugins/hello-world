@@ -26,7 +26,16 @@ If you have an OpenShift cluster with RHOAI already running, you can deploy this
 
 #### 1. Install the plugin
 
-Deploy the Helm chart into a namespace of your choice (it will be created if it doesn't exist):
+Install directly from the OCI registry — no need to clone this repo:
+
+```bash
+helm install hello-world oci://quay.io/rh-ai-community-plugins/hello-world-chart \
+  --version 0.4.0 \
+  --namespace hello-world \
+  --create-namespace
+```
+
+Or, if you have a local checkout of the repository:
 
 ```bash
 helm install hello-world chart/ \
@@ -49,14 +58,27 @@ import json, sys
 config = json.load(sys.stdin)
 config.append({
   'name': 'helloWorld',
-  'remoteEntry': '/remoteEntry.js',
-  'authorize': False,
-  'tls': False,
-  'service': {
-    'name': 'hello-world',
-    'namespace': 'hello-world',
-    'port': 8080
-  }
+  'backend': {
+    'remoteEntry': '/remoteEntry.js',
+    'authorize': False,
+    'tls': False,
+    'service': {
+      'name': 'hello-world',
+      'namespace': 'hello-world',
+      'port': 8080
+    }
+  },
+  'proxyService': [{
+    'path': '/hello-world/api',
+    'pathRewrite': '/api',
+    'authorize': True,
+    'tls': False,
+    'service': {
+      'name': 'hello-world-bff',
+      'namespace': 'hello-world',
+      'port': 3000
+    }
+  }]
 })
 print(json.dumps(config))
 " > /tmp/mf-config-extended.json

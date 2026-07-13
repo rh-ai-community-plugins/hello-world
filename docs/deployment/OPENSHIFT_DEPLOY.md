@@ -14,7 +14,16 @@ This guide walks through deploying the plugin on an OpenShift cluster that alrea
 
 ## 1. Install the Plugin
 
-Deploy the Helm chart into a namespace of your choice:
+Install directly from the OCI registry — no need to clone the repo:
+
+```bash
+helm install hello-world oci://quay.io/rh-ai-community-plugins/hello-world-chart \
+  --version 0.4.0 \
+  --namespace hello-world \
+  --create-namespace
+```
+
+Or, from a local checkout of the repository:
 
 ```bash
 helm install hello-world chart/ \
@@ -32,18 +41,18 @@ This creates:
 Pass `--set` flags to customize the installation:
 
 ```bash
-helm install hello-world chart/ \
+helm install hello-world oci://quay.io/rh-ai-community-plugins/hello-world-chart \
+  --version 0.4.0 \
   --namespace hello-world \
   --create-namespace \
-  --set image.tag=0.3.0 \
-  --set bff.image.tag=0.3.0 \
   --set replicaCount=2
 ```
 
 To deploy the frontend only (no BFF):
 
 ```bash
-helm install hello-world chart/ \
+helm install hello-world oci://quay.io/rh-ai-community-plugins/hello-world-chart \
+  --version 0.4.0 \
   --namespace hello-world \
   --create-namespace \
   --set bff.enabled=false
@@ -70,13 +79,15 @@ import json, sys
 config = json.load(sys.stdin)
 config.append({
   'name': 'helloWorld',
-  'remoteEntry': '/remoteEntry.js',
-  'authorize': False,
-  'tls': False,
-  'service': {
-    'name': 'hello-world',
-    'namespace': 'hello-world',
-    'port': 8080
+  'backend': {
+    'remoteEntry': '/remoteEntry.js',
+    'authorize': False,
+    'tls': False,
+    'service': {
+      'name': 'hello-world',
+      'namespace': 'hello-world',
+      'port': 8080
+    }
   }
 })
 print(json.dumps(config))
