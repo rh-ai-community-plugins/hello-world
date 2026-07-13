@@ -1,56 +1,85 @@
-/**
- * RHOAI Hello World Plugin Extensions
- *
- * This file defines the extension points that register this plugin
- * with the RHOAI Dashboard. It follows the Module Federation pattern
- * used by other RHOAI plugins.
- */
+// [SHARED] Common section for all community plugins — never changes across plugins.
+// Do not change the id or name: all community plugins share this section
+// so they appear grouped together in the dashboard sidebar.
+export const communityPluginsSectionExtension = {
+  type: 'app.navigation/section' as const,
+  properties: {
+    id: 'community-plugins', // [SHARED] common section for all community plugins
+    title: 'Community plugins', // [SHARED]
+    group: '9_plugins', // [SHARED]
+    iconRef: () => import('./CommunityNavIcon'),
+  },
+};
 
-// Extension point types from @openshift/dynamic-plugin-sdk
-// These are the standard extension types that the RHOAI dashboard recognizes
+// [PLUGIN-SPECIFIC] Everything below is specific to this plugin
 
-/**
- * Area Extension - Creates a top-level area/section in the dashboard
- */
 export const helloWorldAreaExtension = {
   type: 'app.area' as const,
   properties: {
-    id: 'hello-world',
-    featureFlags: [], // No feature flags required for this simple plugin
+    id: 'hello-world', // [PLUGIN-SPECIFIC] unique area ID
+    featureFlags: [] as string[],
   },
 };
 
-/**
- * Navigation Item Extension - Adds a link to the sidebar navigation
- */
-export const helloWorldNavItemExtension = {
+export const helloWorldSectionExtension = {
+  type: 'app.navigation/section' as const,
+  properties: {
+    id: 'hello-world', // [PLUGIN-SPECIFIC] unique nav section ID
+    title: 'Hello World', // [PLUGIN-SPECIFIC] display name in sidebar
+    group: '1_hello_world', // [PLUGIN-SPECIFIC] sort key within community-plugins
+    section: 'community-plugins', // [SHARED] must match communityPluginsSectionExtension.id — do not change
+    iconRef: () => import('~/app/components/HelloWorldNavIcon'),
+  },
+};
+
+export const userInfoNavExtension = {
   type: 'app.navigation/href' as const,
   properties: {
-    id: 'hello-world-nav',
-    title: 'Hello World',
-    href: '/hello-world',
-    group: '9_plugins',
+    id: 'hello-world-user-info', // [PLUGIN-SPECIFIC] unique nav item ID
+    title: 'User Info',
+    href: '/hello-world/user-info', // [PLUGIN-SPECIFIC] must match route prefix
+    section: 'hello-world', // [PLUGIN-SPECIFIC] references this plugin's section ID
+    path: '/hello-world/user-info/*', // [PLUGIN-SPECIFIC] route-matching pattern
   },
 };
 
-/**
- * Route Extension - Registers the plugin's route
- */
+export const clusterResourcesNavExtension = {
+  type: 'app.navigation/href' as const,
+  properties: {
+    id: 'hello-world-cluster-resources', // [PLUGIN-SPECIFIC] unique nav item ID
+    title: 'Cluster Resources',
+    href: '/hello-world/cluster-resources', // [PLUGIN-SPECIFIC] must match route prefix
+    section: 'hello-world', // [PLUGIN-SPECIFIC] references this plugin's section ID
+    path: '/hello-world/cluster-resources/*', // [PLUGIN-SPECIFIC] route-matching pattern
+  },
+};
+
+export const namespaceSummaryNavExtension = {
+  type: 'app.navigation/href' as const,
+  properties: {
+    id: 'hello-world-namespace-summary', // [PLUGIN-SPECIFIC] unique nav item ID
+    title: 'Namespace Summary',
+    href: '/hello-world/namespace-summary', // [PLUGIN-SPECIFIC] must match route prefix
+    section: 'hello-world', // [PLUGIN-SPECIFIC] references this plugin's section ID
+    path: '/hello-world/namespace-summary/*', // [PLUGIN-SPECIFIC] route-matching pattern
+  },
+};
+
 export const helloWorldRouteExtension = {
   type: 'app.route' as const,
   properties: {
-    path: '/hello-world/*',
-    // The component will be dynamically imported via Module Federation
-    component: () => import('../app/components/HelloWorldPage'),
+    path: '/hello-world/*', // [PLUGIN-SPECIFIC] top-level route prefix
+    component: () => import('~/app/App'),
   },
 };
 
-/**
- * All extensions exported together
- */
 export const extensions = [
+  communityPluginsSectionExtension,
   helloWorldAreaExtension,
-  helloWorldNavItemExtension,
+  helloWorldSectionExtension,
+  userInfoNavExtension,
+  clusterResourcesNavExtension,
+  namespaceSummaryNavExtension,
   helloWorldRouteExtension,
 ];
 

@@ -1,26 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "hello-world-plugin.fullname" . }}
+  name: {{ include "hello-world.fullname" . }}
   labels:
-    {{- include "hello-world-plugin.labels" . | nindent 4 }}
+    {{- include "hello-world.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "hello-world-plugin.selectorLabels" . | nindent 6 }}
+      {{- include "hello-world.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "hello-world-plugin.selectorLabels" . | nindent 8 }}
+        {{- include "hello-world.selectorLabels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "hello-world-plugin.serviceAccountName" . }}
+      serviceAccountName: {{ include "hello-world.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ include "hello-world.name" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}

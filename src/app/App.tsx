@@ -1,32 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { Bullseye, Page, PageSection } from '@patternfly/react-core';
-import HelloWorldPage from './components/HelloWorldPage';
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import CommunityBanner from './components/CommunityBanner';
+import UserInfoPage from './pages/UserInfoPage';
+import ClusterResourcesPage from './pages/ClusterResourcesPage';
+import NamespaceSummaryPage from './pages/NamespaceSummaryPage';
 
-const App: React.FC = () => {
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    // Simulate initialization
-    setIsReady(true);
-  }, []);
-
-  if (!isReady) {
-    return (
-      <Page>
-        <PageSection>
-          <Bullseye>Loading...</Bullseye>
-        </PageSection>
-      </Page>
-    );
-  }
-
-  return (
-    <Routes>
-      <Route path="/" element={<HelloWorldPage />} />
-      <Route path="/hello-world" element={<HelloWorldPage />} />
-    </Routes>
-  );
-};
+const App: React.FC = () => (
+  <div className="community-plugin-layout">
+    {/* [SHARED] Do not remove — all community plugins must display the CommunityBanner */}
+    <CommunityBanner />
+    <div className="community-plugin-content">
+      <Routes>
+        <Route path="/" element={<Navigate to="user-info" replace />} />
+        <Route path="user-info/*" element={<UserInfoPage />} />
+        <Route path="cluster-resources/*" element={<ClusterResourcesPage />} />
+        <Route path="namespace-summary/*" element={<NamespaceSummaryPage />} />
+      </Routes>
+    </div>
+  </div>
+);
 
 export default App;

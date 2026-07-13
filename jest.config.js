@@ -7,6 +7,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': '<rootDir>/jest.style-mock.js',
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^~/(.*)$': '<rootDir>/src/$1',
   },
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
@@ -14,7 +15,7 @@ module.exports = {
       jsx: 'react-jsx',
     }],
   },
-  testMatch: ['**/*.test.ts', '**/*.test.tsx'],
+  testMatch: ['**/*.spec.ts', '**/*.spec.tsx'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

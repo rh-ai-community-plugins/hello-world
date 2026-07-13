@@ -1,46 +1,26 @@
+ARG BUILD_IMAGE="registry.access.redhat.com/ubi9/nodejs-22:latest"
+
 # Build stage
-FROM node:20-alpine AS builder
+FROM ${BUILD_IMAGE} AS builder
 
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
+COPY --chown=default:root package*.json ./
 RUN npm ci
 
-# Copy source code
-COPY . .
-
-# Build the plugin
+COPY --chown=default:root . .
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
+FROM registry.access.redhat.com/ubi9/nginx-124:latest
 
-# Copy built files from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy built files
+COPY --from=builder --chown=1001:0 /opt/app-root/src/dist .
 
-# Copy nginx configuration
-RUN echo 'server { \
-    listen 8080; \
-    server_name localhost; \
-    root /usr/share/nginx/html; \
-    index index.html; \
-    \
-    location / { \
-        try_files $uri $uri/ /index.html; \
-    } \
-    \
-    location /remoteEntry.js { \
-        add_header Access-Control-Allow-Origin *; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+# Add CORS header for Module Federation remote entry
+RUN echo $'location /remoteEntry.js {\n    add_header Access-Control-Allow-Origin *;\n}' \
+    > "${NGINX_DEFAULT_CONF_PATH}/cors.conf"
 
-# Expose port
 EXPOSE 8080
 
-# Run as non-root user (OpenShift security requirement)
-USER 1001
+USER 1001:0
 
 CMD ["nginx", "-g", "daemon off;"]

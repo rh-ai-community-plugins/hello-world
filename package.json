@@ -1,8 +1,10 @@
 {
-  "name": "rhoai-hello-world",
-  "version": "0.1.0",
-  "description": "A simple Hello World plugin for the RHOAI Dashboard",
+  "name": "hello-world",
+  "version": "0.4.0",
+  "description": "A reference implementation and scaffold plugin for the RHOAI Dashboard",
   "private": true,
+  "_comment_name": "[PLUGIN-SPECIFIC] package name — change to rhoai-{your-plugin}",
+  "_comment_mf": "[PLUGIN-SPECIFIC] module-federation.name — camelCase, must match webpack and plugin.yaml",
   "module-federation": {
     "name": "helloWorld",
     "remoteEntry": "remoteEntry.js",
@@ -14,13 +16,15 @@
         "pathRewrite": "/hello-world"
       }
     ],
+    "_comment_proxy": "[PLUGIN-SPECIFIC] proxy path must match route prefix in extensions.ts",
     "local": {
       "host": "localhost",
-      "port": 9111
+      "port": 9500
     },
+    "_comment_port": "[PLUGIN-SPECIFIC] dev port — any unused port works",
     "service": {
       "name": "odh-dashboard",
-      "port": 8843
+      "port": 8443
     }
   },
   "scripts": {
@@ -31,7 +35,14 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test-unit": "jest",
-    "lint": "eslint src/"
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run typecheck && npm run lint && npm test",
+    "lint": "npm run lint:ts && npm run lint:md",
+    "lint:ts": "eslint --ext .ts,.tsx src/",
+    "lint:md": "markdownlint-cli2 '**/*.md'",
+    "rename-plugin": "node scripts/rename-plugin.js",
+    "sync-chart-version": "node scripts/sync-chart-version.js",
+    "version": "npm run sync-chart-version && git add chart/Chart.yaml bff/package.json plugin.yaml README.md docs/development/BUILD_AND_PUSH.md docs/deployment/OPENSHIFT_DEPLOY.md"
   },
   "dependencies": {
     "@openshift/dynamic-plugin-sdk": "^5",
@@ -60,6 +71,7 @@
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "jsdom": "^29.1.1",
+    "markdownlint-cli2": "^0.23.0",
     "mini-css-extract-plugin": "^2",
     "style-loader": "^4",
     "ts-jest": "^29.4.11",

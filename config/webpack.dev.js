@@ -6,13 +6,18 @@ module.exports = merge(common, {
   mode: 'development',
   devtool: 'eval-source-map',
   devServer: {
-    port: 9111,
+    port: parseInt(process.env.PORT, 10) || 9500, // [PLUGIN-SPECIFIC] dev port
     historyApiFallback: true,
     hot: true,
     proxy: [
       {
-        context: ['/hello-world'],
-        target: 'http://localhost:8843',
+        context: ['/hello-world/api'], // [PLUGIN-SPECIFIC] BFF proxy — must come before the general proxy
+        target: 'http://localhost:3000',
+        pathRewrite: { '^/hello-world/api': '/api' },
+      },
+      {
+        context: ['/hello-world'], // [PLUGIN-SPECIFIC] must match route prefix
+        target: 'http://localhost:8443',
         pathRewrite: { '^/hello-world': '/hello-world' },
       },
     ],

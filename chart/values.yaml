@@ -1,12 +1,14 @@
-# Default values for hello-world-plugin.
+# Default values for hello-world.
 # This is a YAML-formatted file.
 
 image:
-  repository: quay.io/rh-ai-community-plugins/rhoai-hello-world
-  tag: latest
+  repository: quay.io/rh-ai-community-plugins/hello-world
+  tag: ""
   pullPolicy: IfNotPresent
 
-nameOverride: ""
+# Overrides .Chart.Name so deployed resources use the plugin name, not the
+# chart name (which has a -chart suffix to avoid OCI registry collisions).
+nameOverride: "hello-world"
 fullnameOverride: ""
 
 serviceAccount:
@@ -42,10 +44,29 @@ resources:
 
 securityContext:
   runAsNonRoot: true
-  runAsUser: 1001
 
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
+
+# BFF (Backend For Frontend) service
+bff:
+  enabled: true
+  image:
+    repository: quay.io/rh-ai-community-plugins/hello-world-bff
+    tag: ""
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi

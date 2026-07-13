@@ -1,25 +1,68 @@
-apiVersion: backend.openshift.io/v1
-kind: Plugin
-metadata:
-  name: hello-world
-  displayName: Hello World
-  description: A simple Hello World plugin for the RHOAI Dashboard
-  version: 0.1.0
-  link:
-    url: https://github.com/rh-ai-community-plugins/hello-plugin-world
-  iconPath: ''
-  remote:
-    type: module-federation
-    spec:
-      name: helloWorld
-      scope: helloWorld
-      # NOTE: Update this URL to point to your deployed container image.
-      # Example: https://your-openshift-route/hello-world/remoteEntry.js
-      remoteEntry: https://<registry>/rhoai-hello-world/remoteEntry.js
-      paths:
-        - type: route
-          path: /hello-world
-          extensions:
-            - helloWorld/extensions
-        - type: icon
-          path: helloWorld/Icon
+# --- Plugin identity (required) ---
+name: hello-world                    # [PLUGIN-SPECIFIC] unique plugin identifier (kebab-case)
+displayName: Hello World             # [PLUGIN-SPECIFIC] human-readable name
+description: A reference implementation and scaffold plugin for the RHOAI Dashboard
+version: 0.4.0
+
+# --- Maintainer (required) ---
+maintainer:                          # [PLUGIN-SPECIFIC]
+  name: Your Name                    # [PLUGIN-SPECIFIC] replace with maintainer's name
+  github: your-github-handle        # [PLUGIN-SPECIFIC] replace with maintainer's GitHub handle
+
+# --- RHOAI compatibility (required) ---
+rhoai_compatibility:                 # [PLUGIN-SPECIFIC]
+  min_version: "3.3.0"
+  tested_versions: ["3.3.0", "3.4.2"]
+
+# --- Deployment (required) ---
+deployment_model: cluster-shared     # per-project | cluster-shared | both
+
+image:                               # [PLUGIN-SPECIFIC]
+  repository: quay.io/rh-ai-community-plugins/hello-world
+  tag: "0.4.0"
+
+bff_image:                           # [PLUGIN-SPECIFIC] (optional — only if using BFF pattern)
+  repository: quay.io/rh-ai-community-plugins/hello-world-bff
+  tag: "0.4.0"
+
+# --- Installation (required) ---
+install:
+  method: automatic                  # automatic | assisted | manual
+  helm:
+    chart_path: chart/
+    registry: oci://quay.io/rh-ai-community-plugins/hello-world-chart  # [PLUGIN-SPECIFIC]
+  prerequisites: []
+  instructions: https://github.com/rh-ai-community-plugins/hello-world/blob/main/docs/deployment  # [PLUGIN-SPECIFIC]
+
+# --- Dashboard integration (required) ---
+remote:
+  type: module-federation
+  spec:
+    name: helloWorld                 # [PLUGIN-SPECIFIC] Module Federation container name (camelCase)
+    scope: helloWorld                # [PLUGIN-SPECIFIC] must match name above
+    # [PLUGIN-SPECIFIC] Update this URL to point to your deployed OpenShift route.
+    # The URL is cluster-specific and depends on the route created by the Helm chart or Ingress.
+    # Example: https://hello-world-mynamespace.apps.mycluster.example.com/remoteEntry.js
+    remoteEntry: https://<your-openshift-route>/remoteEntry.js  # [PLUGIN-SPECIFIC]
+    paths:
+      - type: route
+        path: /hello-world           # [PLUGIN-SPECIFIC] must match route prefix in extensions.ts
+        extensions:
+          - helloWorld/extensions     # [PLUGIN-SPECIFIC] {scope}/extensions
+      - type: icon
+        path: helloWorld/Icon         # [PLUGIN-SPECIFIC] {scope}/Icon
+
+# --- RBAC (required) ---
+# NOTE: The plugin itself requires no cluster roles at install time. However,
+# users of the Cluster Resources page need RBAC permissions for create/list/delete
+# on apps/deployments, core/services, core/configmaps, and core/secrets via the
+# dashboard's K8s API pass-through.
+rbac:
+  required_roles: []
+  cluster_roles: false
+
+# --- Support (optional) ---
+support:
+  repo: https://github.com/rh-ai-community-plugins/hello-world   # [PLUGIN-SPECIFIC]
+  docs: https://github.com/rh-ai-community-plugins/hello-world/tree/main/docs
+  issues: https://github.com/rh-ai-community-plugins/hello-world/issues

@@ -56,11 +56,11 @@ module.exports = {
       template: path.resolve(__dirname, '../src/index.html'),
     }),
     new ModuleFederationPlugin({
-      name: "helloWorld",
+      name: "helloWorld", // [PLUGIN-SPECIFIC] must match package.json and plugin.yaml
       filename: remoteEntry,
       exposes: {
         './extensions': './src/rhoai/extensions.ts',
-        './Icon': './src/rhoai/HelloWorldNavIcon.tsx',
+        './Icon': './src/app/components/HelloWorldNavIcon.tsx',
       },
       shared: {
         react: {

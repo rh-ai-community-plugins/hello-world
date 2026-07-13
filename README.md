@@ -1,215 +1,164 @@
-# RHOAI Hello World Plugin
+# Hello World
 
-A simple "Hello World" community plugin for the Red Hat OpenShift AI (RHOAI) Dashboard. This plugin demonstrates how to create a Module Federation-based plugin that integrates with the RHOAI dashboard UI.
+A community plugin for the **Red Hat OpenShift AI (RHOAI) Dashboard** that serves as both a **reference implementation** and a **scaffold** for building your own plugins. It uses Webpack 5 Module Federation to integrate with the dashboard at runtime.
 
-## Overview
+## What's Inside
 
-This plugin adds a "Hello World" page to the RHOAI Dashboard that displays:
-- A welcome message with interactive elements
-- A clickable button that tracks interactions
-- Plugin metadata (version, deployment mode)
+The plugin provides three pages, each demonstrating a different way to integrate with the dashboard and the cluster. These are the three patterns you will use when building your own plugin:
 
-Built with **PatternFly v6** UI components.
+| Page | Pattern | What it shows |
+|---|---|---|
+| **User Info** | Dashboard API | Call the dashboard's own backend endpoints (`/api/status`) to get user info, config, and other dashboard-managed data |
+| **Cluster Resources** | K8s API pass-through | Read and write Kubernetes resources directly via the dashboard's `/api/k8s/*` proxy — CRUD on Deployments, Services, and any K8s resource the user has RBAC access to |
+| **Namespace Summary** | BFF (Backend For Frontend) | Call the plugin's own backend service, which aggregates multiple K8s API calls server-side and returns a single response — useful for server-side logic, external service integration, or keeping credentials out of the browser |
 
-## Architecture
+The first two patterns require no additional backend — your plugin's frontend code calls dashboard endpoints directly. The BFF pattern adds a separate Node.js service (`bff/` directory) that the dashboard proxies to, forwarding the user's authentication token.
 
-This plugin uses the **Module Federation** pattern to integrate with the RHOAI Dashboard:
+For a detailed guide on choosing the right pattern for your use case, see the [Integration Patterns](docs/development/DASHBOARD_APIS.md#integration-patterns) section. All available APIs are documented in the [Development](docs/development/README.md) guides.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    RHOAI Dashboard                          │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  Sidebar Navigation                                    │  │
-│  │  └── Hello World ──────────────────────────────────┐  │
-│  └───────────────────────────────────────────────────────┘  │
-│                                                              │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  Main Content Area (iframe/Module Federation)         │  │
-│  │  ┌─────────────────────────────────────────────────┐  │  │
-│  │  │  Hello World Plugin (remoteEntry.js)            │  │  │
-│  │  │  ┌───────────────────────────────────────────┐  │  │  │
-│  │  │  │  HelloWorldPage Component                 │  │  │  │
-│  │  │  │  - Welcome message                        │  │  │  │
-│  │  │  │  - Interactive button                     │  │  │  │
-│  │  │  │  - Plugin metadata                        │  │  │  │
-│  │  │  └───────────────────────────────────────────┘  │  │  │
-│  │  └─────────────────────────────────────────────────┘  │  │
-│  └───────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-```
+## Quick Start
 
-## Project Structure
+### Deploy this Plugin on an Existing Dashboard
 
-```
-hello-plugin-world/
-├── src/
-│   ├── index.ts              # Entry point
-│   ├── bootstrap.tsx         # React app bootstrap
-│   ├── index.html            # HTML template
-│   ├── typings.d.ts          # TypeScript declarations
-│   ├── app/
-│   │   ├── App.tsx           # Main app component
-│   │   ├── utilities.ts      # Route utilities
-│   │   └── components/
-│   │       └── HelloWorldPage.tsx  # Main page component
-│   └── rhoai/
-│       ├── extensions.ts     # Module Federation extensions
-│       └── HelloWorldNavIcon.tsx  # Navigation icon
-├── config/
-│   ├── webpack.common.js     # Common webpack config
-│   ├── webpack.dev.js        # Development webpack config
-│   ├── webpack.prod.js       # Production webpack config
-│   ├── moduleFederation.js   # Module Federation plugin config
-│   └── stylePaths.js         # Style path configuration
-├── chart/                    # Helm chart for Kubernetes deployment
-│   ├── Chart.yaml            # Helm chart metadata
-│   ├── values.yaml           # Default values
-│   └── templates/            # Kubernetes manifests
-├── .github/                    # GitHub configuration
-│   ├── pull_request_template.md  # PR template with checklist
-│   └── workflows/              # CI/CD workflows
-│       ├── ci.yml              # Linting and testing
-│       └── build-push.yml      # Build and push on release
-├── docs/                       # Documentation
-├── plugin.yaml                 # RHOAI plugin registration
-├── Containerfile               # Container build definition (podman)
-├── package.json                # Dependencies and scripts
-├── tsconfig.json               # TypeScript configuration
-├── .env.development            # Development environment variables
-└── .gitignore
-```
+If you have an OpenShift cluster with RHOAI already running, you can deploy this plugin in three steps using the pre-built container image.
 
-## Prerequisites
+**Prerequisites:** Helm, `oc` CLI access to the cluster, and access to the `redhat-ods-applications` namespace (typically requires cluster-admin).
 
-- Node.js 18+ (or 20+)
-- npm or yarn
-- RHOAI Dashboard (for integration testing)
+#### 1. Install the plugin
 
-## Development
-
-### Installation
+Install directly from the OCI registry — no need to clone this repo:
 
 ```bash
-npm install
+helm install hello-world oci://quay.io/rh-ai-community-plugins/hello-world-chart \
+  --version 0.4.0 \
+  --namespace hello-world \
+  --create-namespace
 ```
 
-### Development Server
+Or, if you have a local checkout of the repository:
 
 ```bash
-npm run start:dev
+helm install hello-world chart/ \
+  --namespace hello-world \
+  --create-namespace
 ```
 
-This starts a development server on `http://localhost:9111` with hot module replacement.
+This creates a Deployment and Service for both the frontend (`hello-world`, serving `remoteEntry.js` via Nginx) and the BFF (`hello-world-bff`, Node.js backend on port 3000). To deploy the frontend only, add `--set bff.enabled=false`.
 
-### Build
+#### 2. Register with the RHOAI Dashboard
+
+Retrieve the current Module Federation configuration from the dashboard, append the plugin entry, and apply it:
 
 ```bash
-npm run build
-```
-
-This produces a production build in the `dist/` directory.
-
-### Testing
-
-```bash
-npm test
-```
-
-Tests use semantic queries (`getByRole`, `getByText`) to verify real PatternFly v6 components. React Router is mocked for test isolation, but UI components render and behave as in production.
-
-### Container Build (Podman)
-
-```bash
-podman build -t quay.io/rh-ai-community-plugins/rhoai-hello-world:0.1.0 .
-```
-
-### Helm Deployment
-
-You can deploy the plugin using the included Helm chart:
-
-```bash
-# Deploy with default values
-helm install hello-world ./chart
-
-# Deploy with custom image
-helm install hello-world ./chart --set image.tag=v0.1.0
-```
-
-#### Chart Configuration
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `image.repository` | Container image repository | `quay.io/rh-ai-community-plugins/rhoai-hello-world` |
-| `image.tag` | Container image tag | `latest` |
-| `image.pullPolicy` | Image pull policy | `IfNotPresent` |
-| `service.type` | Kubernetes service type | `ClusterIP` |
-| `service.port` | Service port | `8080` |
-| `replicaCount` | Number of replicas | `1` |
-| `ingress.enabled` | Enable ingress | `true` |
-
-## CI/CD
-
-This project uses GitHub Actions for continuous integration and deployment:
-
-- **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): Runs on every PR and push to `main`. Executes tests and linting.
-- **Build & Push** ([`.github/workflows/build-push.yml`](.github/workflows/build-push.yml)): Builds and pushes the container image to `quay.io` on release or tag.
-
-## Integration with RHOAI Dashboard
-
-### Module Federation Remote
-
-The plugin exposes two modules via Module Federation:
-
-1. **`./extensions`** - Extension point definitions for the dashboard
-2. **`./Icon`** - Navigation icon component
-
-### Extension Points
-
-The plugin registers the following extension points:
-
-| Extension Type | ID | Description |
-|---------------|-----|-------------|
-| `app.area` | `hello-world` | Creates a top-level area in the dashboard |
-| `app.navigation/href` | `hello-world-nav` | Adds a sidebar navigation link |
-| `app.route` | `/hello-world/*` | Registers the plugin route |
-
-### Adding to RHOAI Dashboard
-
-To integrate this plugin with the RHOAI Dashboard, you need to:
-
-1. **Build the plugin**: `npm run build`
-2. **Deploy the container**: Push to your container registry
-3. **Configure the dashboard**: Add the remote to the dashboard's Module Federation configuration
-
-The dashboard needs to be configured to recognize the remote entry point:
-
-```javascript
-// In the RHOAI Dashboard configuration
-const remotes = [
-  {
-    name: 'helloWorld',
-    module: './remoteEntry.js',
-    path: '/hello-world/remoteEntry.js',
+oc get configmap federation-config \
+  -n redhat-ods-applications \
+  -o jsonpath='{.data.module-federation-config\.json}' \
+| python3 -c "
+import json, sys
+config = json.load(sys.stdin)
+config.append({
+  'name': 'helloWorld',
+  'backend': {
+    'remoteEntry': '/remoteEntry.js',
+    'authorize': False,
+    'tls': False,
+    'service': {
+      'name': 'hello-world',
+      'namespace': 'hello-world',
+      'port': 8080
+    }
   },
-];
+  'proxyService': [{
+    'path': '/hello-world/api',
+    'pathRewrite': '/api',
+    'authorize': True,
+    'tls': False,
+    'service': {
+      'name': 'hello-world-bff',
+      'namespace': 'hello-world',
+      'port': 3000
+    }
+  }]
+})
+print(json.dumps(config))
+" > /tmp/mf-config-extended.json
+
+oc set env deployment/rhods-dashboard \
+  -n redhat-ods-applications \
+  "MODULE_FEDERATION_CONFIG=$(cat /tmp/mf-config-extended.json)"
 ```
 
-## Security
+New dashboard pods roll out automatically. After roughly two minutes, reload the RHOAI dashboard to see the plugin's sidebar entries.
 
-This plugin follows OpenShift security best practices:
+#### 3. Verify
 
-- Runs as non-root user (UID 1001+)
-- Uses Alpine-based images
-- No privileged containers
-- Read-only root filesystem (recommended)
+Confirm the plugin is registered in the dashboard configuration:
+
+```bash
+oc set env deployment/rhods-dashboard -n redhat-ods-applications --list \
+  | grep MODULE_FEDERATION_CONFIG \
+  | python3 -c "import json,sys; d=json.loads(sys.stdin.read().split('=',1)[1]); print([e['name'] for e in d])"
+```
+
+To deploy your own plugin image instead, see [Build & Push](docs/development/BUILD_AND_PUSH.md). For the full deployment guide with Helm chart customization and BFF registration, see [Deploying on OpenShift](docs/deployment/OPENSHIFT_DEPLOY.md).
+
+### Developing a New Plugin
+
+This repository is designed as a **seed project**. To start developing your own plugin, **duplicate** the repo — do not fork it. Forking creates a link back to this upstream repository, which isn't what you want for an independent plugin with its own identity and lifecycle.
+
+```bash
+git clone https://github.com/rh-ai-community-plugins/hello-world.git my-plugin
+cd my-plugin
+rm -rf .git
+git init
+```
+
+Then follow the [Customization Guide](docs/development/CUSTOMIZATION.md) to rename identifiers, update routes, and make the plugin your own.
+
+Developing a dashboard plugin is way easier with a **running RHOAI dashboard** connected to a **real OpenShift cluster** — the plugin runs inside the dashboard and relies on its backend to proxy API calls to the cluster. You almost cannot develop the plugin in isolation if you want a proper integration with the dashboard.
+
+There are two approaches to set up this environment:
+
+- **Container-based** (recommended) — Run the dashboard as a container image alongside your plugin dev server. Faster to set up.
+- **Source-based** — Clone and run the [odh-dashboard](https://github.com/opendatahub-io/odh-dashboard) from source alongside your plugin. More involved setup, but provides full hot module replacement for both the dashboard and the plugin.
+
+Both methods require Node.js 20+, `oc` CLI access to the cluster, and cluster-admin privileges. Once the environment is running:
+
+```bash
+npm install              # Install plugin dependencies
+npm run start:dev        # Start the plugin dev server on port 9500
+```
+
+If you want to work with the BFF pattern (Namespace Summary page), you also need to start the BFF service:
+
+```bash
+cd bff
+npm install              # Install BFF dependencies (first time only)
+K8S_API_BASE=$(oc whoami --show-server) npm run start:dev   # Start BFF on port 3000
+```
+
+See the full [Local Setup Guide](docs/development/LOCAL_SETUP.md) for step-by-step instructions on both methods, including dashboard proxy configuration for the BFF.
+
+#### Build & Test
+
+```bash
+npm run build           # Production build to dist/
+npm test                # Run all tests
+npm run test:watch      # Watch mode
+npm run test:coverage   # Tests with coverage report
+npm run lint            # ESLint on src/ + markdownlint on **/*.md
+```
+
+A `Makefile` is also available for unified operations across frontend and BFF — run `make help` for the full list of targets.
+
+## Documentation
+
+See the [docs/](docs/) directory for detailed guides:
+
+- **[Architecture](docs/architecture/)** -- Plugin system internals, extension contract, and community plugin examples
+- **[Development](docs/development/)** -- Local environment setup, [customization guide](docs/development/CUSTOMIZATION.md), and backend API reference
+- **[Deployment](docs/deployment/)** -- Deploying the plugin on OpenShift with Helm and dashboard registration
 
 ## License
 
 Apache-2.0
-
-## Support
-
-This is a community plugin. For issues or questions:
-
-- Open an issue in this repository
-- Join the RHOAI community discussions
