@@ -1,5 +1,55 @@
 # Build, Push, and Scan Container Images
 
+## Makefile
+
+The project includes a `Makefile` at the repository root that provides a single entry point for all common tasks. Run `make help` to see every target and configurable variable with its default value.
+
+### Quick Reference
+
+| Target | Description |
+|---|---|
+| `make install` | Install dependencies (frontend + BFF) |
+| `make lint` | Lint source code (frontend + BFF) |
+| `make typecheck` | TypeScript type checking (frontend + BFF) |
+| `make test` | Run tests (frontend + BFF) |
+| `make validate` | Full validation: typecheck + lint + test |
+| `make build` | Production build (frontend + BFF) |
+| `make dev` | Start frontend dev server (port 9500) |
+| `make dev-bff` | Start BFF dev server (port 3000) |
+| `make image-build` | Build container images locally |
+| `make image-push` | Build and push container images |
+| `make image-scan` | Build and scan images for vulnerabilities |
+| `make chart-package` | Package Helm chart into a `.tgz` archive |
+| `make chart-push` | Package and push Helm chart to OCI registry |
+| `make clean` | Remove build artifacts |
+
+Most targets have a `-frontend` and `-bff` variant (e.g. `make lint-frontend`, `make test-bff`) for running against a single component.
+
+### Configurable Variables
+
+Override any variable on the command line:
+
+```bash
+make image-build BUILDER=docker IMAGE_TAG=dev
+make image-push VERSION=0.5.0
+make image-scan SEVERITY=MEDIUM
+```
+
+| Variable | Description | Default |
+|---|---|---|
+| `REGISTRY` | Container image registry | `quay.io/rh-ai-community-plugins` |
+| `FRONTEND_IMAGE` | Frontend image name | `hello-world` |
+| `BFF_IMAGE` | BFF image name | `hello-world-bff` |
+| `CHART_NAME` | Helm chart name | `hello-world-chart` |
+| `VERSION` | Release version for `image-push` | Auto-computed from git tags |
+| `BUILDER` | Container build tool | `podman` |
+| `IMAGE_TAG` | Tag for `image-build` / `image-scan` | `latest` |
+| `SEVERITY` | Trivy severity filter for `image-scan` | `HIGH,CRITICAL` |
+
+The sections below document the underlying scripts that the Makefile wraps.
+
+---
+
 ## Image Details
 
 - **Registry**: `quay.io`
@@ -9,6 +59,7 @@
 ## Prerequisites
 
 - [Podman](https://podman.io/) installed
+- [Helm](https://helm.sh/) 3.8+ installed (required for `helm push` to OCI registries)
 - [Quay.io](https://quay.io/) account with push access to `rh-ai-community-plugins`
 
 ---
@@ -92,6 +143,51 @@ BUILDER=docker ./scripts/scan-image.sh   # Use Docker instead of Podman
 |-------------|--------------------------------------|-----------|
 | `IMAGE_TAG` | Tag applied to built images          | `latest`  |
 | `BUILDER`   | Container build tool (`podman`/`docker`) | `podman`  |
+
+---
+
+## Helm Chart
+
+The `chart/` directory contains a Helm chart for deploying both the frontend and BFF to Kubernetes/OpenShift. The chart is published to the same Quay.io registry as an OCI artifact.
+
+- **Chart name**: `hello-world-chart`
+- **OCI registry**: `oci://quay.io/rh-ai-community-plugins/hello-world-chart`
+
+The chart version is kept in sync with the project version in `package.json` by the `scripts/sync-chart-version.js` script, which runs automatically on `npm version`.
+
+### Package
+
+```bash
+helm package chart/
+```
+
+This produces a `hello-world-chart-<version>.tgz` file in the current directory, using the version from `chart/Chart.yaml`.
+
+### Push to OCI Registry
+
+Pushing Helm charts to an OCI registry requires **Helm 3.8+** (`helm push` was added in that release). Check your version with `helm version --short`.
+
+```bash
+helm registry login quay.io
+helm push hello-world-chart-<version>.tgz oci://quay.io/rh-ai-community-plugins
+```
+
+Or use the Makefile to package and push in one step:
+
+```bash
+make chart-push
+```
+
+### Install from OCI Registry
+
+```bash
+helm install hello-world oci://quay.io/rh-ai-community-plugins/hello-world-chart \
+  --version 0.4.0 \
+  --namespace hello-world \
+  --create-namespace
+```
+
+See [OPENSHIFT_DEPLOY.md](../deployment/OPENSHIFT_DEPLOY.md) for the full deployment guide including dashboard registration.
 
 ---
 

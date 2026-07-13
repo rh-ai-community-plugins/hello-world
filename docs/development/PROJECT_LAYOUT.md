@@ -36,6 +36,7 @@ This is the directory structure every RHOAI community plugin should follow. Use 
 │       ├── routes/                  #   API route handlers
 │       └── utils/                   #   K8s client helpers
 ├── chart/                           # Helm chart for OpenShift deployment
+├── Makefile                         # Build, test, image, and chart targets (run `make help`)
 ├── plugin.yaml                      # Plugin metadata for the RHOAI registry
 ├── Containerfile                    # Frontend container (Nginx)
 └── bff/Containerfile                # BFF container (Node.js)
