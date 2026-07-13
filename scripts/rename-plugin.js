@@ -227,7 +227,7 @@ function buildChangePlan(names) {
 
   const docFiles = [
     'README.md',
-    'CLAUDE.md',
+    'AGENTS.md',
     'docs/architecture/BFF_PATTERN.md',
     'docs/development/CUSTOMIZATION.md',
     'docs/development/LOCAL_SETUP.md',

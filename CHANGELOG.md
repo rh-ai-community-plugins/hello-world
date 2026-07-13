@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Makefile with build targets for common development tasks
 - Component tests for page components
 - Comprehensive documentation: architecture guides, BFF pattern, local dev setup, deployment, and customization reference
+- `CHANGELOG.md` and `CONTRIBUTING.md`
+- Apache License 2.0 (`LICENSE`)
 
 ### Changed
 
@@ -30,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reorganized source files to align with odh-dashboard conventions
 - Streamlined CI/CD build-push workflow with BFF support in build and scan scripts
 - Automated version sync across `package.json`, `Chart.yaml`, `bff/package.json`, and `plugin.yaml`
+- Renamed `CLAUDE.md` to `AGENTS.md` for agent-harness portability (`CLAUDE.md` kept as symlink)
 
 ### Fixed
 
