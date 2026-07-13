@@ -69,14 +69,14 @@ The dashboard discovers BFF services via the `proxyService` field in the federat
   "name": "helloWorld",
   "backend": {
     "remoteEntry": "/remoteEntry.js",
-    "service": { "name": "hello-world-plugin", "namespace": "hello-world", "port": 8080 }
+    "service": { "name": "hello-world", "namespace": "hello-world", "port": 8080 }
   },
   "proxyService": [{
     "path": "/hello-world/api",
     "pathRewrite": "/api",
     "authorize": true,
     "tls": false,
-    "service": { "name": "hello-world-plugin-bff", "namespace": "hello-world", "port": 3000 }
+    "service": { "name": "hello-world-bff", "namespace": "hello-world", "port": 3000 }
   }]
 }
 ```
@@ -134,8 +134,8 @@ The BFF always uses the user's forwarded token, never a service account token. T
 
 The BFF runs as a separate Deployment and Service in the Helm chart:
 
-- **Deployment**: `hello-world-plugin-bff` -- Node.js container on port 3000
-- **Service**: `hello-world-plugin-bff` -- ClusterIP service exposing port 3000
+- **Deployment**: `hello-world-bff` -- Node.js container on port 3000
+- **Service**: `hello-world-bff` -- ClusterIP service exposing port 3000
 
 Both are gated by `.Values.bff.enabled` (default: `true`).
 

@@ -17,22 +17,22 @@ This guide walks through deploying the plugin on an OpenShift cluster that alrea
 Deploy the Helm chart into a namespace of your choice:
 
 ```bash
-helm install hello-world-plugin chart/ \
+helm install hello-world chart/ \
   --namespace hello-world \
   --create-namespace
 ```
 
 This creates:
 
-- A **Deployment** and **Service** (`hello-world-plugin`) serving the plugin's static assets (including `remoteEntry.js`) via Nginx on port 8080
-- A **BFF Deployment** and **Service** (`hello-world-plugin-bff`) running the plugin's backend service on port 3000 (enabled by default)
+- A **Deployment** and **Service** (`hello-world`) serving the plugin's static assets (including `remoteEntry.js`) via Nginx on port 8080
+- A **BFF Deployment** and **Service** (`hello-world-bff`) running the plugin's backend service on port 3000 (enabled by default)
 
 ### Overriding Defaults
 
 Pass `--set` flags to customize the installation:
 
 ```bash
-helm install hello-world-plugin chart/ \
+helm install hello-world chart/ \
   --namespace hello-world \
   --create-namespace \
   --set image.tag=0.3.0 \
@@ -43,7 +43,7 @@ helm install hello-world-plugin chart/ \
 To deploy the frontend only (no BFF):
 
 ```bash
-helm install hello-world-plugin chart/ \
+helm install hello-world chart/ \
   --namespace hello-world \
   --create-namespace \
   --set bff.enabled=false
@@ -74,7 +74,7 @@ config.append({
   'authorize': False,
   'tls': False,
   'service': {
-    'name': 'hello-world-plugin',
+    'name': 'hello-world',
     'namespace': 'hello-world',
     'port': 8080
   }
@@ -105,7 +105,7 @@ config.append({
     'authorize': False,
     'tls': False,
     'service': {
-      'name': 'hello-world-plugin',
+      'name': 'hello-world',
       'namespace': 'hello-world',
       'port': 8080
     }
@@ -116,7 +116,7 @@ config.append({
     'authorize': True,
     'tls': False,
     'service': {
-      'name': 'hello-world-plugin-bff',
+      'name': 'hello-world-bff',
       'namespace': 'hello-world',
       'port': 3000
     }
@@ -167,7 +167,7 @@ Verify the plugin pods are running:
 oc get pods -n hello-world
 ```
 
-You should see pods for `hello-world-plugin` (and `hello-world-plugin-bff` if BFF is enabled), all in `Running` status.
+You should see pods for `hello-world` (and `hello-world-bff` if BFF is enabled), all in `Running` status.
 
 ### Check the dashboard
 
@@ -200,7 +200,7 @@ oc set env deployment/rhods-dashboard \
 ### 2. Uninstall the Helm release
 
 ```bash
-helm uninstall hello-world-plugin -n hello-world
+helm uninstall hello-world -n hello-world
 oc delete namespace hello-world   # optional: remove the namespace entirely
 ```
 
@@ -212,7 +212,7 @@ Key values in `chart/values.yaml`:
 
 | Parameter | Default | Description |
 |---|---|---|
-| `image.repository` | `quay.io/rh-ai-community-plugins/hello-plugin-world` | Frontend container image |
+| `image.repository` | `quay.io/rh-ai-community-plugins/hello-world` | Frontend container image |
 | `image.tag` | `latest` | Frontend image tag |
 | `image.pullPolicy` | `IfNotPresent` | Image pull policy |
 | `replicaCount` | `1` | Frontend replicas |

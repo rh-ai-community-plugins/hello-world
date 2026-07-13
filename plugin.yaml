@@ -6,7 +6,7 @@ metadata:
   description: A reference implementation and scaffold plugin for the RHOAI Dashboard
   version: 0.4.0
   link:
-    url: https://github.com/rh-ai-community-plugins/hello-plugin-world  # [PLUGIN-SPECIFIC]
+    url: https://github.com/rh-ai-community-plugins/hello-world  # [PLUGIN-SPECIFIC]
   iconPath: ''
   remote:
     type: module-federation
@@ -15,7 +15,7 @@ metadata:
       scope: helloWorld          # [PLUGIN-SPECIFIC] must match name above
       # NOTE: Update this URL to point to your deployed container image.
       # Example: https://your-openshift-route/hello-world/remoteEntry.js
-      remoteEntry: https://<registry>/hello-plugin-world/remoteEntry.js  # [PLUGIN-SPECIFIC]
+      remoteEntry: https://<registry>/hello-world/remoteEntry.js  # [PLUGIN-SPECIFIC]
       paths:
         - type: route
           path: /hello-world     # [PLUGIN-SPECIFIC] must match route prefix in extensions.ts

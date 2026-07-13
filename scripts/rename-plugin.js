@@ -158,9 +158,9 @@ function buildChangePlan(names) {
     ['Hello World', display],
   ];
 
-  // package.json uses "hello-world-plugin" as name → rhoai-{kebab}
+  // package.json: match the JSON name field specifically so route paths get the plain kebab
   const npmReplacements = [
-    ['hello-world-plugin', `rhoai-${kebab}`],
+    ['"name": "hello-world"', `"name": "rhoai-${kebab}"`],
     ...identifierReplacements,
   ];
 
@@ -170,18 +170,12 @@ function buildChangePlan(names) {
     ...identifierReplacements,
   ];
 
-  // Helm chart uses "hello-world-plugin" as chart name → {kebab}-plugin
-  const helmReplacements = [
-    ['hello-world-plugin', `${kebab}-plugin`],
-    ...identifierReplacements,
-  ];
-
   const imageReplacements = [
-    ['quay.io/rh-ai-community-plugins/hello-plugin-world', `quay.io/OWNER/rhoai-${kebab}`],
     ['quay.io/rh-ai-community-plugins/hello-world-bff', `quay.io/OWNER/${kebab}-bff`],
-    ['hello-plugin-world', `rhoai-${kebab}`],
+    ['quay.io/rh-ai-community-plugins/hello-world', `quay.io/OWNER/rhoai-${kebab}`],
     ['rhoai-hello-world', `rhoai-${kebab}`],
     ['hello-world-bff', `${kebab}-bff`],
+    ['hello-world', `rhoai-${kebab}`],
   ];
 
   const portReplacements =
@@ -246,7 +240,7 @@ function buildChangePlan(names) {
 
   const fileReplacements = [];
 
-  // package.json: "hello-world-plugin" → "rhoai-{kebab}"
+  // package.json: name field "hello-world" → "rhoai-{kebab}"
   fileReplacements.push({
     file: 'package.json',
     replacements: [...npmReplacements, ...portReplacements],
@@ -274,11 +268,11 @@ function buildChangePlan(names) {
     });
   }
 
-  // Chart files: "hello-world-plugin" → "{kebab}-plugin", then identifiers + images
+  // Chart files: image replacements + identifiers
   for (const f of chartFiles) {
     fileReplacements.push({
       file: f,
-      replacements: [...imageReplacements, ...helmReplacements],
+      replacements: [...imageReplacements, ...identifierReplacements],
     });
   }
 
@@ -290,11 +284,11 @@ function buildChangePlan(names) {
     });
   }
 
-  // Doc files: all replacements (images + helm pattern + identifiers)
+  // Doc files: all replacements (images + npm name + identifiers)
   for (const f of docFiles) {
     fileReplacements.push({
       file: f,
-      replacements: [...imageReplacements, ...npmReplacements, ...helmReplacements],
+      replacements: [...imageReplacements, ...npmReplacements, ...identifierReplacements],
     });
   }
 

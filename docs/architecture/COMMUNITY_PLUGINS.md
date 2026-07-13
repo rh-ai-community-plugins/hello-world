@@ -4,9 +4,9 @@ Two community plugins demonstrate the standalone approach for building RHOAI Das
 
 ---
 
-## hello-plugin-world
+## hello-world
 
-**Repository**: [github.com/rh-ai-community-plugins/hello-plugin-world](https://github.com/rh-ai-community-plugins/hello-plugin-world)
+**Repository**: [github.com/rh-ai-community-plugins/hello-world](https://github.com/rh-ai-community-plugins/hello-world)
 
 A minimal "Hello World" plugin that demonstrates:
 

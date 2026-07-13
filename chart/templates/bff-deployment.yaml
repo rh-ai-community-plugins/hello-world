@@ -2,20 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "hello-world-plugin.fullname" . }}-bff
+  name: {{ include "hello-world.fullname" . }}-bff
   labels:
-    {{- include "hello-world-plugin.labels" . | nindent 4 }}
+    {{- include "hello-world.labels" . | nindent 4 }}
     app.kubernetes.io/component: bff
 spec:
   replicas: {{ .Values.bff.replicaCount }}
   selector:
     matchLabels:
-      {{- include "hello-world-plugin.selectorLabels" . | nindent 6 }}
+      {{- include "hello-world.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: bff
   template:
     metadata:
       labels:
-        {{- include "hello-world-plugin.selectorLabels" . | nindent 8 }}
+        {{- include "hello-world.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: bff
     spec:
       securityContext:

@@ -1,10 +1,10 @@
-# Hello Plugin World — Project Plan
+# Hello World — Project Plan
 
 > Captured from project planning session, 2026-07-07.
 
 ## 1. Project Vision
 
-**hello-plugin-world** serves a dual purpose for the RHOAI (Red Hat OpenShift AI) community:
+**hello-world** serves a dual purpose for the RHOAI (Red Hat OpenShift AI) community:
 
 1. **Reference implementation** — A working plugin that demonstrates real integration patterns with the RHOAI Dashboard: authentication, project/namespace access, Kubernetes resource management via the dashboard's backend APIs. Not just a skeleton, but a source of practical examples.
 

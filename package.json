@@ -1,5 +1,5 @@
 {
-  "name": "hello-world-plugin",
+  "name": "hello-world",
   "version": "0.4.0",
   "description": "A reference implementation and scaffold plugin for the RHOAI Dashboard",
   "private": true,

@@ -1,4 +1,4 @@
-# Hello Plugin World
+# Hello World
 
 A community plugin for the **Red Hat OpenShift AI (RHOAI) Dashboard** that serves as both a **reference implementation** and a **scaffold** for building your own plugins. It uses Webpack 5 Module Federation to integrate with the dashboard at runtime.
 
@@ -29,12 +29,12 @@ If you have an OpenShift cluster with RHOAI already running, you can deploy this
 Deploy the Helm chart into a namespace of your choice (it will be created if it doesn't exist):
 
 ```bash
-helm install hello-world-plugin chart/ \
+helm install hello-world chart/ \
   --namespace hello-world \
   --create-namespace
 ```
 
-This creates a Deployment and a Service (`hello-world-plugin`) that serves the plugin's `remoteEntry.js` via Nginx.
+This creates a Deployment and a Service (`hello-world`) that serves the plugin's `remoteEntry.js` via Nginx.
 
 #### 2. Register with the RHOAI Dashboard
 
@@ -53,7 +53,7 @@ config.append({
   'authorize': False,
   'tls': False,
   'service': {
-    'name': 'hello-world-plugin',
+    'name': 'hello-world',
     'namespace': 'hello-world',
     'port': 8080
   }
@@ -85,7 +85,7 @@ To deploy your own plugin image instead, see [Build & Push](docs/development/BUI
 This repository is designed as a **seed project**. To start developing your own plugin, **duplicate** the repo — do not fork it. Forking creates a link back to this upstream repository, which isn't what you want for an independent plugin with its own identity and lifecycle.
 
 ```bash
-git clone https://github.com/rh-ai-community-plugins/hello-plugin-world.git my-plugin
+git clone https://github.com/rh-ai-community-plugins/hello-world.git my-plugin
 cd my-plugin
 rm -rf .git
 git init

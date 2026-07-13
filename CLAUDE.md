@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is `hello-plugin-world`, a community plugin for the **Red Hat OpenShift AI (RHOAI) Dashboard**. It uses Webpack 5 Module Federation to expose remote modules that the RHOAI dashboard host application loads at runtime.
+This is `hello-world`, a community plugin for the **Red Hat OpenShift AI (RHOAI) Dashboard**. It uses Webpack 5 Module Federation to expose remote modules that the RHOAI dashboard host application loads at runtime.
 
 ## Build & Development Commands
 
@@ -100,7 +100,7 @@ Jest with `ts-jest` preset and `jsdom` environment (`jest.config.js`). `jest.set
 
 - **Frontend container**: Multi-stage build in `Containerfile` — Node 20 Alpine builder → Nginx Alpine serving `dist/` on port 8080 as UID 1001. Nginx adds CORS header on `remoteEntry.js`.
 - **BFF container**: Multi-stage build in `bff/Containerfile` — Node 20 Alpine builder → Node 20 Alpine runtime on port 3000 as UID 1001.
-- **Helm chart**: `chart/` deploys to Kubernetes with Deployment + Service for both frontend and BFF. Frontend defaults to `quay.io/rh-ai-community-plugins/hello-plugin-world:latest`, BFF to `quay.io/rh-ai-community-plugins/hello-world-bff:latest`.
+- **Helm chart**: `chart/` deploys to Kubernetes with Deployment + Service for both frontend and BFF. Frontend defaults to `quay.io/rh-ai-community-plugins/hello-world:latest`, BFF to `quay.io/rh-ai-community-plugins/hello-world-bff:latest`.
 
 ### CI/CD Workflows
 

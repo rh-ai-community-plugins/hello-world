@@ -5,7 +5,7 @@ description: This skill should be used when the user asks to "rename this plugin
 
 # Rename Plugin
 
-Automate renaming all plugin-specific identifiers when creating a new RHOAI community plugin from the `hello-plugin-world` seed project.
+Automate renaming all plugin-specific identifiers when creating a new RHOAI community plugin from the `hello-world` seed project.
 
 ## When to Use
 

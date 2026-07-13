@@ -41,7 +41,7 @@ EOF
 }
 
 # Target configurations
-frontend_image_name="hello-plugin-world"
+frontend_image_name="hello-world"
 frontend_containerfile="Containerfile"
 frontend_context="."
 

@@ -3,7 +3,7 @@
 ## Image Details
 
 - **Registry**: `quay.io`
-- **Frontend image**: `quay.io/rh-ai-community-plugins/hello-plugin-world`
+- **Frontend image**: `quay.io/rh-ai-community-plugins/hello-world`
 - **BFF image**: `quay.io/rh-ai-community-plugins/hello-world-bff`
 
 ## Prerequisites
@@ -45,8 +45,8 @@ To build and push images manually without the script:
 
 ```bash
 podman login quay.io
-podman build -t quay.io/rh-ai-community-plugins/hello-plugin-world:0.5.0 -f Containerfile .
-podman push quay.io/rh-ai-community-plugins/hello-plugin-world:0.5.0
+podman build -t quay.io/rh-ai-community-plugins/hello-world:0.5.0 -f Containerfile .
+podman push quay.io/rh-ai-community-plugins/hello-world:0.5.0
 
 podman build -t quay.io/rh-ai-community-plugins/hello-world-bff:0.5.0 -f bff/Containerfile bff/
 podman push quay.io/rh-ai-community-plugins/hello-world-bff:0.5.0
