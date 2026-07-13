@@ -174,6 +174,7 @@ function buildChangePlan(names) {
     ['quay.io/rh-ai-community-plugins/hello-world-bff', `quay.io/OWNER/${kebab}-bff`],
     ['quay.io/rh-ai-community-plugins/hello-world', `quay.io/OWNER/rhoai-${kebab}`],
     ['rhoai-hello-world', `rhoai-${kebab}`],
+    ['nameOverride: "hello-world"', `nameOverride: "${kebab}"`],
     ['hello-world-bff', `${kebab}-bff`],
     ['hello-world', `rhoai-${kebab}`],
   ];

@@ -1,5 +1,5 @@
 apiVersion: v2
-name: hello-world
+name: hello-world-chart
 description: A Helm chart for deploying the RHOAI Hello World plugin
 type: application
 version: 0.4.0

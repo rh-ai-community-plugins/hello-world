@@ -6,7 +6,9 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-nameOverride: ""
+# Overrides .Chart.Name so deployed resources use the plugin name, not the
+# chart name (which has a -chart suffix to avoid OCI registry collisions).
+nameOverride: "hello-world"
 fullnameOverride: ""
 
 serviceAccount:

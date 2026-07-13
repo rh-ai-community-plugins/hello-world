@@ -26,7 +26,7 @@ install:
   method: automatic                  # automatic | assisted | manual
   helm:
     chart_path: chart/
-    registry: oci://quay.io/rh-ai-community-plugins/hello-world  # [PLUGIN-SPECIFIC]
+    registry: oci://quay.io/rh-ai-community-plugins/hello-world-chart  # [PLUGIN-SPECIFIC]
   prerequisites: []
   instructions: https://github.com/rh-ai-community-plugins/hello-world/blob/main/docs/deployment  # [PLUGIN-SPECIFIC]
 
