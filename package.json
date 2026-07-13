@@ -42,7 +42,7 @@
     "lint:md": "markdownlint-cli2 '**/*.md'",
     "rename-plugin": "node scripts/rename-plugin.js",
     "sync-chart-version": "node scripts/sync-chart-version.js",
-    "version": "npm run sync-chart-version && git add chart/Chart.yaml bff/package.json"
+    "version": "npm run sync-chart-version && git add chart/Chart.yaml bff/package.json plugin.yaml"
   },
   "dependencies": {
     "@openshift/dynamic-plugin-sdk": "^5",

@@ -4,7 +4,7 @@ metadata:
   name: hello-world              # [PLUGIN-SPECIFIC] unique plugin name in the registry
   displayName: Hello World       # [PLUGIN-SPECIFIC] human-readable name
   description: A reference implementation and scaffold plugin for the RHOAI Dashboard
-  version: 0.1.0
+  version: 0.4.0
   link:
     url: https://github.com/rh-ai-community-plugins/hello-plugin-world  # [PLUGIN-SPECIFIC]
   iconPath: ''

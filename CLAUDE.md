@@ -94,7 +94,7 @@ Jest with `ts-jest` preset and `jsdom` environment (`jest.config.js`). `jest.set
 - `scripts/build-push.sh` — Builds and pushes container images (frontend, BFF, or both) to Quay.io. Auto-computes the next version from git tags if not provided.
 - `scripts/scan-image.sh` — Builds container images locally and scans them for vulnerabilities using Trivy.
 - `scripts/rename-plugin.js` — Interactive script to rename all plugin identifiers when forking this seed project into a new plugin. Prompts for a display name and updates all files.
-- `scripts/sync-chart-version.js` — Syncs the version from root `package.json` into `chart/Chart.yaml` and `bff/package.json`. Runs automatically via npm's `version` lifecycle hook.
+- `scripts/sync-chart-version.js` — Syncs the version from root `package.json` into `chart/Chart.yaml`, `bff/package.json`, and `plugin.yaml`. Runs automatically via npm's `version` lifecycle hook.
 
 ### Deployment
 
