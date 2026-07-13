@@ -25,6 +25,7 @@ describe('useProjects', () => {
     expect(result.current.error).toBeNull();
     expect(global.fetch).toHaveBeenCalledWith(
       '/api/k8s/apis/project.openshift.io/v1/projects',
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
 

@@ -19,7 +19,8 @@ export function useCurrentUser() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/status')
+    const controller = new AbortController();
+    fetch('/api/status', { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to fetch status: ${res.status}`);
         return res.json();
@@ -29,9 +30,11 @@ export function useCurrentUser() {
         setLoading(false);
       })
       .catch((e) => {
+        if (e.name === 'AbortError') return;
         setError(e.message);
         setLoading(false);
       });
+    return () => controller.abort();
   }, []);
 
   return { user, loading, error };

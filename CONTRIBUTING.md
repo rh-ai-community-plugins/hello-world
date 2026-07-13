@@ -6,10 +6,12 @@ Thank you for your interest in the hello-world community plugin for Red Hat Open
 
 1. Fork the repository and create a feature branch from `main`.
 2. Make your changes and ensure tests and lint pass:
+
    ```bash
    npm test
    npm run lint
    ```
+
 3. Submit a pull request with a clear description of the change.
 
 ## Reporting Issues

@@ -29,6 +29,12 @@ export interface NamespaceInfo {
   pods: PodCounts;
 }
 
+export interface NamespaceError {
+  name: string;
+  error: string;
+}
+
 export interface NamespaceSummaryResponse {
   namespaces: NamespaceInfo[];
+  errors: NamespaceError[];
 }

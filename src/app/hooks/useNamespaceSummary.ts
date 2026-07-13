@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export type PodCounts = {
   total: number;
@@ -15,19 +15,30 @@ export type NamespaceInfo = {
   pods: PodCounts;
 };
 
+export type NamespaceError = {
+  name: string;
+  error: string;
+};
+
 export type NamespaceSummaryData = {
   namespaces: NamespaceInfo[];
+  errors: NamespaceError[];
 };
 
 export function useNamespaceSummary() {
   const [data, setData] = useState<NamespaceSummaryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const controllerRef = useRef<AbortController | null>(null);
 
   const refresh = useCallback(() => {
+    controllerRef.current?.abort();
+    const controller = new AbortController();
+    controllerRef.current = controller;
+
     setLoading(true);
     setError(null);
-    fetch('/hello-world/api/namespace-summary')
+    fetch('/hello-world/api/namespace-summary', { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to fetch namespace summary: ${res.status}`);
         return res.json();
@@ -37,6 +48,7 @@ export function useNamespaceSummary() {
         setLoading(false);
       })
       .catch((e) => {
+        if (e.name === 'AbortError') return;
         setError(e.message);
         setLoading(false);
       });
@@ -44,6 +56,7 @@ export function useNamespaceSummary() {
 
   useEffect(() => {
     refresh();
+    return () => controllerRef.current?.abort();
   }, [refresh]);
 
   return { data, loading, error, refresh };

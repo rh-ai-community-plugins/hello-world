@@ -2,10 +2,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useProjects } from '~/app/hooks/useProjects';
 import { useK8sResources } from '~/app/hooks/useK8sResources';
+import { useAccessReview } from '~/app/hooks/useAccessReview';
 import ClusterResourcesPage from '../ClusterResourcesPage';
 
 jest.mock('~/app/hooks/useProjects');
 jest.mock('~/app/hooks/useK8sResources');
+jest.mock('~/app/hooks/useAccessReview');
 
 const mockProjects = [
   { metadata: { name: 'project-a', uid: 'uid-a' } },
@@ -58,9 +60,23 @@ function setupK8sMock(deployments: unknown[] = [], services: unknown[] = []) {
   });
 }
 
+function mockAccessReview(overrides: { allowed?: boolean; loading?: boolean } = {}) {
+  const { allowed = true, loading = false } = overrides;
+  const results = ['deployments', 'services', 'configmaps', 'secrets'].flatMap((resource) =>
+    ['get', 'list', 'create', 'delete'].map((verb) => ({
+      verb,
+      resource,
+      group: resource === 'deployments' ? 'apps' : '',
+      allowed,
+    })),
+  );
+  (useAccessReview as jest.Mock).mockReturnValue({ results, loading, error: null });
+}
+
 describe('ClusterResourcesPage', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    mockAccessReview();
   });
 
   it('shows project selector', () => {
@@ -150,6 +166,33 @@ describe('ClusterResourcesPage', () => {
       expect(screen.getByText('my-deploy')).toBeInTheDocument();
       expect(screen.getByText('2/2 ready')).toBeInTheDocument();
       expect(screen.getByText('my-svc')).toBeInTheDocument();
+    });
+  });
+
+  it('disables create buttons when user lacks RBAC permissions', async () => {
+    const user = userEvent.setup();
+
+    (useProjects as jest.Mock).mockReturnValue({
+      projects: mockProjects,
+      loading: false,
+      error: null,
+    });
+    setupK8sMock(mockDeployments, mockServices);
+    mockAccessReview({ allowed: false });
+
+    render(<ClusterResourcesPage />);
+
+    const toggle = screen.getByLabelText('Select a project');
+    await user.click(toggle);
+
+    const option = await screen.findByText('project-a');
+    await user.click(option);
+
+    await waitFor(() => {
+      const createDeployBtn = screen.getByText('Create Deployment').closest('button');
+      const createSvcBtn = screen.getByText('Create Service').closest('button');
+      expect(createDeployBtn).toBeDisabled();
+      expect(createSvcBtn).toBeDisabled();
     });
   });
 

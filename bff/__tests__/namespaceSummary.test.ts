@@ -104,6 +104,7 @@ describe('namespaceSummaryHandler', () => {
           },
         },
       ],
+      errors: [],
     });
   });
 
@@ -137,6 +138,9 @@ describe('namespaceSummaryHandler', () => {
     const response = (res.json as jest.Mock).mock.calls[0][0];
     expect(response.namespaces).toHaveLength(1);
     expect(response.namespaces[0].name).toBe('ns-ok');
+    expect(response.errors).toEqual([
+      { name: 'ns-fail', error: 'forbidden' },
+    ]);
   });
 
   it('returns 502 when projects call fails', async () => {

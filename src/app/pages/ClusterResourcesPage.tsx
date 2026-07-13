@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   PageSection,
   Title,
@@ -22,6 +22,7 @@ import {
   Form,
   FormGroup,
   TextInput,
+  Tooltip,
 } from '@patternfly/react-core';
 import { CubesIcon, PlusCircleIcon, SyncAltIcon } from '@patternfly/react-icons';
 import { ProjectSelector } from '~/app/components/ProjectSelector';
@@ -30,6 +31,7 @@ import {
   createK8sResource,
   K8sResource,
 } from '~/app/hooks/useK8sResources';
+import { useAccessReview } from '~/app/hooks/useAccessReview';
 
 type DeploymentResource = K8sResource & {
   spec: { replicas?: number };
@@ -334,6 +336,16 @@ const ClusterResourcesPage: React.FC = () => {
     ? `/api/v1/namespaces/${selectedProject}/services`
     : null;
 
+  const { results: accessResults, loading: accessLoading } = useAccessReview(selectedProject);
+
+  const canDo = useCallback(
+    (resource: string, verb: string) => {
+      if (accessLoading) return false;
+      return accessResults.find((r) => r.resource === resource && r.verb === verb)?.allowed ?? false;
+    },
+    [accessResults, accessLoading],
+  );
+
   const {
     items: deployments,
     loading: deploymentsLoading,
@@ -402,13 +414,19 @@ const ClusterResourcesPage: React.FC = () => {
                       />
                     </SplitItem>
                     <SplitItem>
-                      <Button
-                        variant="primary"
-                        icon={<PlusCircleIcon />}
-                        onClick={() => setIsCreateDeployOpen(true)}
+                      <Tooltip
+                        content="You don't have permission to create deployments in this namespace"
+                        trigger={canDo('deployments', 'create') ? 'manual' : 'mouseenter focus'}
                       >
-                        Create Deployment
-                      </Button>
+                        <Button
+                          variant="primary"
+                          icon={<PlusCircleIcon />}
+                          onClick={() => setIsCreateDeployOpen(true)}
+                          isDisabled={!canDo('deployments', 'create')}
+                        >
+                          Create Deployment
+                        </Button>
+                      </Tooltip>
                     </SplitItem>
                   </Split>
                 </CardTitle>
@@ -446,13 +464,19 @@ const ClusterResourcesPage: React.FC = () => {
                       />
                     </SplitItem>
                     <SplitItem>
-                      <Button
-                        variant="primary"
-                        icon={<PlusCircleIcon />}
-                        onClick={() => setIsCreateServiceOpen(true)}
+                      <Tooltip
+                        content="You don't have permission to create services in this namespace"
+                        trigger={canDo('services', 'create') ? 'manual' : 'mouseenter focus'}
                       >
-                        Create Service
-                      </Button>
+                        <Button
+                          variant="primary"
+                          icon={<PlusCircleIcon />}
+                          onClick={() => setIsCreateServiceOpen(true)}
+                          isDisabled={!canDo('services', 'create')}
+                        >
+                          Create Service
+                        </Button>
+                      </Tooltip>
                     </SplitItem>
                   </Split>
                 </CardTitle>

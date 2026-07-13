@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { k8sRequest } from '../utils/k8sClient';
-import { K8sResource, K8sList, PodCounts, NamespaceInfo, NamespaceSummaryResponse } from '../types';
+import { K8sResource, K8sList, PodCounts, NamespaceInfo, NamespaceError, NamespaceSummaryResponse } from '../types';
 
 function countPods(items: K8sResource[]): PodCounts {
   const counts: PodCounts = {
@@ -70,14 +70,19 @@ export async function namespaceSummaryHandler(
       }),
     );
 
-    const namespaces: NamespaceInfo[] = results
-      .filter(
-        (r): r is PromiseFulfilledResult<NamespaceInfo> =>
-          r.status === 'fulfilled',
-      )
-      .map((r) => r.value);
+    const namespaces: NamespaceInfo[] = [];
+    const errors: NamespaceError[] = [];
 
-    const response: NamespaceSummaryResponse = { namespaces };
+    results.forEach((r, i) => {
+      if (r.status === 'fulfilled') {
+        namespaces.push(r.value);
+      } else {
+        const name = projectsData.items[i].metadata.name;
+        errors.push({ name, error: r.reason?.message ?? 'Unknown error' });
+      }
+    });
+
+    const response: NamespaceSummaryResponse = { namespaces, errors };
     res.json(response);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';

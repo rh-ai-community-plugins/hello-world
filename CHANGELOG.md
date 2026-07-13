@@ -38,6 +38,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Relative route handling so the plugin renders correctly inside the dashboard routing context
 - Helm chart OpenShift compatibility (security context constraints, route TLS)
+- `useK8sResources` loading state stuck true when deselecting a project
+- BFF namespace summary now surfaces partial failures in the response instead of silently dropping them
+- `useAccessReview` wired into Cluster Resources page to disable create buttons when RBAC denies access
+- `useAccessReview` switched from `Promise.all` to `Promise.allSettled` to preserve successful checks
+- Added AbortController cleanup to `useCurrentUser`, `useProjects`, and `useNamespaceSummary` hooks
+- BFF CA certificate cached at module load instead of reading from disk on every request
+- Renamed `useFavoriteProjects.test.ts` to `.spec.ts` to match `jest.config.js` testMatch pattern
+- Added missing `[PLUGIN-SPECIFIC]` comments to `namespaceSummaryNavExtension`
 
 ## [0.3.0] - 2026-06-25
 

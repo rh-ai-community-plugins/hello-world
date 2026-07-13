@@ -57,11 +57,11 @@ export const clusterResourcesNavExtension = {
 export const namespaceSummaryNavExtension = {
   type: 'app.navigation/href' as const,
   properties: {
-    id: 'hello-world-namespace-summary',
+    id: 'hello-world-namespace-summary', // [PLUGIN-SPECIFIC] unique nav item ID
     title: 'Namespace Summary',
-    href: '/hello-world/namespace-summary',
-    section: 'hello-world',
-    path: '/hello-world/namespace-summary/*',
+    href: '/hello-world/namespace-summary', // [PLUGIN-SPECIFIC] must match route prefix
+    section: 'hello-world', // [PLUGIN-SPECIFIC] references this plugin's section ID
+    path: '/hello-world/namespace-summary/*', // [PLUGIN-SPECIFIC] route-matching pattern
   },
 };
 

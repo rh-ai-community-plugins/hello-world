@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export type Project = {
   metadata: {
@@ -16,11 +16,16 @@ export function useProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const controllerRef = useRef<AbortController | null>(null);
 
   const refresh = useCallback(() => {
+    controllerRef.current?.abort();
+    const controller = new AbortController();
+    controllerRef.current = controller;
+
     setLoading(true);
     setError(null);
-    fetch('/api/k8s/apis/project.openshift.io/v1/projects')
+    fetch('/api/k8s/apis/project.openshift.io/v1/projects', { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to fetch projects: ${res.status}`);
         return res.json();
@@ -30,6 +35,7 @@ export function useProjects() {
         setLoading(false);
       })
       .catch((e) => {
+        if (e.name === 'AbortError') return;
         setError(e.message);
         setLoading(false);
       });
@@ -37,6 +43,7 @@ export function useProjects() {
 
   useEffect(() => {
     refresh();
+    return () => controllerRef.current?.abort();
   }, [refresh]);
 
   return { projects, loading, error, refresh };

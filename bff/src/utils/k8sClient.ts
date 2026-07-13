@@ -1,6 +1,14 @@
 import https from 'https';
 import fs from 'fs';
 
+const CA_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt';
+let cachedCa: Buffer | undefined;
+try {
+  cachedCa = fs.readFileSync(CA_PATH);
+} catch {
+  // Not running in-cluster or CA file not available
+}
+
 export function getK8sBaseUrl(): string {
   if (process.env.K8S_API_BASE) {
     return process.env.K8S_API_BASE;
@@ -33,15 +41,8 @@ export function k8sRequest<T = unknown>(token: string, path: string): Promise<T>
 
     if (process.env.K8S_API_BASE) {
       options.rejectUnauthorized = false;
-    } else {
-      const caPath = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt';
-      try {
-        if (fs.existsSync(caPath)) {
-          options.ca = fs.readFileSync(caPath);
-        }
-      } catch {
-        // CA file not readable; proceed without it
-      }
+    } else if (cachedCa) {
+      options.ca = cachedCa;
     }
 
     const req = https.request(options, (res) => {

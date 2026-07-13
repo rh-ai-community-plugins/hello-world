@@ -25,6 +25,7 @@ export function useK8sResources<T extends K8sResource = K8sResource>(
   const refresh = useCallback(() => {
     if (!apiPath) {
       setItems([]);
+      setLoading(false);
       return;
     }
 

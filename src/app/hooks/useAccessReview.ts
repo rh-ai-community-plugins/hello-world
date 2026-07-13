@@ -68,7 +68,7 @@ export function useAccessReview(namespace: string | null) {
       VERBS.map((verb) => ({ verb, ...check })),
     );
 
-    Promise.all(
+    Promise.allSettled(
       checks.map(({ verb, group, resource }) =>
         checkAccess(namespace, verb, group, resource).then((allowed) => ({
           verb,
@@ -78,9 +78,23 @@ export function useAccessReview(namespace: string | null) {
         })),
       ),
     )
-      .then((r) => { if (!cancelled) setResults(r); })
-      .catch((e) => { if (!cancelled) setError(e.message); })
-      .finally(() => { if (!cancelled) setLoading(false); });
+      .then((settled) => {
+        if (cancelled) return;
+        const succeeded: AccessReviewResult[] = [];
+        const errors: string[] = [];
+        settled.forEach((r) => {
+          if (r.status === 'fulfilled') {
+            succeeded.push(r.value);
+          } else {
+            errors.push(r.reason?.message ?? 'Unknown error');
+          }
+        });
+        setResults(succeeded);
+        if (errors.length > 0 && succeeded.length === 0) {
+          setError(errors[0]);
+        }
+        setLoading(false);
+      });
 
     return () => { cancelled = true; };
   }, [namespace]);

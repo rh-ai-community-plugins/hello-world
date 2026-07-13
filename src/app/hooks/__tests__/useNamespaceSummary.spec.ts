@@ -35,6 +35,7 @@ describe('useNamespaceSummary', () => {
     expect(result.current.error).toBeNull();
     expect(global.fetch).toHaveBeenCalledWith(
       '/hello-world/api/namespace-summary',
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
 

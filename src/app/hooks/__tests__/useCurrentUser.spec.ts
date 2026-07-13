@@ -33,7 +33,10 @@ describe('useCurrentUser', () => {
 
     expect(result.current.user).toEqual(mockUser);
     expect(result.current.error).toBeNull();
-    expect(global.fetch).toHaveBeenCalledWith('/api/status');
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/status',
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
   });
 
   it('should return error on fetch failure', async () => {
