@@ -85,14 +85,16 @@ All route prefixes, hrefs, and path patterns in `extensions.ts` must use the sam
 | `package.json` | `module-federation.proxy[].path` | `/hello-world` | `/{your-plugin}` |
 | `package.json` | `module-federation.proxy[].pathRewrite` | `/hello-world` | `/{your-plugin}` |
 | `package.json` | `module-federation.local.port` | `9500` | Any unused port (see [Port allocation](#port-allocation)) |
-| `plugin.yaml` | `metadata.name` | `hello-world` | `{your-plugin}` |
-| `plugin.yaml` | `metadata.displayName` | `Hello World` | Your plugin name |
+| `plugin.yaml` | `name` | `hello-world` | `{your-plugin}` |
+| `plugin.yaml` | `displayName` | `Hello World` | Your plugin name |
+| `plugin.yaml` | `image.repository` | `quay.io/.../hello-world` | Your image repository |
+| `plugin.yaml` | `install.helm.registry` | `oci://quay.io/.../hello-world` | Your OCI chart registry |
 | `plugin.yaml` | `remote.spec.name` | `helloWorld` | `{yourPlugin}` (camelCase) |
 | `plugin.yaml` | `remote.spec.scope` | `helloWorld` | `{yourPlugin}` (must match `name`) |
-| `plugin.yaml` | `remote.spec.remoteEntry` | `.../rhoai-hello-world/...` | Your deployed image URL |
-| `plugin.yaml` | `paths[0].path` | `/hello-world` | `/{your-plugin}` |
-| `plugin.yaml` | `paths[0].extensions` | `helloWorld/extensions` | `{yourPlugin}/extensions` |
-| `plugin.yaml` | `paths[1].path` | `helloWorld/Icon` | `{yourPlugin}/Icon` |
+| `plugin.yaml` | `remote.spec.remoteEntry` | `.../hello-world/...` | Your deployed image URL |
+| `plugin.yaml` | `remote.spec.paths[0].path` | `/hello-world` | `/{your-plugin}` |
+| `plugin.yaml` | `remote.spec.paths[0].extensions` | `helloWorld/extensions` | `{yourPlugin}/extensions` |
+| `plugin.yaml` | `remote.spec.paths[1].path` | `helloWorld/Icon` | `{yourPlugin}/Icon` |
 | `src/rhoai/extensions.ts` | area `id` | `hello-world` | `{your-plugin}` |
 | `src/rhoai/extensions.ts` | plugin section `id` | `hello-world` | `{your-plugin}` |
 | `src/rhoai/extensions.ts` | plugin section `title` | `Hello World` | Your plugin name |

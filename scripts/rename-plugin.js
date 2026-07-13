@@ -190,7 +190,6 @@ function buildChangePlan(names) {
 
   // Files grouped by category with their replacement sets
   const sourceFiles = [
-    'plugin.yaml',
     'config/webpack.common.js',
     'config/moduleFederation.js',
     'config/webpack.dev.js',
@@ -250,6 +249,15 @@ function buildChangePlan(names) {
   fileReplacements.push({
     file: 'bff/package.json',
     replacements: [...bffNpmReplacements],
+  });
+
+  // plugin.yaml: image URL replacement (specific, not catch-all) + identifiers
+  fileReplacements.push({
+    file: 'plugin.yaml',
+    replacements: [
+      ['quay.io/rh-ai-community-plugins/hello-world', `quay.io/OWNER/rhoai-${kebab}`],
+      ...identifierReplacements,
+    ],
   });
 
   // Source + test files: identifier replacements + port

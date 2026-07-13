@@ -14,5 +14,6 @@ fs.writeFileSync(bffPkgPath, JSON.stringify(bffPkg, null, 2) + '\n');
 
 const pluginPath = 'plugin.yaml';
 let plugin = fs.readFileSync(pluginPath, 'utf8');
-plugin = plugin.replace(/^(\s+version:)\s.*/m, `$1 ${version}`);
+plugin = plugin.replace(/^version:.*/m, `version: ${version}`);
+plugin = plugin.replace(/^(\s+tag:)\s.*/m, `$1 "${version}"`);
 fs.writeFileSync(pluginPath, plugin);
