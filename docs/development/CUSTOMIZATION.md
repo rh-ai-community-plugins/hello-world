@@ -222,7 +222,7 @@ All route prefixes, hrefs, and path patterns in `extensions.ts` must use the sam
 
 | File | Identifier | Current value | Replace with |
 |---|---|---|---|
-| `package.json` | `name` | `rhoai-hello-world` | `rhoai-{your-plugin}` |
+| `package.json` | `name` | `hello-world` | `rhoai-{your-plugin}` |
 | `package.json` | `module-federation.name` | `helloWorld` | `{yourPlugin}` (camelCase) |
 | `package.json` | `module-federation.proxy[].path` | `/hello-world` | `/{your-plugin}` |
 | `package.json` | `module-federation.proxy[].pathRewrite` | `/hello-world` | `/{your-plugin}` |
@@ -250,8 +250,8 @@ All route prefixes, hrefs, and path patterns in `extensions.ts` must use the sam
 | `config/webpack.dev.js` | proxy `context` | `/hello-world` | `/{your-plugin}` |
 | `config/webpack.dev.js` | `port` | `9500` | Same as `package.json` port |
 | `.env.development` | `URL_PREFIX` | `/hello-world` | `/{your-plugin}` |
-| `chart/Chart.yaml` | `name` | `hello-world` | `{your-plugin}` |
-| `chart/values.yaml` | `image.repository` | `.../rhoai-hello-world` | Your image repository |
+| `chart/Chart.yaml` | `name` | `hello-world-chart` | `{your-plugin}-chart` |
+| `chart/values.yaml` | `image.repository` | `quay.io/.../hello-world` | Your image repository |
 | `chart/values.yaml` | `ingress.path` | `/hello-world` | `/{your-plugin}` |
 
 ### Identifiers to keep (shared)

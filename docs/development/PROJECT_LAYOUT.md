@@ -15,7 +15,8 @@ This is the directory structure every RHOAI community plugin should follow. Use 
 │       ├── components/             #   Shared UI components
 │       │   ├── CommunityBanner.tsx  #     [SHARED] "Community Plugin" banner — do not modify
 │       │   ├── CommunityBanner.css  #     [SHARED] Banner styles — do not modify
-│       │   └── HelloWorldNavIcon.tsx#     [PLUGIN-SPECIFIC] Your plugin's sidebar icon
+│       │   ├── HelloWorldNavIcon.tsx#     [PLUGIN-SPECIFIC] Your plugin's sidebar icon
+│       │   └── ProjectSelector.tsx #     Project selector with fuzzy search and favorites
 │       ├── pages/                  #   One file per page/route
 │       │   ├── UserInfoPage.tsx    #     Example: dashboard API pattern (/api/status)
 │       │   ├── ClusterResourcesPage.tsx  # Example: K8s API pass-through (/api/k8s/*)
@@ -23,6 +24,7 @@ This is the directory structure every RHOAI community plugin should follow. Use 
 │       └── hooks/                  #   Data-fetching hooks for the example pages
 │           ├── useCurrentUser.ts   #     Dashboard API
 │           ├── useProjects.ts      #     K8s API
+│           ├── useFavoriteProjects.ts  # localStorage-backed project favorites
 │           ├── useK8sResources.ts  #     K8s API (generic CRUD)
 │           ├── useAccessReview.ts  #     RBAC check via SelfSubjectAccessReview
 │           └── useNamespaceSummary.ts  # BFF call
@@ -33,6 +35,7 @@ This is the directory structure every RHOAI community plugin should follow. Use 
 ├── bff/                             # Backend-For-Frontend service (optional — only if using BFF pattern)
 │   └── src/
 │       ├── server.ts                #   Express server entry
+│       ├── types.ts                 #   Shared types (PodCounts, NamespaceInfo)
 │       ├── routes/                  #   API route handlers
 │       └── utils/                   #   K8s client helpers
 ├── chart/                           # Helm chart for OpenShift deployment

@@ -98,7 +98,7 @@ The dashboard discovers BFF services via the `proxyService` field in the federat
 bff/
   package.json              # Express + TypeScript project
   tsconfig.json
-  Containerfile             # Node 20 Alpine, runs on port 3000
+  Containerfile             # UBI9 Node 22, runs on port 3000
   src/
     server.ts               # Express app with health check + namespace summary route
     types.ts                # Shared types (PodCounts, NamespaceInfo)
@@ -151,7 +151,7 @@ The BFF runs as a separate Node.js process alongside the plugin dev server and t
 
 | Process | Port | What it does |
 |---|---|---|
-| Dashboard (container or source) | 8080 or 4010 | Host app; proxies frontend and BFF requests |
+| Dashboard (container or source) | 8443 | Host app; proxies frontend and BFF requests |
 | BFF service | 3000 | Plugin backend; makes K8s API calls server-side |
 | Plugin dev server | 9500 | Plugin frontend; serves webpack bundles with HMR |
 

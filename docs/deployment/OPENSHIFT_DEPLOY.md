@@ -224,7 +224,7 @@ Key values in `chart/values.yaml`:
 | Parameter | Default | Description |
 |---|---|---|
 | `image.repository` | `quay.io/rh-ai-community-plugins/hello-world` | Frontend container image |
-| `image.tag` | `latest` | Frontend image tag |
+| `image.tag` | `""` (defaults to appVersion) | Frontend image tag |
 | `image.pullPolicy` | `IfNotPresent` | Image pull policy |
 | `replicaCount` | `1` | Frontend replicas |
 | `service.type` | `ClusterIP` | Frontend Service type |
@@ -235,7 +235,7 @@ Key values in `chart/values.yaml`:
 | `resources.limits.memory` | `128Mi` | Frontend memory limit |
 | `bff.enabled` | `true` | Deploy the BFF service |
 | `bff.image.repository` | `quay.io/rh-ai-community-plugins/hello-world-bff` | BFF container image |
-| `bff.image.tag` | `latest` | BFF image tag |
+| `bff.image.tag` | `""` (defaults to appVersion) | BFF image tag |
 | `bff.service.port` | `3000` | BFF Service port |
 | `bff.resources.requests.cpu` | `100m` | BFF CPU request |
 | `bff.resources.requests.memory` | `128Mi` | BFF memory request |

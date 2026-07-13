@@ -6,8 +6,8 @@ version: 0.4.0
 
 # --- Maintainer (required) ---
 maintainer:                          # [PLUGIN-SPECIFIC]
-  name: Your Name
-  github: your-github-handle
+  name: Your Name                    # [PLUGIN-SPECIFIC] replace with maintainer's name
+  github: your-github-handle        # [PLUGIN-SPECIFIC] replace with maintainer's GitHub handle
 
 # --- RHOAI compatibility (required) ---
 rhoai_compatibility:                 # [PLUGIN-SPECIFIC]
@@ -19,6 +19,10 @@ deployment_model: cluster-shared     # per-project | cluster-shared | both
 
 image:                               # [PLUGIN-SPECIFIC]
   repository: quay.io/rh-ai-community-plugins/hello-world
+  tag: "0.4.0"
+
+bff_image:                           # [PLUGIN-SPECIFIC] (optional — only if using BFF pattern)
+  repository: quay.io/rh-ai-community-plugins/hello-world-bff
   tag: "0.4.0"
 
 # --- Installation (required) ---
@@ -36,9 +40,10 @@ remote:
   spec:
     name: helloWorld                 # [PLUGIN-SPECIFIC] Module Federation container name (camelCase)
     scope: helloWorld                # [PLUGIN-SPECIFIC] must match name above
-    # NOTE: Update this URL to point to your deployed container image.
-    # Example: https://your-openshift-route/hello-world/remoteEntry.js
-    remoteEntry: https://<registry>/hello-world/remoteEntry.js  # [PLUGIN-SPECIFIC]
+    # [PLUGIN-SPECIFIC] Update this URL to point to your deployed OpenShift route.
+    # The URL is cluster-specific and depends on the route created by the Helm chart or Ingress.
+    # Example: https://hello-world-mynamespace.apps.mycluster.example.com/remoteEntry.js
+    remoteEntry: https://<your-openshift-route>/remoteEntry.js  # [PLUGIN-SPECIFIC]
     paths:
       - type: route
         path: /hello-world           # [PLUGIN-SPECIFIC] must match route prefix in extensions.ts
@@ -48,6 +53,10 @@ remote:
         path: helloWorld/Icon         # [PLUGIN-SPECIFIC] {scope}/Icon
 
 # --- RBAC (required) ---
+# NOTE: The plugin itself requires no cluster roles at install time. However,
+# users of the Cluster Resources page need RBAC permissions for create/list/delete
+# on apps/deployments, core/services, core/configmaps, and core/secrets via the
+# dashboard's K8s API pass-through.
 rbac:
   required_roles: []
   cluster_roles: false

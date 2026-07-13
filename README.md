@@ -43,7 +43,7 @@ helm install hello-world chart/ \
   --create-namespace
 ```
 
-This creates a Deployment and a Service (`hello-world`) that serves the plugin's `remoteEntry.js` via Nginx.
+This creates a Deployment and Service for both the frontend (`hello-world`, serving `remoteEntry.js` via Nginx) and the BFF (`hello-world-bff`, Node.js backend on port 3000). To deploy the frontend only, add `--set bff.enabled=false`.
 
 #### 2. Register with the RHOAI Dashboard
 
@@ -146,8 +146,10 @@ npm run build           # Production build to dist/
 npm test                # Run all tests
 npm run test:watch      # Watch mode
 npm run test:coverage   # Tests with coverage report
-npm run lint            # ESLint on src/
+npm run lint            # ESLint on src/ + markdownlint on **/*.md
 ```
+
+A `Makefile` is also available for unified operations across frontend and BFF — run `make help` for the full list of targets.
 
 ## Documentation
 

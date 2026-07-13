@@ -14,7 +14,7 @@ npm run build         # Production build to dist/
 npm test              # Run all tests (Jest + jsdom)
 npm run test:watch    # Watch mode
 npm run test:coverage # Tests with coverage report
-npm run lint          # ESLint on src/
+npm run lint          # ESLint on src/ + markdownlint on **/*.md
 ```
 
 To run a single test file:
@@ -45,7 +45,7 @@ The plugin exposes two remote modules to the RHOAI dashboard host via Webpack Mo
   - `app.navigation/section` (x2) — `community-plugins` shared parent section (with `CommunityNavIcon`) and `hello-world` plugin subsection (with `HelloWorldNavIcon`)
   - `app.navigation/href` (x3) — "User Info", "Cluster Resources", and "Namespace Summary" nav items under the `hello-world` section
   - `app.route` — mounts the App component with wildcard routing at `/hello-world/*`
-- **`./Icon`** (`src/rhoai/HelloWorldNavIcon.tsx`) — SVG icon for the plugin's nav subsection. A separate `CommunityNavIcon.tsx` provides the icon for the shared `community-plugins` parent section.
+- **`./Icon`** (`src/app/components/HelloWorldNavIcon.tsx`) — SVG icon for the plugin's nav subsection. A separate `CommunityNavIcon.tsx` provides the icon for the shared `community-plugins` parent section.
 
 Shared singletons (react, react-dom, react-router-dom, @patternfly/react-core, @openshift/dynamic-plugin-sdk) are provided by the host and not bundled into the plugin.
 
@@ -59,10 +59,11 @@ The plugin has three pages, routed under `/hello-world/*`, each demonstrating a 
 
 ### Custom Hooks
 
-Five hooks in `src/app/hooks/` provide data fetching and API integration:
+Six hooks in `src/app/hooks/` provide data fetching and API integration:
 
 - `useCurrentUser` — Fetches authenticated user info from `/api/status`.
 - `useProjects` — Fetches accessible projects from the OpenShift projects API.
+- `useFavoriteProjects` — Manages localStorage-backed project favorites.
 - `useK8sResources` — Generic hook for listing K8s resources with create/delete helpers.
 - `useAccessReview` — Checks RBAC permissions via SelfSubjectAccessReview.
 - `useNamespaceSummary` — Fetches aggregated namespace and pod summary from the BFF endpoint.
@@ -98,8 +99,8 @@ Jest with `ts-jest` preset and `jsdom` environment (`jest.config.js`). `jest.set
 
 ### Deployment
 
-- **Frontend container**: Multi-stage build in `Containerfile` — Node 20 Alpine builder → Nginx Alpine serving `dist/` on port 8080 as UID 1001. Nginx adds CORS header on `remoteEntry.js`.
-- **BFF container**: Multi-stage build in `bff/Containerfile` — Node 20 Alpine builder → Node 20 Alpine runtime on port 3000 as UID 1001.
+- **Frontend container**: Multi-stage build in `Containerfile` — UBI9 Node 22 builder → UBI9 Nginx 1.24 serving `dist/` on port 8080 as UID 1001. Nginx adds CORS header on `remoteEntry.js`.
+- **BFF container**: Multi-stage build in `bff/Containerfile` — UBI9 Node 22 builder → UBI9 Node 22 runtime on port 3000 as UID 1001.
 - **Helm chart**: `chart/` deploys to Kubernetes with Deployment + Service for both frontend and BFF. Frontend defaults to `quay.io/rh-ai-community-plugins/hello-world:latest`, BFF to `quay.io/rh-ai-community-plugins/hello-world-bff:latest`.
 
 ### CI/CD Workflows

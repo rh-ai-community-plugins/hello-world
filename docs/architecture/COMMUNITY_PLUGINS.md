@@ -12,10 +12,10 @@ A minimal "Hello World" plugin that demonstrates:
 
 - Project structure with `src/rhoai/extensions.ts` for extension declarations
 - Webpack Module Federation config using `webpack.container.ModuleFederationPlugin`
-- Three extensions: `app.area`, `app.navigation/href`, `app.route`
-- `Containerfile` with nginx serving static files on port 8080 as non-root user 1001
+- Seven extensions: `app.area`, `app.navigation/section` (x2), `app.navigation/href` (x3), `app.route`
+- `Containerfile` with Nginx serving static files on port 8080 as non-root user 1001
 - Helm chart in `chart/` for deployment
-- No dashboard API interaction -- purely presentational
+- Three dashboard API integration patterns: `/api/status` (dashboard API), `/api/k8s/*` (K8s pass-through), and BFF service (server-side aggregation)
 
 ## kueue-visualizer
 

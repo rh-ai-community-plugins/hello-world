@@ -4,7 +4,7 @@
 REGISTRY       ?= quay.io/rh-ai-community-plugins
 FRONTEND_IMAGE ?= hello-world
 BFF_IMAGE      ?= hello-world-bff
-CHART_NAME     ?= hello-world-chart
+CHART_NAME     ?= hello-world-chart  # used by help display only; chart-package/chart-push use chart/ directly
 VERSION        ?=
 BUILDER        ?= podman
 IMAGE_TAG      ?= latest
@@ -112,7 +112,7 @@ dev-bff: ## Start BFF dev server (port 3000, requires K8S_API_BASE)
 # ──────────────────────────────────────────────
 
 .PHONY: image-build image-build-frontend image-build-bff
-.PHONY: image-push image-scan
+.PHONY: image-push image-push-frontend image-push-bff image-scan
 
 image-build: image-build-frontend image-build-bff ## Build container images
 
@@ -122,8 +122,14 @@ image-build-frontend:
 image-build-bff:
 	$(BUILDER) build -t $(REGISTRY)/$(BFF_IMAGE):$(IMAGE_TAG) -f bff/Containerfile bff/
 
-image-push: ## Build and push container images
+image-push: ## Build and push container images (frontend + BFF)
 	./scripts/build-push.sh all $(VERSION)
+
+image-push-frontend: ## Build and push frontend container image only
+	./scripts/build-push.sh frontend $(VERSION)
+
+image-push-bff: ## Build and push BFF container image only
+	./scripts/build-push.sh bff $(VERSION)
 
 image-scan: ## Build and scan images for vulnerabilities
 	BUILDER=$(BUILDER) IMAGE_TAG=$(IMAGE_TAG) ./scripts/scan-image.sh all $(SEVERITY)
