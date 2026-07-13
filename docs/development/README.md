@@ -8,4 +8,4 @@ Guides for setting up a local development environment and working with the dashb
 - [DASHBOARD_APIS.md](DASHBOARD_APIS.md) -- Covers the three integration patterns (Dashboard API, K8s pass-through, BFF), with a decision guide for choosing the right one. Also includes the full API reference, authentication flow, and code examples.
 - [LOCAL_SETUP.md](LOCAL_SETUP.md) -- Complete guide to setting up the RHOAI Dashboard and plugin dev server locally, including prerequisites, dashboard configuration, BFF setup, and hot reload workflow.
 - [CUSTOMIZATION.md](CUSTOMIZATION.md) -- Guide to renaming identifiers and making the seed project your own.
-- [BUILD_AND_PUSH.md](BUILD_AND_PUSH.md) -- Step-by-step instructions for building container images (frontend and BFF) with Podman, Buildah, or Docker, pushing to Quay.io, and scanning for vulnerabilities with Trivy.
+- [BUILD_AND_PUSH.md](BUILD_AND_PUSH.md) -- Building and pushing container images (frontend and BFF) to Quay.io, scanning for vulnerabilities with Trivy, and the CI build workflow.

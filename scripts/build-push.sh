@@ -20,18 +20,18 @@ usage() {
     cat <<EOF
 Usage: $(basename "$0") [TARGET] [VERSION]
 
-Build and push container images to Quay.io, then create and push a git tag.
+Build and push container images to Quay.io.
 
 Arguments:
   TARGET    Which image to build: frontend, bff, or all (default: all)
-  VERSION   Semver version to tag (e.g. 0.5.0). If omitted, the next
-            minor version is computed from existing git tags and you
+  VERSION   Version tag for the images (e.g. 0.5.0, 0.5.0-rc1). If omitted,
+            the next minor version is computed from existing git tags and you
             are prompted to confirm before proceeding.
 
 Examples:
   $(basename "$0")                  # Build+push both, auto-version with confirmation
   $(basename "$0") frontend         # Build+push frontend only, auto-version
-  $(basename "$0") bff 0.5.0        # Build+push BFF with explicit version
+  $(basename "$0") bff 0.5.0-rc1    # Build+push BFF with explicit version
   $(basename "$0") all 0.5.0        # Build+push both with explicit version
 EOF
 }
@@ -206,14 +206,7 @@ main() {
     done
 
     echo ""
-    log_info "Creating git tag v${version}..."
-    git tag "v${version}"
-
-    log_info "Pushing tag v${version} to origin..."
-    git push origin "v${version}"
-
-    echo ""
-    log_success "Done! Version ${version} released."
+    log_success "Done! Images pushed for version ${version}:"
     for t in "${targets[@]}"; do
         local image_name
         if [[ "${t}" == "frontend" ]]; then
@@ -223,7 +216,6 @@ main() {
         fi
         log_success "  ${REGISTRY}/${image_name}:${version}"
     done
-    log_success "  Tag: v${version}"
 }
 
 main "$@"

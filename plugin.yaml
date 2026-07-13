@@ -15,7 +15,7 @@ metadata:
       scope: helloWorld          # [PLUGIN-SPECIFIC] must match name above
       # NOTE: Update this URL to point to your deployed container image.
       # Example: https://your-openshift-route/hello-world/remoteEntry.js
-      remoteEntry: https://<registry>/rhoai-hello-world/remoteEntry.js  # [PLUGIN-SPECIFIC]
+      remoteEntry: https://<registry>/hello-plugin-world/remoteEntry.js  # [PLUGIN-SPECIFIC]
       paths:
         - type: route
           path: /hello-world     # [PLUGIN-SPECIFIC] must match route prefix in extensions.ts

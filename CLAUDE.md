@@ -89,12 +89,23 @@ The `bff/` directory contains a standalone Express.js + TypeScript backend servi
 
 Jest with `ts-jest` preset and `jsdom` environment (`jest.config.js`). `jest.setup.tsx` mocks `react-router-dom` (useNavigate, useParams, useLocation, Outlet, Routes, Route, Navigate) and polyfills TextEncoder/TextDecoder. CSS modules are proxied to return property names as class names (`jest.style-mock.js`).
 
+### Scripts
+
+- `scripts/build-push.sh` — Builds and pushes container images (frontend, BFF, or both) to Quay.io. Auto-computes the next version from git tags if not provided.
+- `scripts/scan-image.sh` — Builds container images locally and scans them for vulnerabilities using Trivy.
+- `scripts/rename-plugin.js` — Interactive script to rename all plugin identifiers when forking this seed project into a new plugin. Prompts for a display name and updates all files.
+- `scripts/sync-chart-version.js` — Syncs the version from root `package.json` into `chart/Chart.yaml` and `bff/package.json`. Runs automatically via npm's `version` lifecycle hook.
+
 ### Deployment
 
 - **Frontend container**: Multi-stage build in `Containerfile` — Node 20 Alpine builder → Nginx Alpine serving `dist/` on port 8080 as UID 1001. Nginx adds CORS header on `remoteEntry.js`.
 - **BFF container**: Multi-stage build in `bff/Containerfile` — Node 20 Alpine builder → Node 20 Alpine runtime on port 3000 as UID 1001.
 - **Helm chart**: `chart/` deploys to Kubernetes with Deployment + Service for both frontend and BFF. Frontend defaults to `quay.io/rh-ai-community-plugins/hello-plugin-world:latest`, BFF to `quay.io/rh-ai-community-plugins/hello-world-bff:latest`.
-- **CI**: `.github/workflows/ci.yml` runs tests and lint for both frontend and BFF on push/PR to main. `build-push.yml` builds and pushes both container images on release/tag.
+
+### CI/CD Workflows
+
+- `.github/workflows/ci.yml` — Runs tests and lint for both frontend and BFF on push/PR to main.
+- `.github/workflows/build-push.yml` — Builds and pushes both container images to Quay.io. Manually triggered via `workflow_dispatch` with a version input.
 
 ## Documentation
 

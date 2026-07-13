@@ -1,11 +1,12 @@
 name: Build and Push
 
 on:
-  release:
-    types: [published]
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag for the images (e.g. 0.5.0)'
+        required: true
+        type: string
 
 jobs:
   build-and-push:
@@ -25,16 +26,16 @@ jobs:
       - name: Build and push image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: rhoai-hello-world
-          tags: ${{ github.ref_name }}
+          image: hello-plugin-world
+          tags: ${{ inputs.version }}
           containerfiles: |
             ./Containerfile
 
       - name: Push to Quay.io
         uses: redhat-actions/push-to-registry@v2
         with:
-          image: rhoai-hello-world
-          tags: ${{ github.ref_name }}
+          image: hello-plugin-world
+          tags: ${{ inputs.version }}
           registry: quay.io/rh-ai-community-plugins
 
   build-and-push-bff:
@@ -55,7 +56,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: hello-world-bff
-          tags: ${{ github.ref_name }}
+          tags: ${{ inputs.version }}
           containerfiles: |
             ./bff/Containerfile
           context: ./bff
@@ -64,5 +65,5 @@ jobs:
         uses: redhat-actions/push-to-registry@v2
         with:
           image: hello-world-bff
-          tags: ${{ github.ref_name }}
+          tags: ${{ inputs.version }}
           registry: quay.io/rh-ai-community-plugins
