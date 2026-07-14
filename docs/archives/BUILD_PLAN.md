@@ -40,20 +40,20 @@ podman login quay.io
 
 ```bash
 # Build the image (tag for quay.io/rh-ai-community-plugins)
-podman build -t quay.io/rh-ai-community-plugins/rhoai-hello-world:latest .
+podman build -t quay.io/rh-ai-community-plugins/hello-world:latest .
 ```
 
 ### Step 4: Push the Image
 
 ```bash
-podman push quay.io/rh-ai-community-plugins/rhoai-hello-world:latest
+podman push quay.io/rh-ai-community-plugins/hello-world:latest
 ```
 
 ### Step 5: (Optional) Push with Semantic Version Tag
 
 ```bash
-podman tag quay.io/rh-ai-community-plugins/rhoai-hello-world:latest quay.io/rh-ai-community-plugins/rhoai-hello-world:0.1.0
-podman push quay.io/rh-ai-community-plugins/rhoai-hello-world:0.1.0
+podman tag quay.io/rh-ai-community-plugins/hello-world:latest quay.io/rh-ai-community-plugins/hello-world:0.1.0
+podman push quay.io/rh-ai-community-plugins/hello-world:0.1.0
 ```
 
 ## Files to Modify
@@ -65,7 +65,7 @@ podman push quay.io/rh-ai-community-plugins/rhoai-hello-world:0.1.0
 ## Pre-requisites Checklist
 
 - [ ] quay.io account created
-- [ ] Repository created (e.g., `rhoai-hello-world`)
+- [ ] Repository created (e.g., `hello-world`)
 - [ ] Quay.io Access Token generated
 - [ ] Podman installed (confirmed)
 

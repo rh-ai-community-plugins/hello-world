@@ -160,7 +160,7 @@ function buildChangePlan(names) {
 
   // package.json: match the JSON name field specifically so route paths get the plain kebab
   const npmReplacements = [
-    ['"name": "hello-world"', `"name": "rhoai-${kebab}"`],
+    ['"name": "hello-world"', `"name": "${kebab}"`],
     ...identifierReplacements,
   ];
 
@@ -172,22 +172,72 @@ function buildChangePlan(names) {
 
   const imageReplacements = [
     ['quay.io/rh-ai-community-plugins/hello-world-bff', `quay.io/OWNER/${kebab}-bff`],
-    ['quay.io/rh-ai-community-plugins/hello-world', `quay.io/OWNER/rhoai-${kebab}`],
-    ['rhoai-hello-world', `rhoai-${kebab}`],
+    ['quay.io/rh-ai-community-plugins/hello-world', `quay.io/OWNER/${kebab}`],
     ['nameOverride: "hello-world"', `nameOverride: "${kebab}"`],
     ['hello-world-bff', `${kebab}-bff`],
-    ['hello-world', `rhoai-${kebab}`],
+    ['hello-world', kebab],
   ];
 
   const portReplacements =
     port !== '9500' ? [['9500', port]] : [];
 
-  // Icon-specific replacements (initials + color)
+  // Icon-specific replacements (initials + color + component name)
   const iconReplacements = [
+    ['HelloIcon', `${pascal}Icon`],
     ['      HW\n', `      ${initials}\n`],
+    ['the HW text', `the ${initials} text`],
     ["'HW'", `'${initials}'`],
     ['#6b21a8', iconColor],
   ];
+
+  // HTML title replacement
+  const titleReplacements = [
+    ['<title>Hello World! - RHOAI</title>', `<title>${display} - RHOAI</title>`],
+  ];
+
+  // Welcome message replacement
+  const welcomeReplacements = [
+    ['Hello, welcome to your plugin example', `Welcome to ${display}`],
+  ];
+
+  // Prose de-seeding: remove seed/scaffold/demo framing from docs
+  const proseReplacements = {
+    'AGENTS.md': [
+      [', each demonstrating a different integration pattern', ''],
+      ['that demonstrates the BFF pattern', 'that implements the BFF pattern'],
+      ['- `scripts/rename-plugin.js` — Interactive script to rename all plugin identifiers when forking this seed project into a new plugin. Prompts for a display name and updates all files.\n', ''],
+      ['docs/archives/       — Project plan and historical documents\n', ''],
+      ['- Plugin-specific identifiers are annotated with `[PLUGIN-SPECIFIC]` comments; shared conventions use `[SHARED]`. See `docs/development/CUSTOMIZATION.md` for the full reference.\n', ''],
+    ],
+    'README.md': [
+      [' that serves as both a **reference implementation** and a **scaffold** for building your own plugins. It', '. It'],
+      ['The plugin provides three pages, each demonstrating a different way to integrate with the dashboard and the cluster. These are the three patterns you will use when building your own plugin:', 'The plugin provides three pages, each using a different integration pattern:'],
+      ['### Developing a New Plugin\n\nThis repository is designed as a **seed project**. To start developing your own plugin, **duplicate** the repo — do not fork it. Forking creates a link back to this upstream repository, which isn\'t what you want for an independent plugin with its own identity and lifecycle.\n\n```bash\ngit clone https://github.com/rh-ai-community-plugins/hello-world.git my-plugin\ncd my-plugin\nrm -rf .git\ngit init\n```\n\nThen follow the [Customization Guide](docs/development/CUSTOMIZATION.md) to rename identifiers, update routes, and make the plugin your own.\n\n', ''],
+    ],
+    'docs/architecture/BFF_PATTERN.md': [
+      ['this reference plugin', 'this plugin'],
+    ],
+    'docs/development/DASHBOARD_APIS.md': [
+      ['This reference plugin demonstrates three', 'This plugin uses three'],
+      ['**Example page:**', '**See:**'],
+    ],
+    'docs/development/CUSTOMIZATION.md': [
+      ["See the seed project's", 'See'],
+      ['The seed project includes a ready-to-use GitHub Actions workflow', 'This project includes a GitHub Actions workflow'],
+      ['The seed project includes one triggered via', 'This project includes one triggered via'],
+    ],
+    'docs/development/PROJECT_LAYOUT.md': [
+      ['This is the directory structure every RHOAI community plugin should follow. Use it as a map when starting from this seed project.', 'Directory structure of the plugin.'],
+      ['#     Example: dashboard API pattern', '#     Uses dashboard API pattern'],
+      ['# Example: K8s API pass-through', '# Uses K8s API pass-through'],
+      ['# Example: BFF pattern', '# Uses BFF pattern'],
+      ['#   Data-fetching hooks for the example pages', '#   Data-fetching hooks'],
+      ['## Where to start\n\n1. **Rename identifiers** — follow [CUSTOMIZATION.md](CUSTOMIZATION.md) to replace `hello-world` with your plugin name. Do this first.\n2. **Read** `src/rhoai/extensions.ts` — this is what the dashboard loads. It defines your nav items and routes.\n3. **Add pages** under `src/app/pages/` and corresponding nav entries in `extensions.ts`.\n4. **Add hooks** under `src/app/hooks/` for data fetching.', '## Codebase orientation\n\n1. **Read** `src/rhoai/extensions.ts` — this is what the dashboard loads. It defines your nav items and routes.\n2. **Add pages** under `src/app/pages/` and corresponding nav entries in `extensions.ts`.\n3. **Add hooks** under `src/app/hooks/` for data fetching.'],
+    ],
+    'CONTRIBUTING.md': [
+      ['hello-world community plugin for Red Hat OpenShift AI Dashboard', `${display} community plugin for Red Hat OpenShift AI Dashboard`],
+    ],
+  };
 
   // Files grouped by category with their replacement sets
   const sourceFiles = [
@@ -218,11 +268,17 @@ function buildChangePlan(names) {
     'chart/templates/service.yaml',
     'chart/templates/bff-deployment.yaml',
     'chart/templates/bff-service.yaml',
+    'chart/templates/serviceaccount.yaml',
   ];
 
   const ciFiles = [
     '.github/workflows/build-push.yml',
     'scripts/build-push.sh',
+  ];
+
+  const buildFiles = [
+    'Makefile',
+    'scripts/scan-image.sh',
   ];
 
   const docFiles = [
@@ -233,14 +289,16 @@ function buildChangePlan(names) {
     'docs/development/LOCAL_SETUP.md',
     'docs/development/DASHBOARD_APIS.md',
     'docs/development/PROJECT_LAYOUT.md',
+    'docs/development/BUILD_AND_PUSH.md',
     'docs/deployment/OPENSHIFT_DEPLOY.md',
     'docs/archives/PROJECT_PLAN.md',
     'docs/archives/BUILD_PLAN.md',
+    'CONTRIBUTING.md',
   ];
 
   const fileReplacements = [];
 
-  // package.json: name field "hello-world" → "rhoai-{kebab}"
+  // package.json: name field "hello-world" → "{kebab}"
   fileReplacements.push({
     file: 'package.json',
     replacements: [...npmReplacements, ...portReplacements],
@@ -256,7 +314,7 @@ function buildChangePlan(names) {
   fileReplacements.push({
     file: 'plugin.yaml',
     replacements: [
-      ['quay.io/rh-ai-community-plugins/hello-world', `quay.io/OWNER/rhoai-${kebab}`],
+      ['quay.io/rh-ai-community-plugins/hello-world', `quay.io/OWNER/${kebab}`],
       ...identifierReplacements,
     ],
   });
@@ -293,11 +351,32 @@ function buildChangePlan(names) {
     });
   }
 
-  // Doc files: all replacements (images + npm name + identifiers)
-  for (const f of docFiles) {
+  // Build files (Makefile, scan-image.sh): image + identifier replacements
+  for (const f of buildFiles) {
     fileReplacements.push({
       file: f,
-      replacements: [...imageReplacements, ...npmReplacements, ...identifierReplacements],
+      replacements: [...imageReplacements, ...identifierReplacements],
+    });
+  }
+
+  // HTML title in index.html
+  fileReplacements.push({
+    file: 'src/index.html',
+    replacements: [...titleReplacements],
+  });
+
+  // Welcome message in UserInfoPage
+  fileReplacements.push({
+    file: 'src/app/pages/UserInfoPage.tsx',
+    replacements: [...welcomeReplacements],
+  });
+
+  // Doc files: all replacements (images + npm name + identifiers + per-file prose)
+  for (const f of docFiles) {
+    const prose = proseReplacements[f] || [];
+    fileReplacements.push({
+      file: f,
+      replacements: [...prose, ...imageReplacements, ...npmReplacements, ...identifierReplacements],
     });
   }
 
@@ -340,6 +419,141 @@ function executePlan(plan, dryRun) {
   return { modified, renamed };
 }
 
+// --- Seed artifact cleanup ---
+
+function removeFileOrDir(filePath, dryRun) {
+  const absPath = path.resolve(ROOT, filePath);
+  if (!fs.existsSync(absPath)) return null;
+  if (!dryRun) {
+    const stat = fs.statSync(absPath);
+    if (stat.isDirectory()) {
+      fs.rmSync(absPath, { recursive: true });
+    } else {
+      fs.unlinkSync(absPath);
+    }
+  }
+  return filePath;
+}
+
+function stripLineFromFile(filePath, lineContent, dryRun) {
+  const absPath = path.resolve(ROOT, filePath);
+  if (!fs.existsSync(absPath)) return false;
+  const content = fs.readFileSync(absPath, 'utf8');
+  const idx = content.indexOf(lineContent);
+  if (idx === -1) return false;
+  if (!dryRun) {
+    fs.writeFileSync(absPath, content.split(lineContent).join(''));
+  }
+  return true;
+}
+
+function stripSectionFromFile(filePath, startMarker, endMarker, dryRun) {
+  const absPath = path.resolve(ROOT, filePath);
+  if (!fs.existsSync(absPath)) return false;
+  const content = fs.readFileSync(absPath, 'utf8');
+  const startIdx = content.indexOf(startMarker);
+  if (startIdx === -1) return false;
+  let endIdx;
+  if (endMarker) {
+    endIdx = content.indexOf(endMarker, startIdx + startMarker.length);
+    if (endIdx === -1) endIdx = content.length;
+  } else {
+    endIdx = content.length;
+  }
+  if (!dryRun) {
+    const before = content.slice(0, startIdx);
+    const after = content.slice(endIdx);
+    fs.writeFileSync(absPath, before + after);
+  }
+  return true;
+}
+
+function cleanupSeedArtifacts(dryRun) {
+  const deleted = [];
+  const stripped = [];
+
+  // Delete seed-only files and directories
+  const toDelete = [
+    'scripts/rename-plugin.js',
+    'docs/archives',
+    'docs/architecture/COMMUNITY_PLUGINS.md',
+    '.claude/skills/rename-plugin',
+  ];
+  for (const f of toDelete) {
+    if (removeFileOrDir(f, dryRun)) deleted.push(f);
+  }
+
+  // Remove rename-plugin script from package.json
+  if (stripLineFromFile('package.json', '    "rename-plugin": "node scripts/rename-plugin.js",\n', dryRun)) {
+    stripped.push('package.json: removed rename-plugin script');
+  }
+
+  // Remove Archives section from docs/README.md
+  if (stripSectionFromFile('docs/README.md', '\n### [Archives]', null, dryRun)) {
+    stripped.push('docs/README.md: removed Archives section');
+  }
+
+  // Remove COMMUNITY_PLUGINS.md bullet from docs/architecture/README.md
+  if (stripLineFromFile('docs/architecture/README.md', '- [COMMUNITY_PLUGINS.md](COMMUNITY_PLUGINS.md) -- Overview of existing community plugins (hello-world, kueue-visualizer) and key reference files in the dashboard codebase.\n', dryRun)) {
+    stripped.push('docs/architecture/README.md: removed COMMUNITY_PLUGINS.md bullet');
+  }
+
+  // Strip "Automated Rename" section from CUSTOMIZATION.md
+  if (stripSectionFromFile('docs/development/CUSTOMIZATION.md', '\n## Automated Rename', '\n## Manual Reference', dryRun)) {
+    stripped.push('docs/development/CUSTOMIZATION.md: removed Automated Rename section');
+  }
+
+  // Remove "Start here when creating a new plugin" from dev/README.md
+  const devReadmePath = path.resolve(ROOT, 'docs/development/README.md');
+  if (fs.existsSync(devReadmePath)) {
+    const content = fs.readFileSync(devReadmePath, 'utf8');
+    const oldText = 'Start here when creating a new plugin. Lists';
+    const newText = 'Lists';
+    if (content.includes(oldText)) {
+      if (!dryRun) {
+        fs.writeFileSync(devReadmePath, content.split(oldText).join(newText));
+      }
+      stripped.push('docs/development/README.md: removed seed-framing text');
+    }
+  }
+
+  // Rewrite CUSTOMIZATION.md intro
+  const customizePath = path.resolve(ROOT, 'docs/development/CUSTOMIZATION.md');
+  if (fs.existsSync(customizePath)) {
+    const content = fs.readFileSync(customizePath, 'utf8');
+    const oldIntro = 'When forking this repository to create your own community plugin, you need to produce a set of artifacts and replace all plugin-specific identifiers with values unique to your plugin.';
+    const newIntro = "This guide documents the plugin's deliverables, naming conventions, and identifiers.";
+    if (content.includes(oldIntro) && !dryRun) {
+      fs.writeFileSync(customizePath, content.split(oldIntro).join(newIntro));
+    }
+    if (content.includes(oldIntro)) stripped.push('docs/development/CUSTOMIZATION.md: rewrote intro');
+  }
+
+  // Reset CHANGELOG.md
+  const changelogPath = path.resolve(ROOT, 'CHANGELOG.md');
+  if (fs.existsSync(changelogPath)) {
+    const freshChangelog = `# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0] - Unreleased
+
+### Added
+
+- Initial plugin created from hello-world seed project.
+`;
+    if (!dryRun) {
+      fs.writeFileSync(changelogPath, freshChangelog);
+    }
+    stripped.push('CHANGELOG.md: reset to fresh template');
+  }
+
+  return { deleted, stripped };
+}
+
 // --- Display helpers ---
 
 function printSummary(names, plan, prefix = '') {
@@ -371,6 +585,15 @@ function printSummary(names, plan, prefix = '') {
       }
     }
   }
+
+  console.log('');
+  console.log(`${prefix}Seed artifacts to remove:`);
+  console.log(`${prefix}  scripts/rename-plugin.js`);
+  console.log(`${prefix}  docs/archives/ (directory)`);
+  console.log(`${prefix}  docs/architecture/COMMUNITY_PLUGINS.md`);
+  console.log(`${prefix}  .claude/skills/rename-plugin/ (directory)`);
+  console.log(`${prefix}  + strip seed sections from package.json, CHANGELOG.md,`);
+  console.log(`${prefix}    CUSTOMIZATION.md, docs/README.md, docs/architecture/README.md`);
 }
 
 function printResults(results, dryRun) {
@@ -387,6 +610,23 @@ function printResults(results, dryRun) {
     console.log(`\n${renameLabel} ${results.renamed.length} file(s):`);
     for (const { from, to } of results.renamed) {
       console.log(`  ${from} → ${to}`);
+    }
+  }
+
+  if (results.cleanup) {
+    const deleteLabel = dryRun ? 'Would delete' : 'Deleted';
+    if (results.cleanup.deleted.length) {
+      console.log(`\n${deleteLabel} seed artifacts:`);
+      for (const f of results.cleanup.deleted) {
+        console.log(`  ${f}`);
+      }
+    }
+    const stripLabel = dryRun ? 'Would strip' : 'Stripped';
+    if (results.cleanup.stripped.length) {
+      console.log(`\n${stripLabel} seed sections:`);
+      for (const s of results.cleanup.stripped) {
+        console.log(`  ${s}`);
+      }
     }
   }
 
@@ -468,6 +708,7 @@ async function main() {
       }
 
       const results = executePlan(plan, false);
+      results.cleanup = cleanupSeedArtifacts(false);
       printResults(results, false);
       printNextSteps(names, false);
       console.log('\nRun `npm run validate` to verify the changes.');
@@ -508,6 +749,7 @@ async function main() {
     }
 
     const results = executePlan(plan, dryRun);
+    results.cleanup = cleanupSeedArtifacts(dryRun);
     printResults(results, dryRun);
 
     printNextSteps(names, dryRun);

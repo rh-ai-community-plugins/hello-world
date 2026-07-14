@@ -5,7 +5,7 @@ description: This skill should be used when the user asks to "rename this plugin
 
 # Rename Plugin
 
-Automate renaming all plugin-specific identifiers when creating a new RHOAI community plugin from the `hello-world` seed project.
+Automate renaming all plugin-specific identifiers when creating a new RHOAI community plugin from the `hello-world` seed project. The script handles identifier replacement, prose de-seeding (removing demo/scaffold language), and automatic cleanup of seed-only artifacts.
 
 ## When to Use
 
@@ -15,7 +15,14 @@ Automate renaming all plugin-specific identifiers when creating a new RHOAI comm
 
 ## How It Works
 
-The `scripts/rename-plugin.js` script derives all naming variants from a display name, replaces identifiers across ~33 files, renames icon files, updates icon initials and color, and prints post-rename steps.
+The `scripts/rename-plugin.js` script:
+
+1. Derives all naming variants from a display name
+2. Replaces identifiers across ~40 files and renames icon files
+3. Updates icon initials, color, and component name
+4. Replaces seed/scaffold/demo framing in documentation with factual language
+5. Removes seed-only artifacts (the script itself, archives, COMMUNITY_PLUGINS.md, CHANGELOG history, this skill directory)
+6. Prints post-rename steps
 
 ## Workflow
 
@@ -46,6 +53,14 @@ Run the rename script in non-interactive mode:
 node scripts/rename-plugin.js --name "Plugin Display Name" --yes
 ```
 
+The script performs three phases:
+
+1. **Identifier replacement** — replaces `hello-world` / `HelloWorld` / `HelloIcon` across all source, config, chart, CI, build, and doc files
+2. **Prose de-seeding** — replaces seed/scaffold/demo language ("reference implementation", "demonstrates", "example page", "seed project") with factual descriptions
+3. **Seed cleanup** — deletes `scripts/rename-plugin.js` (itself), `docs/archives/`, `docs/architecture/COMMUNITY_PLUGINS.md`, `.claude/skills/rename-plugin/`, resets `CHANGELOG.md`, strips the "Automated Rename" section from `CUSTOMIZATION.md`, and removes the `rename-plugin` npm script
+
+**Note:** After the script runs, this skill file no longer exists in the project.
+
 Available flags for overrides:
 
 | Flag            | Purpose                              |
@@ -62,9 +77,19 @@ Available flags for overrides:
 | `--dry-run`    | Preview changes without applying     |
 | `--yes` / `-y` | Skip confirmation prompt             |
 
-### Step 3: Verify the Rename
+### Step 3: Regenerate Lock Files
 
-After the script completes, run verification:
+After the script completes, run `npm install` in both the root and `bff/` directories to regenerate the lock files with the updated package names:
+
+```bash
+npm install && cd bff && npm install && cd ..
+```
+
+This ensures `package-lock.json` and `bff/package-lock.json` reflect the new package names set by the script.
+
+### Step 4: Verify the Rename
+
+Run verification:
 
 ```bash
 npm run lint && npm test
@@ -72,7 +97,7 @@ npm run lint && npm test
 
 Both must pass with zero errors. If either fails, inspect and fix the issue before proceeding.
 
-### Step 4: Communicate Post-Rename Steps
+### Step 5: Communicate Post-Rename Steps
 
 The script prints a checklist of manual steps. Relay these to the user clearly:
 
@@ -89,15 +114,16 @@ User: "Create a new plugin called Model Monitor"
 node scripts/rename-plugin.js --name "Model Monitor" --yes
 ```
 
-This renames all identifiers (`hello-world` → `model-monitor`, `HelloWorld` → `ModelMonitor`, etc.), updates icon to "MM" initials, and sets a deterministic icon color.
+This renames all identifiers (`hello-world` → `model-monitor`, `HelloWorld` → `ModelMonitor`, `HelloIcon` → `ModelMonitorIcon`, etc.), updates icon to "MM" initials, sets a deterministic icon color, removes seed prose and artifacts.
 
 ## What the Script Modifies
 
 - **npm packages**: `package.json`, `bff/package.json`
 - **Config**: `plugin.yaml`, `config/webpack.common.js`, `config/moduleFederation.js`, `config/webpack.dev.js`, `.env.development`
-- **Source**: `src/bootstrap.tsx`, `src/rhoai/extensions.ts`, `src/app/hooks/useNamespaceSummary.ts`
-- **Icon**: `src/app/components/HelloWorldNavIcon.tsx` (renamed + content updated)
+- **Source**: `src/index.html`, `src/bootstrap.tsx`, `src/rhoai/extensions.ts`, `src/app/hooks/useNamespaceSummary.ts`, `src/app/pages/UserInfoPage.tsx`
+- **Icon**: `src/app/components/HelloWorldNavIcon.tsx` (renamed + component name + content updated)
 - **Tests**: icon spec, extensions spec, namespace summary spec
-- **Helm chart**: `chart/Chart.yaml`, `chart/values.yaml`, all templates
-- **CI**: `.github/workflows/build-push.yml`, `scripts/build-push.sh`
-- **Docs**: `README.md`, `CLAUDE.md`, and files under `docs/`
+- **Helm chart**: `chart/Chart.yaml`, `chart/values.yaml`, all templates including `serviceaccount.yaml`
+- **CI/Build**: `.github/workflows/build-push.yml`, `scripts/build-push.sh`, `Makefile`, `scripts/scan-image.sh`
+- **Docs**: `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `docs/development/BUILD_AND_PUSH.md`, and files under `docs/`
+- **Cleanup**: deletes seed-only files, resets CHANGELOG, strips seed sections from docs
