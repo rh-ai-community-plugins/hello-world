@@ -146,7 +146,7 @@ oci://quay.io/rh-ai-community-plugins/my-cool-plugin-chart   # Helm chart (requi
 
 ## Automated Rename (Recommended)
 
-The `rename-plugin` script handles the entire renaming process — it derives all naming variants from a display name, replaces identifiers across ~33 files, renames icon component files, and updates icon initials and color.
+The `rename-plugin` script handles the entire renaming process — it derives all naming variants from a display name, replaces identifiers across ~40 files, renames icon component files, and updates icon initials and color.
 
 ### Interactive mode
 
@@ -178,9 +178,25 @@ Available flags:
 | `--dry-run`    | Preview changes without applying           |
 | `--yes` / `-y` | Skip confirmation prompt                   |
 
-### Claude Code skill
+### AI skill
 
-If you use [Claude Code](https://docs.anthropic.com/en/docs/claude-code), the `/rename-plugin` skill wraps this script. Ask Claude to "rename this plugin" or "create a new plugin called X" and it will run the script, verify the result, and relay the post-rename steps.
+A `/rename-plugin` AI skill is also available that wraps this script, runs verification, and relays the post-rename steps.
+
+### Regenerate lock files
+
+After the script completes, run `npm install` in both the root and `bff/` directories to regenerate the lock files with the updated package names:
+
+```bash
+npm install && cd bff && npm install && cd ..
+```
+
+### Verify
+
+```bash
+npm run lint && npm test
+```
+
+Both must pass with zero errors before proceeding.
 
 ### Post-rename steps
 
@@ -190,14 +206,6 @@ The script prints these after running — they require manual action:
 2. **Restart ALL services** — the dashboard, plugin dev server, and BFF must all be restarted. The dashboard caches federation config at startup.
 3. **Update container image repositories** — replace `quay.io/OWNER/` placeholders in `chart/values.yaml` and `.github/workflows/build-push.yml`.
 4. **Update `plugin.yaml`** — set the `remoteEntry` URL to point to your deployed image location.
-
-### Verify
-
-```bash
-npm run lint && npm test
-```
-
-Both must pass with zero errors before proceeding.
 
 ---
 
@@ -214,7 +222,7 @@ If you prefer to rename files manually, or need to understand what the script ch
 - **Module Federation name/scope**: camelCase (`myPlugin`)
 - **Nav item IDs**: prefix with your plugin name (`my-plugin-page-name`)
 - **Section group sort key**: `{number}_{snake_case}` (e.g. `1_my_plugin`)
-- **npm package name**: `rhoai-{your-plugin}`
+- **npm package name**: `{your-plugin}`
 
 All route prefixes, hrefs, and path patterns in `extensions.ts` must use the same prefix as the route extension's `path` (e.g. `/my-plugin/*`).
 
@@ -222,7 +230,7 @@ All route prefixes, hrefs, and path patterns in `extensions.ts` must use the sam
 
 | File | Identifier | Current value | Replace with |
 |---|---|---|---|
-| `package.json` | `name` | `hello-world` | `rhoai-{your-plugin}` |
+| `package.json` | `name` | `hello-world` | `{your-plugin}` |
 | `package.json` | `module-federation.name` | `helloWorld` | `{yourPlugin}` (camelCase) |
 | `package.json` | `module-federation.proxy[].path` | `/hello-world` | `/{your-plugin}` |
 | `package.json` | `module-federation.proxy[].pathRewrite` | `/hello-world` | `/{your-plugin}` |

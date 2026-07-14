@@ -113,7 +113,7 @@ rm -rf .git
 git init
 ```
 
-Then follow the [Customization Guide](docs/development/CUSTOMIZATION.md) to rename identifiers, update routes, and make the plugin your own.
+Then run `npm run rename-plugin` to rename all identifiers to your new plugin name. The script derives all naming variants from a display name, replaces identifiers across the codebase, and cleans up seed artifacts. A `/rename-plugin` AI skill is also available to handle the entire process end-to-end. See the [Customization Guide](docs/development/CUSTOMIZATION.md) for details and manual options.
 
 Developing a dashboard plugin is way easier with a **running RHOAI dashboard** connected to a **real OpenShift cluster** — the plugin runs inside the dashboard and relies on its backend to proxy API calls to the cluster. You almost cannot develop the plugin in isolation if you want a proper integration with the dashboard.
 
