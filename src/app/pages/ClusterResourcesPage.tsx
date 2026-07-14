@@ -32,6 +32,7 @@ import {
   K8sResource,
 } from '~/app/hooks/useK8sResources';
 import { useAccessReview } from '~/app/hooks/useAccessReview';
+import { useLastSelectedProject } from '~/app/hooks/useLastSelectedProject';
 
 type DeploymentResource = K8sResource & {
   spec: { replicas?: number };
@@ -327,7 +328,7 @@ const CreateServiceModal: React.FC<{
 };
 
 const ClusterResourcesPage: React.FC = () => {
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useLastSelectedProject();
 
   const deploymentPath = selectedProject
     ? `/apis/apps/v1/namespaces/${selectedProject}/deployments`
