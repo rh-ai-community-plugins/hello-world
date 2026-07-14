@@ -103,7 +103,7 @@ oc set env deployment/rhods-dashboard -n redhat-ods-applications --list \
 
 You should see something like the following (note `hellWorld` at the bottom of the list):
 
-```
+```bash
 ...
 genAi
 maas
