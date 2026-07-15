@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Intermittent `ChunkLoadError` on plugin load caused by vendor chunk splitting in the production webpack build ([#24](https://github.com/rh-ai-community-plugins/hello-world/issues/24))
+- Last selected project not persisted across page navigations — ProjectSelector now saves the selection to localStorage ([#25](https://github.com/rh-ai-community-plugins/hello-world/issues/25))
 
 ## [0.4.0] - 2026-07-10
 
