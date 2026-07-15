@@ -19,6 +19,11 @@ COPY --from=builder --chown=1001:0 /opt/app-root/src/dist .
 RUN echo $'location /remoteEntry.js {\n    add_header Access-Control-Allow-Origin *;\n}' \
     > "${NGINX_DEFAULT_CONF_PATH}/cors.conf"
 
+# Route nginx logs to stdout/stderr (the S2I run script does this
+# automatically, but CMD below bypasses it)
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log
+
 EXPOSE 8080
 
 USER 1001:0

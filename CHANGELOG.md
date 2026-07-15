@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Intermittent `ChunkLoadError` on plugin load caused by vendor chunk splitting in the production webpack build ([#24](https://github.com/rh-ai-community-plugins/hello-world/issues/24))
+
 ## [0.4.0] - 2026-07-10
 
 ### Added
@@ -60,5 +66,6 @@ Initial release of the hello-world community plugin seed project.
 - Container image build (`build-push.sh`) and vulnerability scan (`scan-image.sh`) scripts
 - Multi-stage `Containerfile` for production builds
 
+[Unreleased]: https://github.com/rh-ai-community-plugins/hello-world/compare/v0.4.0...HEAD
 [0.4.0]: https://github.com/rh-ai-community-plugins/hello-world/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/rh-ai-community-plugins/hello-world/releases/tag/v0.3.0
