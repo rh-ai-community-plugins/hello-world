@@ -98,10 +98,10 @@ Confirm the plugin is registered in the dashboard configuration:
 oc set env deployment/rhods-dashboard -n redhat-ods-applications --list \
   | grep '^MODULE_FEDERATION_CONFIG=' \
   | head -n1 \
-  | python3 -c "import json,sys; d=json.loads(sys.stdin.read().split('=',1)[1].strip()); [print(e['name']) for e in d]"
+  | python3 -c "import json,sys; d=json.loads(sys.stdin.read().split('=',1)[1].strip()); print('\n'.join(e['name'] for e in d))"
 ```
 
-You should see something like the following (note `hellWorld` at the bottom of the list):
+You should see something like the following (note `helloWorld` at the bottom of the list):
 
 ```bash
 ...
