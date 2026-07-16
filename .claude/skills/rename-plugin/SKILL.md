@@ -57,7 +57,7 @@ The script performs three phases:
 
 1. **Identifier replacement** — replaces `hello-world` / `HelloWorld` / `HelloIcon` across all source, config, chart, CI, build, and doc files
 2. **Prose de-seeding** — replaces seed/scaffold/demo language ("reference implementation", "demonstrates", "example page", "seed project") with factual descriptions
-3. **Seed cleanup** — deletes `scripts/rename-plugin.js` (itself), `docs/archives/`, `docs/architecture/COMMUNITY_PLUGINS.md`, `.claude/skills/rename-plugin/`, resets `CHANGELOG.md`, strips the "Automated Rename" section from `CUSTOMIZATION.md`, and removes the `rename-plugin` npm script
+3. **Seed cleanup** — deletes `scripts/rename-plugin.js` (itself), `docs/archives/`, `docs/architecture/COMMUNITY_PLUGINS.md`, `.claude/skills/rename-plugin/`, resets `CHANGELOG.md`, resets version to `0.1.0` (via `npm version` which triggers `sync-chart-version.js`), strips the "Automated Rename" section from `CUSTOMIZATION.md`, and removes the `rename-plugin` npm script
 
 **Note:** After the script runs, this skill file no longer exists in the project.
 

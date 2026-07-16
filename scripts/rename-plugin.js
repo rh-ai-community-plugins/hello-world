@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
@@ -549,6 +550,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       fs.writeFileSync(changelogPath, freshChangelog);
     }
     stripped.push('CHANGELOG.md: reset to fresh template');
+  }
+
+  // Reset version to 0.1.0 — npm's "version" lifecycle hook runs
+  // sync-chart-version.js which propagates to chart/Chart.yaml,
+  // bff/package.json, plugin.yaml, and doc version flags.
+  const RESET_VERSION = '0.1.0';
+  const rootPkg = JSON.parse(fs.readFileSync(path.resolve(ROOT, 'package.json'), 'utf8'));
+  if (rootPkg.version !== RESET_VERSION) {
+    if (!dryRun) {
+      execSync(`npm version ${RESET_VERSION} --no-git-tag-version`, { cwd: ROOT, stdio: 'ignore' });
+    }
+    stripped.push(`version reset to ${RESET_VERSION} (package.json + chart + plugin.yaml + docs)`);
   }
 
   return { deleted, stripped };
