@@ -7,7 +7,7 @@ export const communityPluginsSectionExtension = {
     id: 'community-plugins', // [SHARED] common section for all community plugins
     title: 'Community plugins', // [SHARED]
     group: '9_plugins', // [SHARED]
-    iconRef: () => import('./CommunityNavIcon'),
+    iconRef: () => import(/* webpackMode: "eager" */ './CommunityNavIcon'),
   },
 };
 
@@ -28,7 +28,7 @@ export const helloWorldSectionExtension = {
     title: 'Hello World', // [PLUGIN-SPECIFIC] display name in sidebar
     group: '1_hello_world', // [PLUGIN-SPECIFIC] sort key within community-plugins
     section: 'community-plugins', // [SHARED] must match communityPluginsSectionExtension.id — do not change
-    iconRef: () => import('~/app/components/HelloWorldNavIcon'),
+    iconRef: () => import(/* webpackMode: "eager" */ '~/app/components/HelloWorldNavIcon'),
   },
 };
 
@@ -69,7 +69,7 @@ export const helloWorldRouteExtension = {
   type: 'app.route' as const,
   properties: {
     path: '/hello-world/*', // [PLUGIN-SPECIFIC] top-level route prefix
-    component: () => import('~/app/App'),
+    component: () => import(/* webpackMode: "eager" */ '~/app/App'),
   },
 };
 

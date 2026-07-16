@@ -9,10 +9,12 @@ spec:
   selector:
     matchLabels:
       {{- include "hello-world.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: frontend
   template:
     metadata:
       labels:
         {{- include "hello-world.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: frontend
     spec:
       serviceAccountName: {{ include "hello-world.serviceAccountName" . }}
       securityContext:

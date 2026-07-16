@@ -18,7 +18,7 @@ Install directly from the OCI registry — no need to clone the repo:
 
 ```bash
 helm install hello-world oci://quay.io/rh-ai-community-plugins/hello-world-chart \
-  --version 0.4.0 \
+  --version 0.4.1 \
   --namespace hello-world \
   --create-namespace
 ```
@@ -42,7 +42,7 @@ Pass `--set` flags to customize the installation:
 
 ```bash
 helm install hello-world oci://quay.io/rh-ai-community-plugins/hello-world-chart \
-  --version 0.4.0 \
+  --version 0.4.1 \
   --namespace hello-world \
   --create-namespace \
   --set replicaCount=2
@@ -52,7 +52,7 @@ To deploy the frontend only (no BFF):
 
 ```bash
 helm install hello-world oci://quay.io/rh-ai-community-plugins/hello-world-chart \
-  --version 0.4.0 \
+  --version 0.4.1 \
   --namespace hello-world \
   --create-namespace \
   --set bff.enabled=false

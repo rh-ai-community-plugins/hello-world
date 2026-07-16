@@ -30,7 +30,7 @@ Install directly from the OCI registry — no need to clone this repo:
 
 ```bash
 helm install hello-world oci://quay.io/rh-ai-community-plugins/hello-world-chart \
-  --version 0.4.0 \
+  --version 0.4.1 \
   --namespace hello-world \
   --create-namespace
 ```
@@ -96,8 +96,24 @@ Confirm the plugin is registered in the dashboard configuration:
 
 ```bash
 oc set env deployment/rhods-dashboard -n redhat-ods-applications --list \
-  | grep MODULE_FEDERATION_CONFIG \
-  | python3 -c "import json,sys; d=json.loads(sys.stdin.read().split('=',1)[1]); print([e['name'] for e in d])"
+  | grep '^MODULE_FEDERATION_CONFIG=' \
+  | head -n1 \
+  | python3 -c "import json,sys; d=json.loads(sys.stdin.read().split('=',1)[1].strip()); print('\n'.join(e['name'] for e in d))"
+```
+
+You should see something like the following (note `helloWorld` at the bottom of the list):
+
+```bash
+...
+genAi
+maas
+mlflow
+evalHub
+automl
+autorag
+perses
+mlflowEmbedded
+helloWorld
 ```
 
 To deploy your own plugin image instead, see [Build & Push](docs/development/BUILD_AND_PUSH.md). For the full deployment guide with Helm chart customization and BFF registration, see [Deploying on OpenShift](docs/deployment/OPENSHIFT_DEPLOY.md).

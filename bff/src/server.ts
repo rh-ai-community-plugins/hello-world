@@ -5,6 +5,14 @@ import { getK8sBaseUrl } from './utils/k8sClient';
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    console.log(`${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - start}ms`);
+  });
+  next();
+});
+
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 app.get('/api/namespace-summary', namespaceSummaryHandler);
 
