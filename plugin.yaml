@@ -2,7 +2,7 @@
 name: hello-world                    # [PLUGIN-SPECIFIC] unique plugin identifier (kebab-case)
 displayName: Hello World             # [PLUGIN-SPECIFIC] human-readable name
 description: A reference implementation and scaffold plugin for the RHOAI Dashboard
-version: 0.4.0
+version: 0.4.1
 
 # --- Maintainer (required) ---
 maintainer:                          # [PLUGIN-SPECIFIC]
@@ -19,11 +19,11 @@ deployment_model: cluster-shared     # per-project | cluster-shared | both
 
 image:                               # [PLUGIN-SPECIFIC]
   repository: quay.io/rh-ai-community-plugins/hello-world
-  tag: "0.4.0"
+  tag: "0.4.1"
 
 bff_image:                           # [PLUGIN-SPECIFIC] (optional — only if using BFF pattern)
   repository: quay.io/rh-ai-community-plugins/hello-world-bff
-  tag: "0.4.0"
+  tag: "0.4.1"
 
 # --- Installation (required) ---
 install:

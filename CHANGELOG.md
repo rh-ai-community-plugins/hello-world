@@ -7,10 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-07-15
+
 ### Fixed
 
 - Intermittent `ChunkLoadError` on plugin load caused by vendor chunk splitting in the production webpack build ([#24](https://github.com/rh-ai-community-plugins/hello-world/issues/24))
 - Last selected project not persisted across page navigations — ProjectSelector now saves the selection to localStorage ([#25](https://github.com/rh-ai-community-plugins/hello-world/issues/25))
+- Plugin loading resilience: disabled vendor chunk splitting and switched to eager webpack imports for icons and App component, reducing HTTP requests from 5 to 2
+- Container logging: nginx access/error logs routed to stdout/stderr, BFF Express server now includes request logging middleware
+- Rename-plugin script: added `src/index.html` title to the change plan, removed incorrect `rhoai-` prefix from generated names, added npm install step for lock file regeneration ([#22](https://github.com/rh-ai-community-plugins/hello-world/issues/22))
+- Version sync script now updates all `tag:` entries in `plugin.yaml` (previously missed `bff_image.tag`)
 
 ## [0.4.0] - 2026-07-10
 
@@ -67,6 +73,7 @@ Initial release of the hello-world community plugin seed project.
 - Container image build (`build-push.sh`) and vulnerability scan (`scan-image.sh`) scripts
 - Multi-stage `Containerfile` for production builds
 
-[Unreleased]: https://github.com/rh-ai-community-plugins/hello-world/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/rh-ai-community-plugins/hello-world/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/rh-ai-community-plugins/hello-world/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/rh-ai-community-plugins/hello-world/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/rh-ai-community-plugins/hello-world/releases/tag/v0.3.0

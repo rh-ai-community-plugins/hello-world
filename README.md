@@ -30,7 +30,7 @@ Install directly from the OCI registry — no need to clone this repo:
 
 ```bash
 helm install hello-world oci://quay.io/rh-ai-community-plugins/hello-world-chart \
-  --version 0.4.0 \
+  --version 0.4.1 \
   --namespace hello-world \
   --create-namespace
 ```
