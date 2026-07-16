@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Internal
+
+- Rename-plugin script now resets version to `0.1.0` during seed cleanup (via `npm version` + existing `sync-chart-version` hook)
+
 ## [0.4.1] - 2026-07-15
 
 ### Fixed
