@@ -101,6 +101,8 @@ A CI workflow (e.g. `.github/workflows/ci.yml`) that runs validation on push and
 
 This ensures the plugin stays healthy as it evolves. The seed project includes a ready-to-use GitHub Actions workflow.
 
+> See [BEST_PRACTICES.md](BEST_PRACTICES.md) for development patterns and a pre-PR checklist to review before opening pull requests.
+
 ### Optional Artifacts
 
 #### BFF Container Image
