@@ -28,6 +28,7 @@ npx jest src/app/hooks/useCurrentUser.test.ts
 ```bash
 cd bff
 K8S_API_BASE=$(oc whoami --show-server) npm run start:dev  # Dev server on port 3000 (K8S_API_BASE required for local dev)
+K8S_TLS_INSECURE=true K8S_API_BASE=$(oc whoami --show-server) npm run start:dev  # With self-signed cert
 npm run build         # Compile TypeScript to dist/
 npm start             # Run compiled server (in-cluster, K8S_API_BASE not needed)
 npm test              # Run BFF tests (Jest + node)

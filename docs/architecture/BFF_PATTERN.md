@@ -124,7 +124,7 @@ bff/
 The `k8sClient.ts` utility makes authenticated requests to the K8s API server:
 
 - **In-cluster**: Uses `KUBERNETES_SERVICE_HOST` and `KUBERNETES_SERVICE_PORT` env vars, reads the CA cert from the service account mount
-- **Local dev**: Uses the `K8S_API_BASE` env var to point at the cluster API
+- **Local dev**: Uses the `K8S_API_BASE` env var to point at the cluster API. If the cluster uses a self-signed certificate, set `K8S_TLS_INSECURE=true` to skip TLS verification (in production, the in-cluster CA bundle from `kube-root-ca.crt` handles this automatically)
 
 The BFF always uses the user's forwarded token, never a service account token. This ensures all actions respect the user's RBAC permissions.
 
@@ -164,6 +164,14 @@ K8S_API_BASE=$(oc whoami --show-server) npm run start:dev # must set K8S_API_BAS
 ```
 
 **`K8S_API_BASE` is required.** When the BFF runs locally (not in-cluster), it doesn't have access to the `KUBERNETES_SERVICE_HOST` and `KUBERNETES_SERVICE_PORT` env vars that Kubernetes provides to pods. `K8S_API_BASE` tells the BFF where to find the cluster API server. Without it, all K8s API calls will fail and the endpoint returns 502.
+
+> **Tip:** If your cluster uses a self-signed certificate (common in dev/lab environments), add `K8S_TLS_INSECURE=true` to skip TLS verification for K8s API calls:
+>
+> ```bash
+> K8S_TLS_INSECURE=true K8S_API_BASE=$(oc whoami --show-server) npm run start:dev
+> ```
+>
+> This is not needed in production — the in-cluster CA bundle mounted from the `kube-root-ca.crt` ConfigMap handles TLS automatically.
 
 ### Dashboard proxy configuration
 

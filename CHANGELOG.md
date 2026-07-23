@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- BFF TLS skip now requires explicit `K8S_TLS_INSECURE=true` env var instead of applying unconditionally when `K8S_API_BASE` is set
+
 ### Internal
 
 - Rename-plugin script now resets version to `0.1.0` during seed cleanup (via `npm version` + existing `sync-chart-version` hook)
+- Added `K8S_TLS_INSECURE=true` documentation for self-signed cluster certificates across LOCAL_SETUP.md, BFF_PATTERN.md, README.md, and AGENTS.md
 
 ## [0.4.1] - 2026-07-15
 

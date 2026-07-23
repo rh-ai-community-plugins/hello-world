@@ -39,7 +39,7 @@ export function k8sRequest<T = unknown>(token: string, path: string): Promise<T>
       },
     };
 
-    if (process.env.K8S_API_BASE) {
+    if (process.env.K8S_TLS_INSECURE === 'true') {
       options.rejectUnauthorized = false;
     } else if (cachedCa) {
       options.ca = cachedCa;
