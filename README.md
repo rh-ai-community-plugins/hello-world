@@ -153,6 +153,8 @@ npm install              # Install BFF dependencies (first time only)
 K8S_API_BASE=$(oc whoami --show-server) npm run start:dev   # Start BFF on port 3000
 ```
 
+> **Tip:** If your cluster uses a self-signed certificate, add `K8S_TLS_INSECURE=true` to the command above.
+
 See the full [Local Setup Guide](docs/development/LOCAL_SETUP.md) for step-by-step instructions on both methods, including dashboard proxy configuration for the BFF.
 
 #### Build & Test

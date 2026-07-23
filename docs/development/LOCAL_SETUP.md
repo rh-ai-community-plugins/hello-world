@@ -80,6 +80,14 @@ K8S_API_BASE=$(oc whoami --show-server) npm run start:dev
 
 You should see `BFF listening on port 3000`. The `K8S_API_BASE` env var tells the BFF where to find the Kubernetes API server. Without it, the BFF cannot make any cluster calls and all requests will fail with a 502 error.
 
+> **Tip:** If your cluster uses a self-signed certificate (common in dev/lab environments), add `K8S_TLS_INSECURE=true` to skip TLS verification for K8s API calls:
+>
+> ```bash
+> K8S_TLS_INSECURE=true K8S_API_BASE=$(oc whoami --show-server) npm run start:dev
+> ```
+>
+> This is not needed in production — the in-cluster CA bundle mounted from the `kube-root-ca.crt` ConfigMap handles TLS automatically.
+>
 > **Note:** The `proxyService` entry in the `MODULE_FEDERATION_CONFIG` (Step 2) is what tells the dashboard to forward `/hello-world/api/*` requests to the BFF at `localhost:3000`. If you omit the `proxyService` block, those requests will hit the dashboard's SPA fallback and return HTML instead of JSON.
 
 ### Step 4: Start the plugin dev server
@@ -234,6 +242,14 @@ K8S_API_BASE=$(oc whoami --show-server) npm run start:dev
 
 You should see `BFF listening on port 3000`. The `K8S_API_BASE` env var tells the BFF where to find the Kubernetes API server (required for local dev since the BFF is not running in-cluster).
 
+> **Tip:** If your cluster uses a self-signed certificate (common in dev/lab environments), add `K8S_TLS_INSECURE=true` to skip TLS verification for K8s API calls:
+>
+> ```bash
+> K8S_TLS_INSECURE=true K8S_API_BASE=$(oc whoami --show-server) npm run start:dev
+> ```
+>
+> This is not needed in production — the in-cluster CA bundle mounted from the `kube-root-ca.crt` ConfigMap handles TLS automatically.
+>
 > **Note:** The `proxyService` entry in `env.local` (Step 6) tells the dashboard to forward `/hello-world/api/*` requests to the BFF. Without it, those requests return HTML instead of JSON.
 
 ### Step 9: Start the plugin dev server
